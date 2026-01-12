@@ -2,7 +2,9 @@ id: "m6-hmm-filtering"
 type: "short-answer"
 chapter: 6
 question: |
-  **Implement the forward algorithm for HMM filtering.**
+  A Hidden Markov Model (HMM) represents a system with a hidden state that evolves over time according to a Markov transition model, while producing noisy observations. Filtering computes the belief distribution over the current hidden state given all observations so far. This matters because it's the prototypical "reasoning over time" model, used in tracking, speech, robotics, and many sequential inference tasks.
+  
+  **Task:** Write pseudocode for HMM_FILTER(priorBelief, observations, T, O) that performs repeated predict–update–normalize steps.
   
   **Level 0** Why model temporal processes with HMMs? What is the filtering task?
   

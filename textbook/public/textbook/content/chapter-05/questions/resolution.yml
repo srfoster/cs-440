@@ -2,9 +2,9 @@ id: "m5-resolution"
 type: "short-answer"
 chapter: 5
 question: |
-  **Implement resolution for propositional logic.**
+  Resolution is a single, sound inference rule that can be used (with CNF conversion) to perform refutation proof: to show that a knowledge base entails a query, add the negation of the query and derive a contradiction (the empty clause). This matters because it is one of the most important completeness results in automated reasoning: a simple mechanical rule can, in principle, prove any propositional entailment.
   
-  Prove KB ⊨ q by refutation using resolution.
+  **Task:** Write pseudocode for RESOLUTION_ENTAILS(KB_clauses, q).
 answer: |
   Resolution theorem proving works by converting KB ∪ {¬q} to CNF and repeatedly resolving pairs of clauses. If the empty clause is derived, KB ⊨ q.
   

@@ -2,9 +2,9 @@ id: "m4-csp-representation"
 type: "short-answer"
 chapter: 4
 question: |
-  **Create a CSP data structure and initialize map-coloring.**
+  A constraint satisfaction problem (CSP) is defined by variables, domains (allowed values per variable), and constraints (rules restricting combinations of values). Examples include map coloring and Sudoku. CSPs matter because they show a powerful alternative to generic search: you exploit constraints to prune huge portions of the search space using inference.
   
-  Write MAKE_MAP_COLORING_CSP(regions, edges, colors).
+  **Task:** Write pseudocode to create a map-coloring CSP structure given regions, adjacency edges, and colors.
 answer: |
   A CSP consists of variables (regions), domains (available colors for each), and constraints (neighboring regions must have different colors). Store this as a structure with neighbor lists.
   

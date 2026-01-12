@@ -2,11 +2,9 @@ id: "m7-transformer-attention"
 type: "short-answer"
 chapter: 7
 question: |
-  **Implement self-attention mechanism and explain transformers.**
+  Self-attention is the core operation of transformers. Given queries (Q), keys (K), and values (V), attention computes how much each token should "attend" to every other token, producing context-sensitive representations. The scaling factor 1/√d stabilizes gradients when the key/query dimension is large. This matters because attention is the primary reason transformers outperform earlier sequence models on language tasks, and understanding it is essential for understanding LLMs.
   
-  **Level 0** Why did attention mechanisms revolutionize NLP and AI? What problem do they solve?
-  
-  **Level 1** Explain self-attention: Query, Key, Value matrices, scaled dot-product, and weighted sum. Describe transformer blocks with multi-head attention and feedforward layers.
+  **Task:** Write pseudocode for ATTENTION(Q,K,V) using scaled dot-product attention and row-wise softmax.
   
   **Level 2** Implement single-head attention: scores = QK^T/sqrt(d), weights = softmax(scores), output = weights * V.
   

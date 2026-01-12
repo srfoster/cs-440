@@ -2,9 +2,9 @@ id: "m3-minimax-alphabeta"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement Minimax with Alpha-Beta pruning for game trees.**
+  In adversarial search, the environment includes an opponent who actively tries to reduce your success. In a deterministic, turn-based, two-player zero-sum game (like tic-tac-toe), the canonical solution concept is the minimax strategy: assume your opponent plays optimally, and choose moves that maximize your guaranteed outcome. Alpha–beta pruning is an optimization to minimax that avoids exploring branches that cannot affect the final decision. Alpha represents the best value the MAX player can guarantee so far; beta represents the best value the MIN player can guarantee so far. When a branch proves worse than what a player can already force, it can be pruned without changing correctness. These matter because minimax introduces the fundamental AI shift from "find a good plan" to "find a plan that is robust against an adversary," and alpha-beta is a key example of algorithmic speedups that preserve exact optimal play.
   
-  **Level 0** Why do we need special algorithms for games? How does adversarial search differ from single-agent search?
+  **Task:** Write pseudocode for MINIMAX_DECISION(state, player) and the recursive evaluators needed to compute the minimax value using TERMINAL, UTILITY, ACTIONS, and RESULT. Then write ALPHABETA_DECISION including AB_MAX and AB_MIN that correctly uses alpha and beta cutoffs.
   
   **Level 1** Explain minimax: alternating MAX and MIN layers, utility propagation, and best move selection. Then explain alpha-beta pruning. Provide pseudocode.
   

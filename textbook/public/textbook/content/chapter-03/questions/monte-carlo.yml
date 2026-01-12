@@ -2,9 +2,9 @@ id: "m3-monte-carlo"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement Monte Carlo tree search (MCTS) for game playing.**
+  When the game tree is too large for exact minimax—even with alpha–beta pruning—agents can use Monte Carlo simulation to estimate move quality. A rollout (playout) simulates a complete game to terminal using random (or heuristic) moves, and the outcomes are averaged to estimate expected utility. This matters because Monte Carlo ideas are central in modern game-playing systems (and more broadly in approximate planning under uncertainty).
   
-  **Level 0** Why use random sampling for games? When is MCTS better than minimax?
+  **Task:** Write pseudocode for MONTE_CARLO_MOVE(state, player, rolloutsPerMove) and RANDOM_PLAYOUT.
   
   **Level 1** Explain MCTS phases: selection, expansion, simulation (rollout), backpropagation. Describe how random playouts estimate move quality.
   

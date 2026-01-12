@@ -2,15 +2,9 @@ id: "m1-bfs-iddfs"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement BFS (Breadth-First Search) and IDDFS (Iterative Deepening Depth-First Search) algorithms.**
+  Many AI problems can be framed as state-space search, where we explore a graph whose nodes are states and whose edges are actions. Breadth-first search (BFS) explores states in increasing order of depth from the start; it is complete (will find a solution if one exists) and optimal for equal step costs, but often uses large memory. Iterative deepening depth-first search (IDDFS) combines the low memory footprint of DFS with the completeness/optimality (in unit-cost settings) of BFS by repeatedly running depth-limited DFS with increasing depth limits. These matter because they are foundational "default tools" and because the tradeoffs (time vs memory, optimality vs practicality) appear across all of AI.
   
-  **Level 0** Discuss why we need different search strategies. What are the trade-offs between memory usage and completeness?
-  
-  **Level 1** Explain how BFS explores states level by level using a queue, and how IDDFS combines the benefits of BFS and DFS by repeatedly performing depth-limited searches with increasing depth limits. Provide pseudocode for both algorithms.
-  
-  **Level 2** Implement BFS and IDDFS for a generic state space using ACTIONS, RESULT, and GOAL_TEST functions. Include path reconstruction.
-  
-  **Level 3** Analyze the time and space complexity of both algorithms. Compare their performance characteristics: when is IDDFS preferred over BFS despite exploring some states multiple times?
+  **Task:** Given the standard search interface ACTIONS(s), RESULT(s,a), GOAL_TEST(s), write pseudocode for BFS(start) and IDDFS(start, maxDepth). Your BFS should avoid revisiting states; your IDDFS should show a depth loop and a depth-limited search helper.
 answer: "BFS uses a queue (FIFO) to explore states level by level, guaranteeing the shortest path but requiring O(b^d) space. IDDFS performs repeated depth-limited searches with increasing depth limits, achieving BFS's completeness and optimality with only O(bd) space. IDDFS is preferred when memory is limited and the branching factor is high, even though it revisits states."
 answer_kindergarten: "Imagine finding your way through a maze. BFS is like bringing lots of friends to explore every path at the same time, level by level - you'll find the shortest way out but need lots of friends to remember everything. IDDFS is like going in yourself, trying paths that go just 1 step deep, then 2 steps, then 3 steps, and so on. You might check some paths twice, but you don't need to remember as much!"
 answer_3rd_grade: "BFS explores all possible moves one step away, then two steps away, then three steps, and so on, until it finds the goal. It uses a line (queue) to keep track of what to explore next. It finds the shortest path but needs lots of memory. IDDFS is smarter with memory - it searches up to depth 1, then restarts and searches up to depth 2, then depth 3, and keeps going until it finds the answer."

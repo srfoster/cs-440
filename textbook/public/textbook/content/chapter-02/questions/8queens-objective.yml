@@ -2,9 +2,9 @@ id: "m2-8queens-objective"
 type: "short-answer"
 chapter: 2
 question: |
-  **Write the objective function CONFLICTS(board) for 8-Queens where board[col]=row.**
+  In local search, we do not build solution paths; instead we treat problem-solving as optimization. We define an objective function that scores candidate solutions, and we search for a state with a better score. The 8-queens problem can be approached this way by defining an objective like "number of conflicting queen pairs," which we want to minimize. This matters because many real-world problems are naturally "optimize a score" rather than "reach a goal state through a shortest path."
   
-  Count the number of queen pairs attacking each other.
+  **Task:** Using the representation board[col] = row, write pseudocode for CONFLICTS(board) that returns the number of attacking queen pairs (same row or diagonal).
 answer: |
   The CONFLICTS function counts pairs of queens that attack each other either on the same row or the same diagonal. For N-Queens represented as board[col]=row, two queens at positions (i, board[i]) and (j, board[j]) conflict if they're on the same row or same diagonal.
   

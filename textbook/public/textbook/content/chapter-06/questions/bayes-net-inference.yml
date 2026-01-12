@@ -2,7 +2,9 @@ id: "m6-bayes-net-inference"
 type: "short-answer"
 chapter: 6
 question: |
-  **Implement exact inference in Bayesian networks using enumeration.**
+  A Bayesian network is a directed acyclic graph where nodes are random variables and edges represent direct probabilistic dependencies. It compactly represents a joint distribution using conditional probability tables (CPTs) and conditional independence structure. Exact inference answers queries like P(X∣e) by summing out hidden variables, but can be expensive. This matters because Bayes nets are the canonical model for probabilistic reasoning, and enumeration shows the "ground truth" algorithm against which approximations are compared.
+  
+  **Task:** Write pseudocode for ENUM_ASK(X, e, bn) and ENUM_ALL(vars, e, bn).
   
   **Level 0** Why model uncertainty with probability? How do Bayesian networks compactly represent joint distributions?
   

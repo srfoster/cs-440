@@ -2,9 +2,9 @@ id: "m2-airport-optimization"
 type: "short-answer"
 chapter: 2
 question: |
-  **Minimize sum of squared distances from candidate airport (x,y) to towns using continuous local search.**
+  Many optimization problems have continuous state spaces (real-valued parameters) rather than discrete states. In an airport placement problem, the airport location (x,y) can be anywhere on a plane, and we define an objective such as the weighted sum of squared distances to towns. Discrete graph search methods are not a natural fit here; instead we use continuous optimization methods like random search, hill climbing in ℝ², or gradient methods. This matters because it forces you to recognize when "state space as a graph" stops being the right mental model.
   
-  Implement AIRPORT_OBJECTIVE and RANDOM_SEARCH_CONTINUOUS.
+  **Task:** Write pseudocode for AIRPORT_OBJECTIVE(x,y,towns) and RANDOM_SEARCH_CONTINUOUS(towns, bounds, iters) that samples candidate points and tracks the best solution.
 answer: |
   This is a continuous optimization problem where we want to find the best location for an airport that minimizes weighted distances to multiple towns. Random search samples many random points and keeps the best.
   

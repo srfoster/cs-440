@@ -2,9 +2,9 @@ id: "m4-ac3-algorithm"
 type: "short-answer"
 chapter: 4
 question: |
-  **Implement the AC-3 arc consistency algorithm.**
+  Arc consistency enforces a local constraint property: for every value in a variable's domain, there must exist a compatible value in each neighbor's domain (for the constraint between them). The AC-3 algorithm repeatedly applies a REVISE step across arcs until no more pruning is possible. This matters because it's a canonical inference algorithm and a building block for more advanced CSP solvers; it can dramatically shrink domains before or during search.
   
-  **Level 0** What is constraint propagation and why is it powerful for CSPs?
+  **Task:** Write pseudocode for AC3(csp) and REVISE(csp,X,Y).
   
   **Level 1** Explain arc consistency: when is an arc (X,Y) consistent? Describe the AC-3 algorithm with queue of arcs. Provide pseudocode.
   

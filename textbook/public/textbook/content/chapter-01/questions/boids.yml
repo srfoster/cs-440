@@ -2,9 +2,9 @@ id: "m1-boids"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement one simulation tick for boids with separation, alignment, cohesion.**
+  A multi-agent system is a system composed of multiple interacting agents whose collective behavior may be complex even if each agent's rules are simple. The boids model is a classic example: each boid updates its velocity based on local neighbors using three intuitive rules—separation (avoid crowding), alignment (match heading), and cohesion (move toward neighbors). This matters because it shows a key AI theme: intelligent-seeming global behavior can emerge from decentralized local rules, and it contrasts sharply with search-based AI.
   
-  Write STEP_BOIDS(boids, params) that updates all boid positions and velocities.
+  **Task:** Write pseudocode for a function STEP_BOIDS(boids, params) that computes one synchronous update step (all boids updated based on the old configuration), applying weighted separation/alignment/cohesion forces and a speed cap.
 answer: |
   Boids algorithm simulates flocking behavior using three rules: separation (avoid crowding), alignment (steer toward average heading), and cohesion (steer toward average position). Each boid computes forces from neighbors within a radius, combines them with weights, and updates velocity and position.
   

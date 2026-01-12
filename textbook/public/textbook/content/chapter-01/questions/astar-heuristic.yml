@@ -2,15 +2,9 @@ id: "m1-astar-heuristic"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement A* search with an admissible heuristic.**
+  A* (pronounced "A-star") is a best-first search algorithm that uses an evaluation function f(s)=g(s)+h(s) where g(s) is the known cost from the start to state s, and h(s) is a heuristic: an estimate of the remaining cost from s to the goal. A* is widely used in navigation and planning because, with an admissible heuristic (never overestimates true remaining cost), it is complete and optimal, and is often dramatically faster than uniform-cost search in practice. This matters because A* is the canonical example of how "good modeling" (a heuristic) can radically change performance while preserving correctness.
   
-  **Level 0** Discuss the importance of informed search in AI. How do heuristics help guide search algorithms toward goals more efficiently?
-  
-  **Level 1** Explain A* search intuitively: how it combines actual cost g(n) and estimated future cost h(n) to prioritize which states to explore. Provide pseudocode for A* including the use of a priority queue and the f = g + h evaluation function.
-  
-  **Level 2** Implement A* search for a maze navigation problem. Include a heuristic function (such as Manhattan distance) and proper handling of the open list (priority queue) and closed list.
-  
-  **Level 3** Prove that A* is optimal when the heuristic is admissible. Analyze the time and space complexity. Discuss the impact of heuristic quality on performance.
+  **Task:** Write pseudocode for A_STAR(start, h) for maze navigation using a priority queue ordered by f=g+h. Your implementation should maintain g-costs and support "decrease-key" behavior when a better path to a state is found.
 answer: "A* search uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n and h(n) is the estimated cost from n to goal. It maintains a priority queue (open list) ordered by f-value. A* is optimal when h is admissible (never overestimates). Better heuristics (higher h while staying admissible) explore fewer nodes. Manhattan distance is a classic admissible heuristic for grid-based problems."
 answer_kindergarten: "A* is like having a smart helper when you're trying to find your way somewhere. Instead of just trying every path randomly, your helper guesses which paths look like they might be shorter. The helper keeps track of how far you've already walked, plus guesses how much further you need to go, and always picks the path that seems best overall."
 answer_3rd_grade: "A* search is smarter than regular search because it uses clues to find the goal faster. It keeps two numbers for each position: how many steps you've taken to get there (g), and your guess about how many more steps you need (h). It adds these together (f = g + h) and always explores the position with the smallest total first. For a maze, you can guess the remaining distance by counting squares horizontally and vertically (Manhattan distance)."

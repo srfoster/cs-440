@@ -2,11 +2,9 @@ id: "m5-unification"
 type: "short-answer"
 chapter: 5
 question: |
-  **Implement the unification algorithm for first-order logic.**
+  In first-order logic, unification is the process of finding a substitution for variables that makes two logical expressions identical. It is fundamental to resolution, theorem proving, and logic programming (e.g., Prolog). This matters because unification is the "mechanical heart" of symbolic reasoning: it's how a system matches patterns and applies general rules to specific situations.
   
-  **Level 0** Why is pattern matching essential for logical inference? How does unification enable theorem proving?
-  
-  **Level 1** Explain unification: finding substitutions that make expressions identical. Handle variables, constants, and functions. Provide pseudocode.
+  **Task:** Write pseudocode for UNIFY(x, y, subst) including variable handling and occurs-check.
   
   **Level 2** Implement UNIFY(x, y, subst) with occurs check to prevent infinite structures.
   

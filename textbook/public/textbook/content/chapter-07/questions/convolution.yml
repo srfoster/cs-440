@@ -2,7 +2,9 @@ id: "m7-convolution"
 type: "short-answer"
 chapter: 7
 question: |
-  **Implement a single 2D convolution forward pass (no padding, stride 1).**
+  A convolution is a local weighted sum applied across an image, producing feature maps that detect patterns such as edges, corners, or textures. Convolutions matter because they capture spatial locality and weight sharing, which are central to classic deep vision models (CNNs) and still relevant for many modern systems. Writing convolution explicitly demonstrates you understand what "a conv layer" actually computes.
+  
+  **Task:** Write pseudocode for CONV2D(image, kernel) with stride 1 and no padding.
   
   Write CONV2D(image, kernel).
 answer: |

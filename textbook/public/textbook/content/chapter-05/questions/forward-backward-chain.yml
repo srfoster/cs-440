@@ -2,7 +2,9 @@ id: "m5-forward-backward-chain"
 type: "short-answer"
 chapter: 5
 question: |
-  **Implement forward and backward chaining for Horn clauses.**
+  Forward chaining is a data-driven inference method for Horn clauses: starting from known facts, repeatedly apply rules whose premises are satisfied to derive new facts. Backward chaining is a goal-driven inference method: start with a query (goal) and work backward by finding rules that could conclude it, recursively trying to prove their premises. Forward chaining matters because it models rule-based expert systems and production systems, and demonstrates a clear form of inference that can be efficient when there are many facts and you want all consequences. Backward chaining matters because it resembles how humans often reason ("to prove this, what would need to be true?") and because it is efficient when you only care about a specific query rather than all consequences.
+  
+  **Task:** Write pseudocode for FORWARD_CHAIN(rules, facts, query) that returns whether the query is derivable. Also write pseudocode for BACKWARD_CHAIN(rules, facts, goal, visited) that avoids cycles.
   
   **Level 0** Compare data-driven vs. goal-driven reasoning. When is each approach preferable?
   

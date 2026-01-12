@@ -2,7 +2,9 @@ id: "m6-particle-filtering"
 type: "short-answer"
 chapter: 6
 question: |
-  **Implement particle filtering for dynamic Bayesian networks.**
+  When the state space is large or continuous, exact HMM/DBN inference becomes infeasible. Particle filtering approximates the belief state with a set of weighted samples (particles) that are propagated through the dynamics and reweighted by observation likelihood, then resampled. This matters because particle filtering is a standard practical algorithm for robotics and tracking, and it cleanly illustrates approximate inference as "simulation + correction."
+  
+  **Task:** Write pseudocode for PARTICLE_FILTER(particles, observation, TRANSITION, OBS_LIK, N) including propagation, weighting, and resampling.
   
   Write PARTICLE_FILTER with propagate, weight, and resample steps.
 answer: |

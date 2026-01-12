@@ -2,9 +2,9 @@ id: "m6-supervised-learning"
 type: "short-answer"
 chapter: 6
 question: |
-  **Implement a supervised learning training pipeline with train/test split.**
+  In supervised learning, we learn a function from inputs to outputs using labeled examples. A typical pipeline includes splitting data into training and test sets, training a model by minimizing a loss function using an optimizer (e.g., gradient descent), and evaluating generalization performance (e.g., accuracy). This matters because it is the core workflow of modern applied machine learning, and students must understand the loop that converts data into a working model.
   
-  Write TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs).
+  **Task:** Write pseudocode for TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs) showing training and evaluation.
 answer: |
   Supervised learning trains a model on labeled data. Split data into training and test sets, iterate through epochs updating parameters via gradient descent, then evaluate accuracy on test set.
   

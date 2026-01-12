@@ -2,9 +2,9 @@ id: "m4-csp-backtracking"
 type: "short-answer"
 chapter: 4
 question: |
-  **Implement backtracking search with forward checking for CSPs.**
+  Backtracking search solves CSPs by assigning variables one at a time and undoing assignments when they lead to a dead end. Forward checking is an inference technique that prunes neighbor domains immediately after an assignment, detecting failures early. This matters because it demonstrates the key CSP theme: solving is not only "search," but "search + inference," and inference can produce orders-of-magnitude speedups.
   
-  **Level 0** Why are CSPs a useful problem formulation? How do they differ from standard search problems?
+  **Task:** Write pseudocode for BACKTRACK(assignment, csp) that includes forward checking and domain restoration on backtracking.
   
   **Level 1** Explain CSP components (variables, domains, constraints) and backtracking search. Describe forward checking. Provide pseudocode.
   

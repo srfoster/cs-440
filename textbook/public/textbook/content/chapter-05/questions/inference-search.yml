@@ -2,7 +2,9 @@ id: "m5-inference-search"
 type: "short-answer"
 chapter: 5
 question: |
-  **Implement inference as BFS over derived facts.**
+  Many inference systems can be understood as search: you explore a space of derived statements by repeatedly applying inference rules. This viewpoint matters because it connects symbolic reasoning to the earlier parts of AI (search), clarifying that the difference is often the representation and operators, not the "shape" of the computation.
+  
+  **Task:** Write pseudocode for PROOF_BFS(rules, facts, query) that derives new facts by applying rules and returns whether the query is reachable.
   
   Write PROOF_BFS(rules, facts, query) that treats proof search as state-space search.
 answer: |

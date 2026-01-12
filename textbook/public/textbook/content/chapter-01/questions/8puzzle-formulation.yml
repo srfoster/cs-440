@@ -2,15 +2,9 @@ id: "m1-8puzzle-formulation"
 type: "short-answer"
 chapter: 1
 question: |
-  **Write the problem formulation functions for the 8-puzzle problem.**
+  The 8-puzzle is a classic AI search problem consisting of a 3×3 grid containing tiles numbered 1–8 and one empty space (the blank). A state is a particular arrangement of the tiles. An action is a legal move of the blank (up/down/left/right), and the result of an action is the new state produced by swapping the blank with the neighboring tile. A goal test is the procedure that checks whether a state is the goal configuration (usually [[1,2,3],[4,5,6],[7,8,0]]). This problem matters because it is one of the simplest settings where students can demonstrate the core idea of problem formulation: before an algorithm can solve something, you must define the state space precisely.
   
-  **Level 0** Discuss the big-picture significance of problem formulation in AI. Why is it important to formally define states, actions, and goals?
-  
-  **Level 1** Explain the 8-puzzle problem intuitively. Describe how to represent the state as a 3×3 grid, what actions are available, and how to test if we've reached the goal. Give pseudocode for ACTIONS(s), RESULT(s,a), and GOAL_TEST(s).
-  
-  **Level 2** Implement the three functions in a language of your choice. Your implementation should handle a state represented as a 3×3 grid where 0 represents the blank tile.
-  
-  **Level 3** Analyze the state space size for the 8-puzzle. Discuss reachability (not all 9!/2 states are reachable from a given start) and the complexity implications for search algorithms.
+  **Task:** Write pseudocode for ACTIONS(s), RESULT(s,a), and GOAL_TEST(s) for 8-puzzle states represented as a 3×3 grid with 0 as the blank.
 answer: "The 8-puzzle requires three key functions: ACTIONS(s) returns valid moves based on the blank tile's position (UP, DOWN, LEFT, RIGHT within grid bounds), RESULT(s,a) creates a new state by swapping the blank with an adjacent tile, and GOAL_TEST(s) checks if the state matches the goal configuration [[1,2,3],[4,5,6],[7,8,0]]. This formulation enables any search algorithm to solve the puzzle."
 answer_kindergarten: "The 8-puzzle is like a sliding tile game. You have 8 numbered tiles and one empty space in a small square. You can slide tiles into the empty space. We need to tell the computer: which tiles can move right now, what happens when we move a tile, and when we've won the game by getting all the tiles in the right order."
 answer_3rd_grade: "To solve the 8-puzzle with a computer, we need three special instructions: 1) Check which way the empty space can move (up, down, left, or right, but not off the board), 2) Make a new puzzle by sliding a tile into the empty space, and 3) Check if all the numbers are in order from 1 to 8 with the empty space at the bottom right."

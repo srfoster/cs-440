@@ -2,9 +2,9 @@ id: "m7-language-model-training"
 type: "short-answer"
 chapter: 7
 question: |
-  **Write pseudocode to train a next-token transformer language model.**
+  A language model learns to predict the next token given previous tokens. Modern LLMs are trained by taking large text corpora, converting text into tokens with a tokenizer, sampling fixed-length sequences, and training a transformer to minimize cross-entropy loss for next-token prediction. This matters because it is the conceptual backbone of "make your own ChatGPT": while scaling is expensive, the training loop and objective are straightforward and reveal what the model is actually learning.
   
-  Implement TRAIN_LM(corpusText, tokenizer, model, optimizer, steps, seqLen, batchSize).
+  **Task:** Write pseudocode for TRAIN_LM(corpusText, tokenizer, model, optimizer, steps, seqLen, batchSize) that samples sequences, builds shifted targets, computes loss, backpropagates, and updates parameters.
 answer: |
   Training a language model involves predicting the next token given previous tokens. Sample sequences from the corpus, compute cross-entropy loss on next-token predictions, and update parameters via backpropagation.
   

@@ -2,9 +2,9 @@ id: "m4-tree-csp"
 type: "short-answer"
 chapter: 4
 question: |
-  **Solve tree-structured CSP using dynamic programming.**
+  The difficulty of CSP solving depends heavily on the structure of the constraint graph. If the constraint graph is a tree (acyclic), the CSP can be solved in time linear in the number of variables (up to domain factors) using dynamic programming: first enforce consistency from leaves to root, then assign values from root to leaves. This matters because it shows that "NP-hard in general" can become "easy" under structural restrictions, motivating concepts like treewidth.
   
-  Implement TREE_CSP_SOLVE(csp, root) with topological ordering.
+  **Task:** Write pseudocode for TREE_CSP_SOLVE(csp, root) that solves a tree-structured CSP efficiently.
 answer: |
   Tree-structured CSPs can be solved in linear time by making the CSP arc-consistent from leaves to root, then assigning values from root to leaves ensuring consistency with parent assignments.
   

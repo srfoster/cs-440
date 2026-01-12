@@ -2,9 +2,9 @@ id: "m4-cutset-conditioning"
 type: "short-answer"
 chapter: 4
 question: |
-  **Implement cutset conditioning for CSPs.**
+  Cutset conditioning is a technique for solving general CSPs by removing a small set of variables (a cutset) so that the remaining constraint graph becomes a tree. You then enumerate assignments to the cutset and solve the remaining tree-structured CSP efficiently for each case. This matters because it makes the key structural idea operational: if treewidth is small, hard problems become tractable in practice.
   
-  Choose cutset variables, enumerate assignments, solve remaining as tree CSP.
+  **Task:** Write pseudocode for CUTSET_CONDITIONING(csp, cutsetVars) that enumerates cutset assignments, runs inference, and solves the remaining tree.
 answer: |
   Cutset conditioning works by instantiating a set of variables (cutset) such that removing them makes the constraint graph a tree. Then solve the tree CSP for each cutset assignment.
   

@@ -2,9 +2,9 @@ id: "m6-likelihood-weighting"
 type: "short-answer"
 chapter: 6
 question: |
-  **Approximate P(X|e) using likelihood weighting.**
+  Exact inference in Bayesian networks can be intractable for large networks, so we use approximate inference. Likelihood weighting is a sampling method that handles evidence by fixing evidence variables and weighting samples by how likely that evidence is under the sampled parent values. This matters because it introduces a practical and widely used idea: use randomness plus weighting to approximate probabilities when exact computation is too costly.
   
-  Implement LIKELIHOOD_WEIGHTING and WEIGHTED_SAMPLE.
+  **Task:** Write pseudocode for LIKELIHOOD_WEIGHTING(X, e, bn, N) and its weighted sampling helper.
 answer: |
   Likelihood weighting is an approximate inference method that generates samples consistent with evidence by fixing observed variables and weighting samples by the probability of the evidence.
   

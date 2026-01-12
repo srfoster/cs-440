@@ -2,15 +2,9 @@ id: "m2-8queens-hillclimb"
 type: "short-answer"
 chapter: 2
 question: |
-  **Implement hill climbing to solve the 8-Queens problem.**
+  Hill climbing is a greedy local search method: from a current state, examine neighboring states and move to a neighbor with a better objective value. It is simple and often fast, but it can get stuck in local minima/maxima, plateaus, or ridges. This matters because hill climbing is a "first local search idea" that reveals the core limitation of greedy methods and motivates stochastic techniques.
   
-  **Level 0** Discuss why local search is appropriate for problems like N-Queens. What are the advantages over systematic search?
-  
-  **Level 1** Explain the 8-Queens problem and how to represent a state as board[col]=row. Describe the CONFLICTS objective function and the hill climbing algorithm that iteratively moves to the best neighbor. Provide pseudocode.
-  
-  **Level 2** Implement hill climbing for 8-Queens including the CONFLICTS function and neighbor generation. Handle the local optima problem.
-  
-  **Level 3** Analyze the completeness and optimality of hill climbing. Discuss why it gets stuck in local optima and strategies to escape them (random restarts, sideways moves, etc.).
+  **Task:** Write pseudocode for HILL_CLIMB(board) that repeatedly chooses the best neighboring board (lowest conflicts) until no improvement is possible, then returns the final board.
 answer: "Hill climbing for 8-Queens uses a state representation where board[col]=row indicates queen positions. CONFLICTS counts pairs of queens attacking each other (same row or diagonal). The algorithm iteratively examines all neighbors (moving one queen in its column), selects the neighbor with fewest conflicts, and repeats until no improvement is possible. It's incomplete due to local optima but very fast when it succeeds."
 answer_kindergarten: "The 8-Queens problem is like trying to place 8 chess queens on a chessboard so none of them can capture each other. Hill climbing tries moving one queen at a time to a better spot, always picking the move that causes the fewest fights between queens. Sometimes it gets stuck because every move looks worse, even though there's a better solution if you keep trying."
 answer_3rd_grade: "In the 8-Queens puzzle, you need to place 8 queens on a chess board so no two queens can attack each other. We represent this by saying which row each queen is in for each column (like board[3]=5 means the queen in column 3 is in row 5). To solve it, we count how many queen-pairs are attacking (conflicts), then try moving each queen up or down in its column. We pick the move that reduces conflicts the most and keep going until we can't improve anymore."

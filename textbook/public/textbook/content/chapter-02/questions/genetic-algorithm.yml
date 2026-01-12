@@ -2,15 +2,9 @@ id: "m2-genetic-algorithm"
 type: "short-answer"
 chapter: 2
 question: |
-  **Implement a genetic algorithm for the 8-Queens problem.**
+  A genetic algorithm (GA) is a population-based optimization technique inspired by biological evolution. Candidates (called individuals) are evaluated by a fitness function, and new individuals are produced via selection, crossover (recombining "genes"), and mutation (random variation). This matters because GAs model an important AI strategy: exploit good solutions while exploring diverse alternatives, and they are useful when gradients or clean heuristics are unavailable.
   
-  **Level 0** Discuss how evolution inspires computational search. Why are population-based methods powerful?
-  
-  **Level 1** Explain genetic algorithm components: population, fitness, selection, crossover, and mutation. Provide pseudocode for the GA loop.
-  
-  **Level 2** Implement a GA with tournament selection, one-point crossover, and mutation for 8-Queens.
-  
-  **Level 3** Analyze GA performance: diversity vs. convergence, parameter tuning, and schema theorem basics.
+  **Task:** Write pseudocode for GA_8QUEENS(popSize, generations, mutRate) including: a fitness function derived from conflicts, a selection method, crossover, mutation, and a main loop that returns a best board found.
 answer: "Genetic algorithms maintain a population of candidate solutions, select parents based on fitness, create offspring through crossover and mutation, and iterate for multiple generations. For 8-Queens: fitness = 1/(1+conflicts), tournament selection picks best of k random individuals, one-point crossover combines parent board segments, mutation randomly changes queen positions."
 topics:
   - "Genetic Algorithms"

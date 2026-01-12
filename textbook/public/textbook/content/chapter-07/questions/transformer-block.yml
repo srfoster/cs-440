@@ -2,9 +2,9 @@ id: "m7-transformer-block"
 type: "short-answer"
 chapter: 7
 question: |
-  **Implement a transformer block forward pass with residual connections and layer normalization.**
+  A transformer block typically consists of (1) a self-attention sublayer and (2) a position-wise feedforward sublayer, each wrapped with residual connections and layer normalization. Residuals help optimization by preserving gradient flow; layer norm stabilizes activations. This matters because the transformer block is the basic repeating unit of LLMs—understanding one block means you understand the architecture at scale.
   
-  Write TRANSFORMER_BLOCK(X, params).
+  **Task:** Write pseudocode for TRANSFORMER_BLOCK(X, params) showing attention, residual, layer norm, feedforward, residual, and layer norm.
 answer: |
   A transformer block combines multi-head self-attention with a feedforward network, using residual connections and layer normalization. This architecture enables powerful sequence modeling.
   

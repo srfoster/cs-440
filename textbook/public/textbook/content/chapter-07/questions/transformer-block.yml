@@ -1,0 +1,27 @@
+id: "m7-transformer-block"
+type: "short-answer"
+chapter: 7
+question: |
+  **Implement a transformer block forward pass with residual connections and layer normalization.**
+  
+  Write TRANSFORMER_BLOCK(X, params).
+answer: |
+  A transformer block combines multi-head self-attention with a feedforward network, using residual connections and layer normalization. This architecture enables powerful sequence modeling.
+  
+  Pseudocode:
+  ```
+  function TRANSFORMER_BLOCK(X, params):
+      # X: (seqLen x dModel)
+      A = ATTENTION(X*params.Wq, X*params.Wk, X*params.Wv) * params.Wo
+      X1 = LAYERNORM(X + A)
+      
+      F = GELU(X1*params.W1 + params.b1) * params.W2 + params.b2
+      Y = LAYERNORM(X1 + F)
+      return Y
+  ```
+topics:
+  - "Transformers"
+  - "Deep Learning"
+  - "Attention Mechanisms"
+example_videos:
+  - "https://www.youtube.com/watch?v=4Bdc55j80l8"

@@ -1,0 +1,25 @@
+id: "m3-minimax-alphabeta"
+type: "short-answer"
+chapter: 3
+question: |
+  **Implement Minimax with Alpha-Beta pruning for game trees.**
+  
+  **Level 0** Why do we need special algorithms for games? How does adversarial search differ from single-agent search?
+  
+  **Level 1** Explain minimax: alternating MAX and MIN layers, utility propagation, and best move selection. Then explain alpha-beta pruning. Provide pseudocode.
+  
+  **Level 2** Implement minimax decision and alpha-beta pruning for tic-tac-toe or a simple game tree.
+  
+  **Level 3** Prove alpha-beta's correctness and analyze its complexity. Discuss move ordering's impact on pruning effectiveness.
+answer: "Minimax computes optimal play by recursively evaluating MAX (maximizer's turn) and MIN (minimizer's turn) layers. Alpha-beta pruning eliminates branches that cannot affect the final decision by maintaining alpha (best MAX option) and beta (best MIN option) bounds. If beta ≤ alpha, remaining siblings can be pruned. Optimal move ordering achieves O(b^(d/2)) vs. O(b^d) for minimax."
+topics:
+  - "Minimax"
+  - "Alpha-Beta Pruning"
+  - "Game Trees"
+vocab_answer:
+  - word: "adversarial"
+    definition: "Involving opponents with conflicting goals"
+  - word: "utility"
+    definition: "The payoff or value of a game outcome"
+example_videos:
+  - "https://www.youtube.com/watch?v=l-hh51ncgDI"

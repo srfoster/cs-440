@@ -1,0 +1,29 @@
+id: "m2-8queens-objective"
+type: "short-answer"
+chapter: 2
+question: |
+  **Write the objective function CONFLICTS(board) for 8-Queens where board[col]=row.**
+  
+  Count the number of queen pairs attacking each other.
+answer: |
+  The CONFLICTS function counts pairs of queens that attack each other either on the same row or the same diagonal. For N-Queens represented as board[col]=row, two queens at positions (i, board[i]) and (j, board[j]) conflict if they're on the same row or same diagonal.
+  
+  Pseudocode:
+  ```
+  function CONFLICTS(board):
+      n = len(board)
+      c = 0
+      for i in 0..n-1:
+          for j in i+1..n-1:
+              sameRow = (board[i] == board[j])
+              sameDiag = (abs(board[i]-board[j]) == abs(i-j))
+              if sameRow or sameDiag:
+                  c += 1
+      return c
+  ```
+topics:
+  - "N-Queens"
+  - "Objective Functions"
+  - "Optimization"
+example_videos:
+  - "https://www.youtube.com/watch?v=xouin83ebxE"

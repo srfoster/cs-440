@@ -1,0 +1,38 @@
+id: "m2-airport-optimization"
+type: "short-answer"
+chapter: 2
+question: |
+  **Minimize sum of squared distances from candidate airport (x,y) to towns using continuous local search.**
+  
+  Implement AIRPORT_OBJECTIVE and RANDOM_SEARCH_CONTINUOUS.
+answer: |
+  This is a continuous optimization problem where we want to find the best location for an airport that minimizes weighted distances to multiple towns. Random search samples many random points and keeps the best.
+  
+  Pseudocode:
+  ```
+  function AIRPORT_OBJECTIVE(x, y, towns):
+      # towns: list of (tx,ty, weight)
+      s = 0
+      for (tx,ty,w) in towns:
+          dx = x - tx; dy = y - ty
+          s += w * (dx*dx + dy*dy)
+      return s
+  
+  function RANDOM_SEARCH_CONTINUOUS(towns, bounds, iters):
+      best = null
+      bestVal = +infinity
+      for i in 1..iters:
+          x = randomUniform(bounds.xMin, bounds.xMax)
+          y = randomUniform(bounds.yMin, bounds.yMax)
+          v = AIRPORT_OBJECTIVE(x,y,towns)
+          if v < bestVal:
+              bestVal = v
+              best = (x,y)
+      return best
+  ```
+topics:
+  - "Continuous Optimization"
+  - "Random Search"
+  - "Facility Location"
+example_videos:
+  - "https://www.youtube.com/watch?v=IHZwWFHWa-w"

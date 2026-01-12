@@ -1,0 +1,32 @@
+id: "m5-backward-chaining"
+type: "short-answer"
+chapter: 5
+question: |
+  **Implement backward chaining for Horn clauses (goal-driven reasoning).**
+  
+  Write BACKWARD_CHAIN(rules, facts, goal, visited).
+answer: |
+  Backward chaining starts with a goal and works backwards, trying to prove premises of rules that conclude the goal. It's goal-driven and efficient for answering single queries.
+  
+  Pseudocode:
+  ```
+  function BACKWARD_CHAIN(rules, facts, goal, visited):
+      if goal in facts: return true
+      if goal in visited: return false
+      visited.add(goal)
+      
+      for r in rules where r.conclusion == goal:
+          ok = true
+          for prem in r.premises:
+              if not BACKWARD_CHAIN(rules, facts, prem, visited):
+                  ok = false
+                  break
+          if ok: return true
+      return false
+  ```
+topics:
+  - "Backward Chaining"
+  - "Logic"
+  - "Goal-Driven Reasoning"
+example_videos:
+  - "https://www.youtube.com/watch?v=vPRDN1Y8kHg"

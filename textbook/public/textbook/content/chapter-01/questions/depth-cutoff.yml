@@ -1,0 +1,24 @@
+id: "m1-depth-cutoff"
+type: "short-answer"
+chapter: 1
+question: |
+  **Implement depth-limited DFS (DFS with cutoff).**
+  
+  Write DFS_CUTOFF(start, cutoff) that returns failure if not found within depth.
+answer: |
+  DFS_CUTOFF performs depth-limited search by calling the DLS (depth-limited search) helper function with a specified cutoff depth. If the goal is not found within that depth, it returns failure.
+  
+  Pseudocode:
+  ```
+  function DFS_CUTOFF(start, cutoff):
+      parent = map()
+      parent[start] = null
+      found = DLS(start, cutoff, parent)
+      if found == failure: return failure
+      return RECONSTRUCT_PATH(parent, found)
+  ```
+topics:
+  - "Depth-Limited Search"
+  - "DFS"
+example_videos:
+  - "https://www.youtube.com/watch?v=HZ5YTanv5QE"

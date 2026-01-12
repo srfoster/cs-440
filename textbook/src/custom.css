@@ -1,0 +1,87 @@
+/* CS-440 Custom Styles */
+
+/* Fix mobile/narrow screen layout issues */
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: block !important;
+}
+
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.app {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.app header {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.header-content {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Override the header gradient color - red theme for AI */
+.app header {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+}
+
+/* Adjust hover states to match red theme */
+.nav-link:hover {
+  background: rgba(248, 113, 113, 0.2) !important;
+}
+
+.nav-link.active {
+  background: rgba(248, 113, 113, 0.3) !important;
+}
+
+/* Update primary color accents */
+:root {
+  --primary-color: #dc2626 !important;
+}
+
+button {
+  background: #dc2626 !important;
+}
+
+button:hover:not(:disabled) {
+  background: #b91c1c !important;
+}
+
+.generate-exam-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+}
+
+.generate-exam-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c, #dc2626) !important;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #dc2626, #ef4444) !important;
+}
+
+.next-btn {
+  background: #dc2626 !important;
+}

@@ -1,0 +1,27 @@
+id: "m7-transformer-attention"
+type: "short-answer"
+chapter: 7
+question: |
+  **Implement self-attention mechanism and explain transformers.**
+  
+  **Level 0** Why did attention mechanisms revolutionize NLP and AI? What problem do they solve?
+  
+  **Level 1** Explain self-attention: Query, Key, Value matrices, scaled dot-product, and weighted sum. Describe transformer blocks with multi-head attention and feedforward layers.
+  
+  **Level 2** Implement single-head attention: scores = QK^T/sqrt(d), weights = softmax(scores), output = weights * V.
+  
+  **Level 3** Discuss multi-head attention, positional encoding, layer normalization, and training language models. Explain why transformers scale better than RNNs.
+answer: "Self-attention computes attention(Q,K,V) = softmax(QK^T/sqrt(d)) * V, where Q,K,V are learned linear projections of input. Each position attends to all positions (unlike RNNs' sequential processing). Transformer blocks stack attention + feedforward with residual connections and layer norm. This parallel architecture enables efficient training on GPUs and captures long-range dependencies better than RNNs."
+topics:
+  - "Attention Mechanisms"
+  - "Transformers"
+  - "Self-Attention"
+vocab_answer:
+  - word: "query"
+    definition: "Vector representing what information a position is looking for"
+  - word: "key"
+    definition: "Vector representing what information a position contains"
+  - word: "value"
+    definition: "Vector containing the actual information to be retrieved"
+example_videos:
+  - "https://www.youtube.com/watch?v=4Bdc55j80l8"

@@ -1,0 +1,27 @@
+{
+  "name": "cs-440-textbook",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run compile && vite build",
+    "preview": "vite preview",
+    "compile": "node scripts/compile-content.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -t",
+    "deploy:force": "gh-pages -d dist -t -f"
+  },
+  "dependencies": {
+    "@srfoster/textbook-lib": "file:../../cis-110-ai-redo/textbook-lib",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "gh-pages": "^6.3.0",
+    "js-yaml": "^4.1.1",
+    "vite": "^7.1.12"
+  }
+}

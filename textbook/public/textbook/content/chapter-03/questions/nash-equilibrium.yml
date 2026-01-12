@@ -1,0 +1,36 @@
+id: "m3-nash-equilibrium"
+type: "short-answer"
+chapter: 3
+question: |
+  **Find pure Nash equilibria in a 2×2 game.**
+  
+  Given payoff matrices A (row player) and B (col player), find all pure Nash equilibria.
+answer: |
+  A pure Nash equilibrium is a strategy profile where no player can improve their payoff by unilaterally changing strategy. Check each strategy pair (i,j) to see if it's a best response for both players.
+  
+  Pseudocode:
+  ```
+  function PURE_NASH_2x2(A, B):
+      equilibria = []
+      for i in 0..1:          # row action
+          for j in 0..1:      # col action
+              # is (i,j) best response for row?
+              rowBest = true
+              for i2 in 0..1:
+                  if A[i2][j] > A[i][j]:
+                      rowBest = false
+              # is (i,j) best response for col?
+              colBest = true
+              for j2 in 0..1:
+                  if B[i][j2] > B[i][j]:
+                      colBest = false
+              if rowBest and colBest:
+                  add (i,j) to equilibria
+      return equilibria
+  ```
+topics:
+  - "Nash Equilibrium"
+  - "Game Theory"
+  - "Strategic Reasoning"
+example_videos:
+  - "https://www.youtube.com/watch?v=NSVmOC_5zrE"

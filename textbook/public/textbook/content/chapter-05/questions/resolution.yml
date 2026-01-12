@@ -1,0 +1,31 @@
+id: "m5-resolution"
+type: "short-answer"
+chapter: 5
+question: |
+  **Implement resolution for propositional logic.**
+  
+  Prove KB ⊨ q by refutation using resolution.
+answer: |
+  Resolution theorem proving works by converting KB ∪ {¬q} to CNF and repeatedly resolving pairs of clauses. If the empty clause is derived, KB ⊨ q.
+  
+  Pseudocode:
+  ```
+  function RESOLUTION_ENTAILS(KB_clauses, q):
+      clauses = set(KB_clauses ∪ CNF(¬q))
+      new = set()
+      
+      while true:
+          pairs = ALL_PAIRS(clauses)
+          for (c1,c2) in pairs:
+              resolvents = RESOLVE(c1,c2)
+              if {} in resolvents: return true      # empty clause
+              new = new ∪ resolvents
+          if new ⊆ clauses: return false
+          clauses = clauses ∪ new
+  ```
+topics:
+  - "Resolution"
+  - "Propositional Logic"
+  - "Theorem Proving"
+example_videos:
+  - "https://www.youtube.com/watch?v=7_LcT8Jw2L8"

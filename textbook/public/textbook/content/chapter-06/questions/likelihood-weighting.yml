@@ -1,0 +1,35 @@
+id: "m6-likelihood-weighting"
+type: "short-answer"
+chapter: 6
+question: |
+  **Approximate P(X|e) using likelihood weighting.**
+  
+  Implement LIKELIHOOD_WEIGHTING and WEIGHTED_SAMPLE.
+answer: |
+  Likelihood weighting is an approximate inference method that generates samples consistent with evidence by fixing observed variables and weighting samples by the probability of the evidence.
+  
+  Pseudocode:
+  ```
+  function LIKELIHOOD_WEIGHTING(X, e, bn, N):
+      W = map(value -> 0)
+      for i in 1..N:
+          (sample, w) = WEIGHTED_SAMPLE(bn, e)
+          W[sample[X]] += w
+      return NORMALIZE(W)
+  
+  function WEIGHTED_SAMPLE(bn, e):
+      w = 1
+      sample = copy(e)
+      for Y in bn.topoOrder:
+          if Y in e:
+              w *= P(Y=e[Y] | parents(Y)=sample[parents(Y)], bn)
+          else:
+              sample[Y] = SAMPLE_FROM(P(Y | parents(Y)=sample[parents(Y)], bn))
+      return (sample, w)
+  ```
+topics:
+  - "Likelihood Weighting"
+  - "Approximate Inference"
+  - "Bayesian Networks"
+example_videos:
+  - "https://www.youtube.com/watch?v=G-zirzQFWmk"

@@ -1,0 +1,36 @@
+id: "m3-expectiminimax"
+type: "short-answer"
+chapter: 3
+question: |
+  **Implement expectiminimax with CHANCE nodes for stochastic games.**
+  
+  Handle MAX, MIN, and CHANCE node types.
+answer: |
+  Expectiminimax extends minimax to handle games with randomness (like dice rolls). CHANCE nodes compute expected values over possible outcomes weighted by their probabilities, while MAX and MIN nodes work as in regular minimax.
+  
+  Pseudocode:
+  ```
+  function EXPECTIMINIMAX(s, player):
+      if TERMINAL(s): return UTILITY(s, player)
+      if NODE_TYPE(s) == "MAX":
+          v = -infinity
+          for a in ACTIONS(s):
+              v = max(v, EXPECTIMINIMAX(RESULT(s,a), player))
+          return v
+      if NODE_TYPE(s) == "MIN":
+          v = +infinity
+          for a in ACTIONS(s):
+              v = min(v, EXPECTIMINIMAX(RESULT(s,a), player))
+          return v
+      if NODE_TYPE(s) == "CHANCE":
+          v = 0
+          for (outcome, p) in OUTCOMES(s):
+              v += p * EXPECTIMINIMAX(outcome, player)
+          return v
+  ```
+topics:
+  - "Expectiminimax"
+  - "Stochastic Games"
+  - "Game Theory"
+example_videos:
+  - "https://www.youtube.com/watch?v=jaFRyzp7yWw"

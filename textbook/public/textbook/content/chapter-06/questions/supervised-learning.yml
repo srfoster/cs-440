@@ -1,0 +1,36 @@
+id: "m6-supervised-learning"
+type: "short-answer"
+chapter: 6
+question: |
+  **Implement a supervised learning training pipeline with train/test split.**
+  
+  Write TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs).
+answer: |
+  Supervised learning trains a model on labeled data. Split data into training and test sets, iterate through epochs updating parameters via gradient descent, then evaluate accuracy on test set.
+  
+  Pseudocode:
+  ```
+  function TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs):
+      (trainSet, testSet) = SPLIT(dataset, ratio=0.8, shuffle=true)
+      
+      for e in 1..epochs:
+          for (x,y) in trainSet:
+              yhat = model.forward(x)
+              L = lossFn(yhat, y)
+              grads = model.backward(L)
+              optimizer.step(model.params, grads)
+      
+      correct = 0
+      total = 0
+      for (x,y) in testSet:
+          yhat = argmax(model.forward(x))
+          if yhat == y: correct += 1
+          total += 1
+      return correct / total
+  ```
+topics:
+  - "Supervised Learning"
+  - "Machine Learning"
+  - "Training Pipeline"
+example_videos:
+  - "https://www.youtube.com/watch?v=aircAruvnKk"

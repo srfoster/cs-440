@@ -1,0 +1,38 @@
+id: "m7-language-model-training"
+type: "short-answer"
+chapter: 7
+question: |
+  **Write pseudocode to train a next-token transformer language model.**
+  
+  Implement TRAIN_LM(corpusText, tokenizer, model, optimizer, steps, seqLen, batchSize).
+answer: |
+  Training a language model involves predicting the next token given previous tokens. Sample sequences from the corpus, compute cross-entropy loss on next-token predictions, and update parameters via backpropagation.
+  
+  Pseudocode:
+  ```
+  function TRAIN_LM(corpusText, tokenizer, model, optimizer, steps, seqLen, batchSize):
+      tokens = tokenizer.encode(corpusText)
+      
+      for step in 1..steps:
+          batchX = []
+          batchY = []
+          for b in 1..batchSize:
+              i = randomInt(0, len(tokens)-seqLen-2)
+              x = tokens[i : i+seqLen]              # input tokens
+              y = tokens[i+1 : i+seqLen+1]          # next-token targets
+              batchX.append(x)
+              batchY.append(y)
+          
+          logits = model.forward(batchX)            # (B, seqLen, vocab)
+          L = CROSS_ENTROPY(logits, batchY)         # token-wise
+          grads = model.backward(L)
+          optimizer.step(model.params, grads)
+      
+      return model
+  ```
+topics:
+  - "Language Models"
+  - "Transformers"
+  - "Next-Token Prediction"
+example_videos:
+  - "https://www.youtube.com/watch?v=kCc8FmEb1nY"

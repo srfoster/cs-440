@@ -1,0 +1,25 @@
+id: "m5-forward-backward-chain"
+type: "short-answer"
+chapter: 5
+question: |
+  **Implement forward and backward chaining for Horn clauses.**
+  
+  **Level 0** Compare data-driven vs. goal-driven reasoning. When is each approach preferable?
+  
+  **Level 1** Explain forward chaining (start from facts, apply rules forward) and backward chaining (start from query, work backwards). Provide pseudocode for both.
+  
+  **Level 2** Implement both algorithms for a simple Horn clause knowledge base.
+  
+  **Level 3** Analyze completeness, soundness, and complexity. Discuss applications in expert systems and Prolog.
+answer: "Forward chaining: maintain agenda of known facts, repeatedly select a fact, find rules whose premises are satisfied, add conclusions to agenda. Stops when query is derived or agenda empties. Backward chaining: start with query goal, find rules that conclude it, recursively prove premises. Both are sound and complete for Horn clauses. Forward chaining is data-driven (good for many queries), backward is goal-driven (efficient for single query)."
+topics:
+  - "Forward Chaining"
+  - "Backward Chaining"
+  - "Horn Clauses"
+vocab_answer:
+  - word: "Horn clause"
+    definition: "A logical clause with at most one positive literal"
+  - word: "data-driven"
+    definition: "Reasoning that starts from known facts and derives conclusions"
+example_videos:
+  - "https://www.youtube.com/watch?v=vPRDN1Y8kHg"

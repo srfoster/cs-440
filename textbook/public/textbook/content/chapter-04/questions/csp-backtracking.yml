@@ -1,0 +1,25 @@
+id: "m4-csp-backtracking"
+type: "short-answer"
+chapter: 4
+question: |
+  **Implement backtracking search with forward checking for CSPs.**
+  
+  **Level 0** Why are CSPs a useful problem formulation? How do they differ from standard search problems?
+  
+  **Level 1** Explain CSP components (variables, domains, constraints) and backtracking search. Describe forward checking. Provide pseudocode.
+  
+  **Level 2** Implement backtracking with forward checking for map coloring or Sudoku.
+  
+  **Level 3** Analyze heuristics: MRV (minimum remaining values), degree heuristic, least-constraining-value. Discuss time complexity improvements.
+answer: "Backtracking search assigns variables one at a time, checking consistency at each step. Forward checking prunes future variable domains after each assignment by removing values that conflict with the assignment. When a domain becomes empty, backtrack. For map coloring with k colors and n regions: without inference O(k^n), with forward checking much faster in practice."
+topics:
+  - "CSP"
+  - "Backtracking"
+  - "Forward Checking"
+vocab_answer:
+  - word: "domain"
+    definition: "The set of possible values for a variable"
+  - word: "constraint"
+    definition: "A restriction on which combinations of values are allowed"
+example_videos:
+  - "https://www.youtube.com/watch?v=0K_00aimUEw"

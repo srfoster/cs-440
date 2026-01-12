@@ -1,0 +1,25 @@
+id: "m5-unification"
+type: "short-answer"
+chapter: 5
+question: |
+  **Implement the unification algorithm for first-order logic.**
+  
+  **Level 0** Why is pattern matching essential for logical inference? How does unification enable theorem proving?
+  
+  **Level 1** Explain unification: finding substitutions that make expressions identical. Handle variables, constants, and functions. Provide pseudocode.
+  
+  **Level 2** Implement UNIFY(x, y, subst) with occurs check to prevent infinite structures.
+  
+  **Level 3** Discuss unification's role in resolution, Prolog, and type inference. Analyze time complexity and most general unifiers (MGU).
+answer: "Unification finds substitutions θ such that SUBST(θ, x) = SUBST(θ, y). Algorithm recursively processes terms: if both are identical, success; if one is a variable, extend substitution; if both are functions with same name/arity, unify arguments pairwise. Occurs check prevents X from unifying with f(X). Returns most general unifier or failure."
+topics:
+  - "Unification"
+  - "First-Order Logic"
+  - "Pattern Matching"
+vocab_answer:
+  - word: "substitution"
+    definition: "A mapping from variables to terms"
+  - word: "occurs check"
+    definition: "Test preventing a variable from unifying with a term containing itself"
+example_videos:
+  - "https://www.youtube.com/watch?v=vXqUZNpPJ8Y"

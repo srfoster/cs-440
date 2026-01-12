@@ -1,0 +1,25 @@
+id: "m6-bayes-net-inference"
+type: "short-answer"
+chapter: 6
+question: |
+  **Implement exact inference in Bayesian networks using enumeration.**
+  
+  **Level 0** Why model uncertainty with probability? How do Bayesian networks compactly represent joint distributions?
+  
+  **Level 1** Explain Bayes nets: nodes as variables, edges as dependencies, CPTs (conditional probability tables). Describe enumeration algorithm for computing P(X|e). Provide pseudocode.
+  
+  **Level 2** Implement ENUM_ASK and ENUM_ALL for a simple Bayesian network.
+  
+  **Level 3** Discuss computational complexity, variable elimination improvements, and approximate inference (likelihood weighting, MCMC).
+answer: "Enumeration computes P(X|e) by summing joint probabilities over all possible values of hidden variables. ENUM_ASK normalizes the distribution. ENUM_ALL recursively multiplies CPT entries: if variable is observed, use its value; otherwise sum over all possible values. Time complexity exponential in number of variables, but variable elimination reduces it to exponential in tree-width."
+topics:
+  - "Bayesian Networks"
+  - "Probabilistic Inference"
+  - "Graphical Models"
+vocab_answer:
+  - word: "CPT"
+    definition: "Conditional Probability Table defining P(X|Parents(X))"
+  - word: "evidence"
+    definition: "Observed variable values"
+example_videos:
+  - "https://www.youtube.com/watch?v=G-zirzQFWmk"

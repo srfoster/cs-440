@@ -1,0 +1,25 @@
+id: "m7-feedforward-backprop"
+type: "short-answer"
+chapter: 7
+question: |
+  **Implement forward and backward passes for a 2-layer neural network.**
+  
+  **Level 0** Why are neural networks so powerful for learning? What does "learning" mean mathematically?
+  
+  **Level 1** Explain feedforward computation (linear + activation layers) and backpropagation (chain rule for gradients). Describe one training step with loss calculation and weight updates.
+  
+  **Level 2** Implement a training step for 2-layer MLP with ReLU activation and softmax output.
+  
+  **Level 3** Derive backpropagation equations from chain rule. Discuss gradient descent variants (SGD, Adam), initialization, and universal approximation theorem.
+answer: "Forward pass: z1 = W1*x + b1, h = ReLU(z1), z2 = W2*h + b2, p = softmax(z2). Loss: L = -log(p[y]). Backward pass: dz2 = p (with dz2[y] -= 1 for cross-entropy gradient), propagate through W2 to get dh, apply ReLU derivative to get dz1, compute weight gradients dW1, dW2, db1, db2. Update: W -= lr * dW."
+topics:
+  - "Neural Networks"
+  - "Backpropagation"
+  - "Gradient Descent"
+vocab_answer:
+  - word: "activation function"
+    definition: "Non-linear function applied to neuron outputs (e.g., ReLU, sigmoid)"
+  - word: "gradient"
+    definition: "Vector of partial derivatives indicating direction of steepest increase"
+example_videos:
+  - "https://www.youtube.com/watch?v=Ilg3gGewQ5U"

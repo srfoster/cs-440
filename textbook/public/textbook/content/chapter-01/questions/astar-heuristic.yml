@@ -1,0 +1,60 @@
+id: "m1-astar-heuristic"
+type: "short-answer"
+chapter: 1
+question: |
+  **Implement A* search with an admissible heuristic.**
+  
+  **Level 0** Discuss the importance of informed search in AI. How do heuristics help guide search algorithms toward goals more efficiently?
+  
+  **Level 1** Explain A* search intuitively: how it combines actual cost g(n) and estimated future cost h(n) to prioritize which states to explore. Provide pseudocode for A* including the use of a priority queue and the f = g + h evaluation function.
+  
+  **Level 2** Implement A* search for a maze navigation problem. Include a heuristic function (such as Manhattan distance) and proper handling of the open list (priority queue) and closed list.
+  
+  **Level 3** Prove that A* is optimal when the heuristic is admissible. Analyze the time and space complexity. Discuss the impact of heuristic quality on performance.
+answer: "A* search uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n and h(n) is the estimated cost from n to goal. It maintains a priority queue (open list) ordered by f-value. A* is optimal when h is admissible (never overestimates). Better heuristics (higher h while staying admissible) explore fewer nodes. Manhattan distance is a classic admissible heuristic for grid-based problems."
+answer_kindergarten: "A* is like having a smart helper when you're trying to find your way somewhere. Instead of just trying every path randomly, your helper guesses which paths look like they might be shorter. The helper keeps track of how far you've already walked, plus guesses how much further you need to go, and always picks the path that seems best overall."
+answer_3rd_grade: "A* search is smarter than regular search because it uses clues to find the goal faster. It keeps two numbers for each position: how many steps you've taken to get there (g), and your guess about how many more steps you need (h). It adds these together (f = g + h) and always explores the position with the smallest total first. For a maze, you can guess the remaining distance by counting squares horizontally and vertically (Manhattan distance)."
+answer_7th_grade: "A* maintains a priority queue of states ordered by f(n) = g(n) + h(n), where g(n) is the actual cost from the start and h(n) is the heuristic estimate to the goal. It repeatedly extracts the state with minimum f-value, checks if it's the goal, and generates its successors. For each successor, if it offers a better path (lower g-value) than previously found, A* updates its g-value and parent, and adds it to the priority queue with its f-value as priority. For grid mazes, Manhattan distance |x1-x2| + |y1-y2| is an admissible heuristic."
+answer_high_school: "A* is an informed search algorithm that expands states in order of increasing f(n) = g(n) + h(n). The algorithm maintains: (1) an open list (min-priority queue by f-value), (2) g-scores (distance from start), and (3) parent pointers for path reconstruction. The heuristic h(n) must be admissible (h(n) ≤ h*(n) where h* is true cost) to guarantee optimality. A* is optimal because it never expands a state with f(n) > C* (optimal cost) before expanding all states on an optimal path. Consistency (h(n) ≤ c(n,n') + h(n')) implies admissibility and ensures states are expanded at most once."
+answer_undergraduate: "A* optimally solves shortest-path problems when h is admissible. Proof of optimality: Suppose suboptimal goal G2 with f(G2) < f(G1) where G1 is optimal. Let n be an unexpanded node on optimal path to G1. Then f(n) = g(n) + h(n) ≤ g(n) + h*(n) = f*(n) = C* (optimal cost). But f(G2) = g(G2) > C*, contradicting f(G2) < f(G1) = C*. Time/space: O(b^d) in worst case, but effective branching factor depends on h accuracy. A* with consistent h expands nodes in order of increasing g-value, equivalent to Dijkstra's on an implicit graph. Heuristic quality measured by effective branching factor b*: N = 1 + b* + (b*)^2 + ... + (b*)^d where N is nodes expanded. Well-designed heuristics can reduce b* dramatically. Pattern databases, linear conflict, and disjoint pattern additivity are advanced techniques for creating powerful admissible heuristics."
+topics:
+  - "A* Search"
+  - "Heuristic Functions"
+  - "Informed Search"
+  - "Optimality"
+vocab_answer:
+  - word: "admissible"
+    definition: "A heuristic that never overestimates the true cost to reach the goal"
+  - word: "priority queue"
+    definition: "A data structure that returns elements in order of priority (typically minimum value first)"
+  - word: "Manhattan distance"
+    definition: "The sum of horizontal and vertical distances, named after the grid layout of Manhattan"
+vocab_kindergarten:
+  - word: "guess"
+    definition: "To think about what might happen without knowing for sure"
+  - word: "total"
+    definition: "The amount you get when you add things together"
+vocab_3rd_grade:
+  - word: "priority"
+    definition: "Which things are more important to do first"
+  - word: "estimate"
+    definition: "A smart guess about a number or amount"
+vocab_7th_grade:
+  - word: "successor"
+    definition: "A state that can be reached directly from the current state"
+  - word: "extract"
+    definition: "To take out or remove (in this case, from a priority queue)"
+vocab_high_school:
+  - word: "consistent"
+    definition: "A heuristic where h(n) ≤ cost(n,n') + h(n') for any edge"
+  - word: "optimal path"
+    definition: "The shortest or lowest-cost path from start to goal"
+vocab_undergraduate:
+  - word: "effective branching factor"
+    definition: "A measure of search efficiency: the average number of nodes generated per level"
+  - word: "pattern database"
+    definition: "Precomputed exact costs for subproblems used as heuristic values"
+example_videos:
+  - "https://www.youtube.com/watch?v=ySN5Wnu88nE"
+  - "https://www.youtube.com/watch?v=6TsL96NAZCo"
+  - "https://www.youtube.com/watch?v=71CEj4gKDnE"

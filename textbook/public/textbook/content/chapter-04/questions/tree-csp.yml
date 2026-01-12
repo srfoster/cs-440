@@ -1,0 +1,36 @@
+id: "m4-tree-csp"
+type: "short-answer"
+chapter: 4
+question: |
+  **Solve tree-structured CSP using dynamic programming.**
+  
+  Implement TREE_CSP_SOLVE(csp, root) with topological ordering.
+answer: |
+  Tree-structured CSPs can be solved in linear time by making the CSP arc-consistent from leaves to root, then assigning values from root to leaves ensuring consistency with parent assignments.
+  
+  Pseudocode:
+  ```
+  function TREE_CSP_SOLVE(csp, root):
+      order = TOPOLOGICAL_ORDER_FROM_ROOT(csp, root)
+      parent = PARENTS_FROM_ROOT(csp, root)
+      
+      # make arc-consistent from leaves upward
+      for X in reverse(order):
+          for Y in csp.neigh[X]:
+              if parent[X] == Y:
+                  REVISE(csp, Y, X)
+      
+      assignment = {}
+      assignment[root] = any value in csp.dom[root]
+      for X in order:
+          if X == root: continue
+          P = parent[X]
+          assignment[X] = any v in csp.dom[X] with CONSTRAINT_OK(P, assignment[P], X, v)
+      return assignment
+  ```
+topics:
+  - "Tree-Structured CSP"
+  - "Dynamic Programming"
+  - "Arc Consistency"
+example_videos:
+  - "https://www.youtube.com/watch?v=hJ-6Ma1veUE"

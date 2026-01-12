@@ -1,0 +1,35 @@
+id: "m5-inference-search"
+type: "short-answer"
+chapter: 5
+question: |
+  **Implement inference as BFS over derived facts.**
+  
+  Write PROOF_BFS(rules, facts, query) that treats proof search as state-space search.
+answer: |
+  Inference can be formulated as a search problem where states are sets of derived facts, actions are rule applications, and the goal is deriving the query.
+  
+  Pseudocode:
+  ```
+  function PROOF_BFS(rules, facts, query):
+      frontier = queue()
+      visitedFacts = set(facts)
+      frontier.enqueue(facts)
+      
+      while not frontier.isEmpty():
+          currentFacts = frontier.dequeue()
+          if query in currentFacts: return true
+          
+          for r in rules:
+              if all prem in currentFacts:
+                  nextFacts = currentFacts ∪ {r.conclusion}
+                  if r.conclusion not in visitedFacts:
+                      visitedFacts.add(r.conclusion)
+                      frontier.enqueue(nextFacts)
+      return false
+  ```
+topics:
+  - "Inference"
+  - "Search"
+  - "Logic"
+example_videos:
+  - "https://www.youtube.com/watch?v=KiCBXu4P-2Y"

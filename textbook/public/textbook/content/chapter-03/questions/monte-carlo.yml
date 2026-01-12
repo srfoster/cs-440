@@ -1,0 +1,25 @@
+id: "m3-monte-carlo"
+type: "short-answer"
+chapter: 3
+question: |
+  **Implement Monte Carlo tree search (MCTS) for game playing.**
+  
+  **Level 0** Why use random sampling for games? When is MCTS better than minimax?
+  
+  **Level 1** Explain MCTS phases: selection, expansion, simulation (rollout), backpropagation. Describe how random playouts estimate move quality.
+  
+  **Level 2** Implement a simple Monte Carlo move selection using random rollouts.
+  
+  **Level 3** Discuss UCB1 formula, exploration-exploitation balance, and why MCTS excels in large branching factor games like Go.
+answer: "Monte Carlo move selection evaluates each legal move by performing random playouts from the resulting state. For each move, run N simulations playing randomly until game end, record wins/losses, and choose the move with highest win rate. MCTS extends this with tree search, UCB selection, and incremental tree building."
+topics:
+  - "Monte Carlo Methods"
+  - "MCTS"
+  - "Stochastic Search"
+vocab_answer:
+  - word: "rollout"
+    definition: "A simulated game played with random moves from a given state"
+  - word: "UCB"
+    definition: "Upper Confidence Bound - balances exploitation and exploration"
+example_videos:
+  - "https://www.youtube.com/watch?v=UXW2yZndl7U"

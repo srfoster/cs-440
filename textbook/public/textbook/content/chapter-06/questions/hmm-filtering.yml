@@ -1,0 +1,25 @@
+id: "m6-hmm-filtering"
+type: "short-answer"
+chapter: 6
+question: |
+  **Implement the forward algorithm for HMM filtering.**
+  
+  **Level 0** Why model temporal processes with HMMs? What is the filtering task?
+  
+  **Level 1** Explain HMM components: states, transition model, observation model. Describe filtering: computing P(X_t|e_{1:t}). Provide the recursive forward algorithm.
+  
+  **Level 2** Implement HMM filtering with belief update using transition and observation matrices.
+  
+  **Level 3** Discuss Viterbi algorithm for most likely sequence, particle filtering for non-linear models, and applications in speech/robotics.
+answer: "HMM filtering maintains belief state over hidden variables. Forward algorithm: belief_{t} = α * O_t * T^T * belief_{t-1}, where T is transition matrix, O_t is observation matrix (diagonal), α normalizes. This is a Bayesian update: prediction (apply transition) then correction (incorporate observation). Time O(n²) per step for n states."
+topics:
+  - "Hidden Markov Models"
+  - "Filtering"
+  - "Temporal Reasoning"
+vocab_answer:
+  - word: "filtering"
+    definition: "Estimating current state from past observations"
+  - word: "belief state"
+    definition: "Probability distribution over possible hidden states"
+example_videos:
+  - "https://www.youtube.com/watch?v=kqSzLo9fenk"

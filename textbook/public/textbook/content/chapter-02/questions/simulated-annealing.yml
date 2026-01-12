@@ -1,0 +1,25 @@
+id: "m2-simulated-annealing"
+type: "short-answer"
+chapter: 2
+question: |
+  **Implement simulated annealing for the 8-Queens problem.**
+  
+  **Level 0** Explain why randomness and accepting worse moves can help optimization. What real-world annealing process inspired this algorithm?
+  
+  **Level 1** Describe simulated annealing intuitively: how temperature controls the probability of accepting worse moves, and how cooling schedules work. Provide pseudocode.
+  
+  **Level 2** Implement simulated annealing with temperature schedule and probabilistic acceptance based on exp(-delta/T).
+  
+  **Level 3** Analyze convergence properties. Discuss the trade-off between exploration (high temperature) and exploitation (low temperature).
+answer: "Simulated annealing accepts worse moves with probability exp(-delta/T) where delta is the increase in cost and T is temperature. Temperature decreases over time (T = alpha * T). This allows escaping local optima early while converging to good solutions as T approaches 0. Named after metallurgical annealing where controlled cooling produces strong crystal structures."
+topics:
+  - "Simulated Annealing"
+  - "Stochastic Search"
+  - "Local Search"
+vocab_answer:
+  - word: "temperature"
+    definition: "A parameter controlling randomness in simulated annealing"
+  - word: "cooling schedule"
+    definition: "The rate at which temperature decreases over time"
+example_videos:
+  - "https://www.youtube.com/watch?v=eBmU1ONJ-os"

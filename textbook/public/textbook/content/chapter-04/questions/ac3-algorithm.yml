@@ -1,0 +1,25 @@
+id: "m4-ac3-algorithm"
+type: "short-answer"
+chapter: 4
+question: |
+  **Implement the AC-3 arc consistency algorithm.**
+  
+  **Level 0** What is constraint propagation and why is it powerful for CSPs?
+  
+  **Level 1** Explain arc consistency: when is an arc (X,Y) consistent? Describe the AC-3 algorithm with queue of arcs. Provide pseudocode.
+  
+  **Level 2** Implement AC-3 with the REVISE function for a specific constraint type (e.g., not-equal for map coloring).
+  
+  **Level 3** Analyze AC-3's time complexity O(n²d³) and its role as preprocessing. Discuss stronger consistency levels (path consistency, k-consistency).
+answer: "AC-3 makes CSP arc-consistent: for every arc (X,Y), every value x in X's domain has some value y in Y's domain satisfying the constraint. Algorithm maintains queue of arcs, repeatedly calling REVISE(X,Y) which removes values from X's domain that have no supporting value in Y. When X's domain changes, add arcs (Z,X) back to queue. Returns false if any domain becomes empty."
+topics:
+  - "Arc Consistency"
+  - "Constraint Propagation"
+  - "AC-3"
+vocab_answer:
+  - word: "arc consistent"
+    definition: "Property where every domain value has a compatible value in constrained neighbors"
+  - word: "revise"
+    definition: "To update a domain by removing unsupported values"
+example_videos:
+  - "https://www.youtube.com/watch?v=4cCS8rrYT14"

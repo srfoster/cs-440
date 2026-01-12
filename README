@@ -1,0 +1,50 @@
+Module 1: The Intelligent Agent Framework
+• Key Topics: Definitions of AI (thinking vs. acting; human vs. rational); PEAS descriptions (Performance, Environment, Actuators, Sensors); and environment properties (observability, determinism, etc.) [1.1, 2.3].
+• Algorithms: Agent skeletons for simple reflex, model-based, goal-based, and utility-based architectures [2.4].
+• Mathematical Principles: The Agent Function, which mathematically maps any given percept sequence to an action [2.1].
+• Drone Throughline:
+    ◦ The Environment: The drone is deployed to a small, discrete 2D grid containing only "Resources" or "Empty Space" [2.3, 187].
+    ◦ The Drone Agent: It operates as a simple reflex agent defined by a PEAS description where its performance is based on ore collected from this stochastic and partially observable environment [2.1, 2.3]. Its behavior is a concrete implementation of an abstract agent function that maps percept sequences to "Drill" or "Move" actuators using a basic agent skeleton [2.1, 2.4].
+
+Module 2: Problem Solving, Search, and Constraint Satisfaction
+• Key Topics: State-space graphs and abstraction [3.1, 3.2]; Constraint Satisfaction Problems (CSPs) using factored representations (variables, domains, and constraints) [6.1]; and constraint propagation (local consistency) [6.2].
+• Algorithms:  search* [3.5.2]; backtracking search for CSPs [6.3]; and min-conflicts (local search) [6.4].
+• Mathematical Principles: Asymptotic complexity (O notation) [3.4]; arc consistency (AC-3) [6.2.2]; and the evaluation function f(n)=g(n)+h(n) [3.5.2].
+• Drone Throughline:
+    ◦ The Environment: The mission expands to a vast, known, deterministic asteroid field where resources are far apart and navigation is costly [3.1]. Additionally, the drone must now manage a daily schedule with multiple variables like "Drill Time" and "Fuel Usage" that must satisfy strict operational constraints [6.1].
+    ◦ The Drone Agent: Now a problem-solving agent, the drone uses abstraction to create a state-space graph [3.1, 3.2]. It employs informed search via the  algorithm* (analyzed with O-notation) and an evaluation function f(n)=g(n)+h(n) using an admissible and consistent heuristic (like straight-line distance) to find paths, avoiding the redundancy of uninformed search like BFS or DFS [3.4, 3.5.2]. It manages its complex schedule as a CSP using a factored representation, applying backtracking search and arc consistency (AC-3) to ensure legal operations, while using min-conflicts to quickly repair the schedule if a new task is added [6.1, 6.2.2, 6.3, 6.4].
+Module 3: Adversarial Search and Game Playing
+• Key Topics: Zero-sum games, plies (half-moves), and the horizon effect [5.1, 5.2, 5.4.2].
+• Algorithms: The Minimax algorithm for optimal decisions and Alpha–Beta pruning for efficiency [5.2.1, 5.3].
+• Mathematical Principles: Expected value calculations for stochastic games involving chance nodes [5.5].
+• Drone Throughline:
+    ◦ The Environment: Rival corporations have entered the asteroid field, leading to a multiagent competitive environment where one agent's resource gain is another's loss [2.3, 5.1].
+    ◦ The Drone Agent: The drone must now treat mining as a zero-sum game [5.1]. It calculates the expected value of moves across multiple plies using the minimax algorithm [5.2.1, 5.5]. To maintain performance under the time-sensitive pressure of competition, it applies Alpha–Beta pruning to ignore irrelevant branches in the search tree and mitigate the horizon effect [5.3, 5.4.2].
+Module 4: Logical Reasoning and Prolog
+• Key Topics: First-Order Logic (FOL) syntax and semantics [8.2]; Prolog and logic programming [9.4.2]; database semantics (unique names and closed-world assumptions) [9.4.5]; and successor-state axioms [7.7.1].
+• Algorithms: Resolution [9.5]; forward and backward chaining [9.3, 9.4].
+• Mathematical Principles: Entailment and the deduction theorem [7.3, 7.5]; and Constraint Logic Programming (CLP) [9.4.6].
+• Drone Throughline:
+    ◦ The Environment: The drone enters a sector governed by complex "physics" rules (e.g., "gas vents are always adjacent to unstable ground") where many hazards are not directly visible [7.2, 8.1.2].
+    ◦ The Drone Agent: It uses FOL syntax and semantics to maintain a knowledge base to ensure entailment of safety [8.2]. Programmed in Prolog, it utilizes backward chaining to answer queries about hidden hazards and relies on database semantics (such as the closed-world assumption) to assume unlisted sectors are safe [9.4.2, 9.4.5]. It applies inference through forward chaining or resolution to prove facts via the deduction theorem [7.5, 9.3, 9.5]. It uses successor-state axioms to solve the frame problem and CLP to combine its logical rules with numerical ranges for its drill pressure [7.7.1, 9.4.6].
+Module 5: Quantifying Uncertainty via Probabilistic Models
+• Key Topics: Belief states (sets of possible worlds), Bayesian networks, and conditional independence [13.6, 14.1, 14.2].
+• Algorithms: HMM filtering for state estimation and variable elimination for inference [14.4.2, 15.2].
+• Mathematical Principles: Bayes’ Rule, the Product Rule, and Kolmogorov’s Axioms [13.2, 13.5].
+• Drone Throughline:
+    ◦ The Environment: Deep-space radiation begins to cause severe sensor noise and nondeterministic action outcomes, meaning the drone's purely logical axioms are no longer certain [13.1, 15.1].
+    ◦ The Drone Agent: It adopts probabilistic reasoning based on Kolmogorov’s Axioms [13.2]. It represents its world as a Bayesian network to exploit conditional independence and uses HMM filtering to maintain a belief state (a probability distribution over possible worlds) [13.6, 14.1, 15.3]. It applies Bayes' Rule and the product rule through variable elimination to estimate its most likely position despite the noise [13.5, 14.4.2].
+Module 6: Decision Theory and Rational Action
+• Key Topics: Utility theory, decision networks, and the Value of Perfect Information (VPI) [16.2, 16.5, 16.6].
+• Algorithms: Evaluating decision networks to select the action with the Maximum Expected Utility (MEU) [16.1, 16.5.2].
+• Mathematical Principles: The expected utility formula and Markov Decision Processes (MDPs) [16.1, 17.1].
+• Drone Throughline:
+    ◦ The Environment: The drone must now make difficult tradeoffs, such as whether to risk its expensive drill on a hard but potentially valuable rock, where payoffs may be far in the future [16.1, 17.1].
+    ◦ The Drone Agent: It becomes a utility-based agent using utility theory to weight rare ore against drill damage [16.2]. It evaluates decision networks to compute MEU using the expected utility formula [16.1, 16.5.2]. It calculates the Value of Perfect Information (VPI) to decide if additional sensing is worth the cost [16.6]. Finally, it models its long-term mining missions as MDPs to find a policy that maximizes its lifetime rewards [17.1].
+Module 7: Foundational Learning Theory
+• Key Topics: Supervised vs. reinforcement learning, overfitting, and the stationarity assumption [18.1, 18.3.5, 18.4].
+• Algorithms: Decision-tree induction and Q-learning [18.3, 21.3.2].
+• Mathematical Principles: Information gain and entropy for data splitting [18.3.4].
+• Drone Throughline:
+    ◦ The Environment: The drone is sent into a completely unexplored region of space where the stationarity assumption fails and its human-coded transition models and logic axioms are entirely inapplicable [18.1, 18.4].
+    ◦ The Drone Agent: It becomes an active learner using reinforcement learning via Q-learning to discover an optimal policy from raw reward signals [21.1, 21.3.2]. It avoids the overfitting found in supervised learning (such as decision-tree induction) by using information gain and entropy to identify which new sensory features are relevant to its survival and success in this unknown territory [18.1, 18.3, 18.3.4].

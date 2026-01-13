@@ -5,7 +5,5 @@ concept_map:
         description: "Pattern matching for logical terms"
         exam_questions:
           - "questions/unification.yml"
-          - "questions/forward-backward-chain.yml"
-          - "questions/backward-chaining.yml"
+          - "questions/horn-clause-inference.yml"
           - "questions/resolution.yml"
-          - "questions/inference-search.yml"

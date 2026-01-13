@@ -2,15 +2,15 @@ id: "m4-ac3-algorithm"
 type: "short-answer"
 chapter: 4
 question: |
-  Arc consistency enforces a local constraint property: for every value in a variable's domain, there must exist a compatible value in each neighbor's domain (for the constraint between them). The AC-3 algorithm repeatedly applies a REVISE step across arcs until no more pruning is possible. This matters because it's a canonical inference algorithm and a building block for more advanced CSP solvers; it can dramatically shrink domains before or during search.
-  
-  **Task:** Write pseudocode for AC3(csp) and REVISE(csp,X,Y).
-  
-  **Level 1** Explain arc consistency: when is an arc (X,Y) consistent? Describe the AC-3 algorithm with queue of arcs. Provide pseudocode.
-  
-  **Level 2** Implement AC-3 with the REVISE function for a specific constraint type (e.g., not-equal for map coloring).
-  
-  **Level 3** Analyze AC-3's time complexity O(n²d³) and its role as preprocessing. Discuss stronger consistency levels (path consistency, k-consistency).
+  **Enforce arc consistency using the AC-3 algorithm.**
+
+  **Level 0** Discuss why forward checking isn't enough: it only looks one step ahead. What is arc consistency? Why is it more powerful than forward checking but still incomplete (doesn't solve the CSP)? When should you use AC-3: as preprocessing, during search, or both?
+
+  **Level 1** Define arc consistency: for arc (X,Y), every value x in D_X must have some value y in D_Y that satisfies the constraint between X and Y. Describe AC-3: maintain queue of arcs, repeatedly call REVISE(X,Y) which removes unsupported values from D_X. When D_X changes, add all arcs (Z,X) back to queue. Give pseudocode for AC3(csp) and REVISE(csp, X, Y). Demonstrate by hand on a map-coloring problem.
+
+  **Level 2** Implement AC-3 with REVISE for binary not-equal constraints (map coloring). Test as preprocessing before backtracking. Compare: backtracking alone vs. AC-3 + backtracking vs. maintaining arc consistency (MAC) during search.
+
+  **Level 3** Prove AC-3 terminates (domains only shrink, finite values). Analyze time complexity: O(cd³) where c=number of constraints, d=domain size. In practice, often O(ed²) where e=edges. Discuss why AC-3 doesn't solve all CSPs (example: 3-coloring a triangle is arc-consistent but has no solution). Introduce stronger notions: path consistency, k-consistency, and the trade-off between preprocessing cost and search reduction.
 answer: "AC-3 makes CSP arc-consistent: for every arc (X,Y), every value x in X's domain has some value y in Y's domain satisfying the constraint. Algorithm maintains queue of arcs, repeatedly calling REVISE(X,Y) which removes values from X's domain that have no supporting value in Y. When X's domain changes, add arcs (Z,X) back to queue. Returns false if any domain becomes empty."
 topics:
   - "Arc Consistency"

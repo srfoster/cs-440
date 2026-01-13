@@ -2,11 +2,19 @@ id: "m7-convolution"
 type: "short-answer"
 chapter: 7
 question: |
-  A convolution is a local weighted sum applied across an image, producing feature maps that detect patterns such as edges, corners, or textures. Convolutions matter because they capture spatial locality and weight sharing, which are central to classic deep vision models (CNNs) and still relevant for many modern systems. Writing convolution explicitly demonstrates you understand what "a conv layer" actually computes.
+  **Implement convolutional layers for computer vision.**
+
+  **Level 0** Discuss why fully-connected layers are impractical for images: an image with 224×224×3 pixels has ~150K dimensions, requiring millions of parameters. How do convolutions solve this? Three key ideas: (1) local connectivity (each neuron only sees a small patch), (2) weight sharing (same filter applied everywhere), (3) translation invariance (detecting edges anywhere in the image). Compare with biological vision: receptive fields in the visual cortex.
+
+  **Level 1** Define 2D convolution: slide a k×k filter (kernel) across an H×W image, computing dot products. For position (i,j), output = Σ_a Σ_b image[i+a][j+b] * kernel[a][b]. Output dimensions: (H-k+1) × (W-k+1) with stride=1, no padding.
   
-  **Task:** Write pseudocode for CONV2D(image, kernel) with stride 1 and no padding.
+  Extensions: **Stride** s (skip s pixels per step), **Padding** p (add p zeros around border), **Multiple channels** (RGB input, multiple filters). Output size: ⌊(H+2p-k)/s⌋ + 1.
   
-  Write CONV2D(image, kernel).
+  Give pseudocode for CONV2D(image, kernel, stride=1, padding=0). Demonstrate 3×3 filter detecting horizontal edges on a simple image.
+
+  **Level 2** Implement CONV2D with stride and padding. Test filters: vertical edge detector [[1,0,-1],[1,0,-1],[1,0,-1]], horizontal edge detector (transpose), Gaussian blur. Implement a simple CNN: conv→ReLU→maxpool→conv→ReLU→maxpool→flatten→fully-connected. Train on MNIST or CIFAR-10.
+
+  **Level 3** Analyze parameter efficiency: fully-connected layer for 224×224 images with 256 hidden units = 12M params. Convolutional layer with 256 filters of size 3×3 = 2K params (1000× reduction). Discuss receptive field growth through layers. Compare CNN architectures: LeNet (1998), AlexNet (2012), VGG (deeper stacks), ResNet (skip connections), modern vision transformers (ViT replaces convolution with attention). Why did CNNs dominate vision 2012-2020? Why are transformers now competitive?
 answer: |
   Convolution is a fundamental operation in CNNs that applies a filter (kernel) across an image to detect features. The kernel slides over the image, computing dot products at each position.
   

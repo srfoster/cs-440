@@ -2,13 +2,19 @@ id: "m7-transformer-attention"
 type: "short-answer"
 chapter: 7
 question: |
-  Self-attention is the core operation of transformers. Given queries (Q), keys (K), and values (V), attention computes how much each token should "attend" to every other token, producing context-sensitive representations. The scaling factor 1/√d stabilizes gradients when the key/query dimension is large. This matters because attention is the primary reason transformers outperform earlier sequence models on language tasks, and understanding it is essential for understanding LLMs.
+  **Implement self-attention, the core mechanism of transformers.**
+
+  **Level 0** Discuss why RNNs were limiting: sequential processing prevents parallelization, long sequences suffer from vanishing gradients. How does attention solve this? Direct connections between all positions, allowing information flow in O(1) steps (not O(T) sequential steps). Why is this revolutionary? Transformers can process entire sequences in parallel during training, scaling to millions of tokens. Compare with previous sequence models: HMMs (Chapter 6) use fixed Markov assumptions, RNNs maintain hidden state sequentially.
+
+  **Level 1** Define self-attention: given input sequence X (T × d), compute Q=XW_Q, K=XW_K, V=XW_V (learned projections). Attention scores: S = QK^T/√d (T × T matrix where S[i,j] = how much position i attends to position j). Weights: A = softmax(S, axis=1) (each row sums to 1). Output: Y = AV (weighted sum of values).
   
-  **Task:** Write pseudocode for ATTENTION(Q,K,V) using scaled dot-product attention and row-wise softmax.
+  Why scaling by √d? Prevents dot products from growing large (softmax saturates). Why QKV separate? Q = "what I'm looking for", K = "what I have", V = "content to retrieve".
   
-  **Level 2** Implement single-head attention: scores = QK^T/sqrt(d), weights = softmax(scores), output = weights * V.
-  
-  **Level 3** Discuss multi-head attention, positional encoding, layer normalization, and training language models. Explain why transformers scale better than RNNs.
+  Give pseudocode for ATTENTION(Q, K, V). Demonstrate by hand on 3-token sequence.
+
+  **Level 2** Implement single-head self-attention. Test on simple sequences: (1) positional patterns (attending to previous tokens), (2) content-based (attending to similar words). Visualize attention weights as heatmap. Implement multi-head attention: run h parallel attention heads with different W_Q, W_K, W_V, concatenate outputs, project with W_O.
+
+  **Level 3** Analyze complexity: attention is O(T²d) for sequence length T. Why is this problematic for long sequences? Discuss efficient variants: sparse attention, linear attention, Flash Attention (memory-efficient). Explain multi-head benefits: different heads learn different patterns (syntax, semantics, positional). Compare attention with: (1) RNN: O(T) sequential steps vs O(1) parallel, (2) CNN: fixed receptive field vs global context. Discuss causal masking for autoregressive LMs: prevent position i from attending to j>i. Why did attention succeed? Parallelization + long-range dependencies + no inductive bias (learns patterns from data).
 answer: "Self-attention computes attention(Q,K,V) = softmax(QK^T/sqrt(d)) * V, where Q,K,V are learned linear projections of input. Each position attends to all positions (unlike RNNs' sequential processing). Transformer blocks stack attention + feedforward with residual connections and layer norm. This parallel architecture enables efficient training on GPUs and captures long-range dependencies better than RNNs."
 topics:
   - "Attention Mechanisms"

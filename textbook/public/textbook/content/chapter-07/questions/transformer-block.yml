@@ -2,9 +2,29 @@ id: "m7-transformer-block"
 type: "short-answer"
 chapter: 7
 question: |
-  A transformer block typically consists of (1) a self-attention sublayer and (2) a position-wise feedforward sublayer, each wrapped with residual connections and layer normalization. Residuals help optimization by preserving gradient flow; layer norm stabilizes activations. This matters because the transformer block is the basic repeating unit of LLMs—understanding one block means you understand the architecture at scale.
+  **Implement a complete transformer block.**
+
+  **Level 0** Discuss the transformer architecture philosophy: repeating identical blocks stacked deeply (GPT-3 has 96 blocks). Why is modularity powerful? Each block refines representations, and stacking allows learning hierarchical patterns. Compare with CNN (convolutional blocks) and ResNet (residual blocks). What innovations made deep transformers trainable: residual connections (gradient flow), layer normalization (stable activations), careful initialization?
+
+  **Level 1** Define transformer block components:
   
-  **Task:** Write pseudocode for TRANSFORMER_BLOCK(X, params) showing attention, residual, layer norm, feedforward, residual, and layer norm.
+  1. **Multi-head self-attention sublayer:**
+     - Compute attention: A = MultiHeadAttention(X)
+     - Residual connection: X' = X + A  
+     - Layer norm: X1 = LayerNorm(X')
+  
+  2. **Position-wise feedforward sublayer:**
+     - Two-layer MLP: F = GELU(X1*W1 + b1)*W2 + b2
+     - Residual: X'' = X1 + F
+     - Layer norm: Y = LayerNorm(X'')
+  
+  **Residual connections:** X + f(X) allows gradients to flow directly backward. **Layer normalization:** normalize across features (not batch), stabilizes training.
+  
+  Give pseudocode for TRANSFORMER_BLOCK(X, params). Show dimensions at each step for T=10 tokens, d=512 model dimension.
+
+  **Level 2** Implement transformer block with multi-head attention (8 heads), feedforward (4d intermediate dimension), GELU activation, residuals, and layer norm. Stack 6 blocks to build encoder. Test on sequence classification task. Visualize attention patterns in different layers: early layers learn positional patterns, later layers learn semantic relations.
+
+  **Level 3** Analyze residual connection theory: without residuals, gradients ∝ (W^T)^L vanish/explode. With residuals: gradient highway, effective depth is adaptive. Discuss layer norm vs batch norm: layer norm normalizes per example (independent of batch), crucial for variable-length sequences. Compare transformer variants: encoder-only (BERT, classification), decoder-only (GPT, generation), encoder-decoder (T5, translation). Discuss architectural choices: pre-norm vs post-norm (where layer norm is placed), GLU vs GELU activation, learned vs sinusoidal positional encoding. Why 512-768-1024 model dimensions? Power of 2 for GPU efficiency, large enough for rich representations.
 answer: |
   A transformer block combines multi-head self-attention with a feedforward network, using residual connections and layer normalization. This architecture enables powerful sequence modeling.
   

@@ -4,8 +4,6 @@ concept_map:
       - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
         description: "Probabilistic graphical models"
         exam_questions:
-          - "questions/bayes-net-inference.yml"
-          - "questions/likelihood-weighting.yml"
-          - "questions/hmm-filtering.yml"
-          - "questions/particle-filtering.yml"
+          - "questions/bayesian-networks.yml"
+          - "questions/temporal-reasoning.yml"
           - "questions/supervised-learning.yml"

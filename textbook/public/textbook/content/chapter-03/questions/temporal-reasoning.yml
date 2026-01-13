@@ -1,0 +1,32 @@
+id: "m6-temporal-reasoning"
+type: "short-answer"
+chapter: 3
+question: |
+  **Perform exact and approximate filtering for temporal probabilistic models.**
+
+  **Level 0** Discuss why temporal reasoning matters: robotics, speech recognition, autonomous systems. How do Hidden Markov Models extend Bayesian networks to time? Compare filtering (estimating current state) with smoothing (past states) and prediction (future states). Why is the Markov assumption (state at t depends only on t-1) both limiting and enabling?
+
+  **Level 1** Define HMM components: state space X, transition model P(Xt|Xt-1), observation model P(Et|Xt), initial belief P(X₀).
+  
+  **Exact Filtering (Forward Algorithm):** Maintain belief distribution b_t = P(Xt|e1:t). Recursive update: (1) Predict: b̄_{t+1} = Σ P(Xt+1|xt) b_t(xt), (2) Update: b_{t+1} = α P(et+1|Xt+1) b̄_{t+1}. Give pseudocode for HMM_FILTER(priorBelief, observations, T, O). In matrix form: b_{t+1} = α O_{t+1} T^T b_t. Demonstrate by hand: robot localization with 3 positions.
+  
+  **Approximate Filtering (Particle Filter):** When state space is large or continuous, represent belief with N weighted particles. Algorithm: (1) Propagate: sample each particle through transition model, (2) Weight: multiply by observation likelihood P(e|x), (3) Resample: draw N new particles proportional to weights. Give pseudocode for PARTICLE_FILTER(particles, observation, TRANSITION, OBS_LIK, N). Demonstrate with continuous state space.
+
+  **Level 2** Implement both methods. **HMM filtering:** use transition and observation matrices, update belief vector at each time step. **Particle filtering:** implement propagate-weight-resample loop for 2D robot localization with noisy odometry and range sensors. Compare: exact filter with 100 discrete states vs. 1000 particles.
+
+  **Level 3** Analyze complexity: HMM forward algorithm O(n²T) where n=states, T=time steps. Particle filtering O(NT) but handles continuous/large state spaces. Discuss particle degeneracy (all weight on few particles) and solutions: resampling strategies, importance sampling. Compare with other temporal inference: Viterbi (most likely sequence), Kalman filter (Gaussian beliefs, linear dynamics), extended/unscented Kalman filters. Applications: SLAM (simultaneous localization and mapping), speech recognition (phoneme sequences), activity recognition.
+answer: "HMM filtering maintains belief state P(Xt|e1:t) via predict-update: predict b̄t+1 = T^T bt, update bt+1 = α Ot+1 b̄t+1. O(n²) per step. Particle filtering approximates with N samples: propagate through transition, weight by P(e|x), resample proportional to weights. Handles continuous/large state spaces. O(N) per step but particle degeneracy can be problematic. Both are Bayesian updates combining prior dynamics with new observations."
+topics:
+  - "Hidden Markov Models"
+  - "Particle Filtering"
+  - "Temporal Reasoning"
+  - "Bayesian Filtering"
+vocab_answer:
+  - word: "filtering"
+    definition: "Estimating current state from past observations"
+  - word: "belief state"
+    definition: "Probability distribution over possible hidden states"
+  - word: "particle"
+    definition: "A sample representing one possible state hypothesis"
+example_videos:
+  - "https://www.youtube.com/watch?v=kqSzLo9fenk"

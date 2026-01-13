@@ -1,0 +1,44 @@
+id: "m5-resolution"
+type: "short-answer"
+chapter: 2
+question: |
+  **Prove logical entailment using resolution and refutation.**
+
+  **Level 0** Discuss the completeness of resolution: why is having a single inference rule that's both sound and complete remarkable? Compare with Horn clause methods (previous question) which are restricted to a fragment. What does "refutation proof" mean? Why prove by contradiction? Compare with proof strategies in mathematics.
+
+  **Level 1** Define resolution rule: from clauses (A ∨ B) and (¬B ∨ C), derive (A ∨ C). Explain CNF (conjunctive normal form): conjunction of disjunctions. Describe resolution theorem proving algorithm:
+  
+  1. Convert KB ∪ {¬query} to CNF
+  2. Repeatedly select clause pairs and resolve
+  3. If empty clause ☐ derived, KB ⊨ query
+  4. If no new clauses, return false
+  
+  Give pseudocode for RESOLUTION_ENTAILS(KB_clauses, q) and RESOLVE(c1, c2). Demonstrate by hand: prove (A→B) ∧ (B→C) ∧ A ⊨ C using resolution.
+
+  **Level 2** Implement resolution theorem prover. Include CNF conversion and RESOLVE function (find complementary literals, combine remaining literals). Test on examples: modus ponens, transitivity of implication, puzzles like "All Greeks are mortal, Socrates is Greek, therefore Socrates is mortal."
+
+  **Level 3** Prove soundness and refutation completeness (Robinson's theorem): if KB ⊨ q, resolution will find a proof. Discuss why completeness requires refutation (can't enumerate all consequences). Analyze complexity: resolution can have exponential blowup in clause size and number. Discuss strategies: unit preference (clauses with one literal), set of support, subsumption. Compare propositional resolution with first-order resolution (requires unification). Why is resolution the basis for Prolog and modern SAT solvers?
+answer: |
+  Resolution theorem proving works by converting KB ∪ {¬q} to CNF and repeatedly resolving pairs of clauses. If the empty clause is derived, KB ⊨ q.
+  
+  Pseudocode:
+  ```
+  function RESOLUTION_ENTAILS(KB_clauses, q):
+      clauses = set(KB_clauses ∪ CNF(¬q))
+      new = set()
+      
+      while true:
+          pairs = ALL_PAIRS(clauses)
+          for (c1,c2) in pairs:
+              resolvents = RESOLVE(c1,c2)
+              if {} in resolvents: return true      # empty clause
+              new = new ∪ resolvents
+          if new ⊆ clauses: return false
+          clauses = clauses ∪ new
+  ```
+topics:
+  - "Resolution"
+  - "Propositional Logic"
+  - "Theorem Proving"
+example_videos:
+  - "https://www.youtube.com/watch?v=7_LcT8Jw2L8"

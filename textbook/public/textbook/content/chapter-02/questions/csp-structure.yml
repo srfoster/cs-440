@@ -1,0 +1,30 @@
+id: "m4-csp-structure"
+type: "short-answer"
+chapter: 2
+question: |
+  **Exploit constraint graph structure to solve CSPs efficiently using tree decomposition and cutset conditioning.**
+
+  **Level 0** Discuss how problem structure affects difficulty. Why are some CSPs easy despite being "NP-hard in general"? Explain the difference between worst-case complexity and structure-dependent complexity. What is treewidth and why does it matter? Compare with other structural properties you've seen (DAGs in search, tree game-trees).
+
+  **Level 1** **Tree-Structured CSPs:** When the constraint graph is a tree (acyclic), solve in O(nd²) time. Algorithm: (1) choose arbitrary root, (2) enforce arc consistency from leaves toward root (directional consistency), (3) assign values root-to-leaves ensuring parent consistency. Give pseudocode for TREE_CSP_SOLVE(csp, root). Demonstrate by hand on a tree-shaped map.
+  
+  **Cutset Conditioning:** For general graphs, find a small cutset (set of variables whose removal makes graph a tree). Enumerate all assignments to cutset variables, then solve remaining tree CSP for each. Give pseudocode for CUTSET_CONDITIONING(csp, cutsetVars). Demonstrate on a nearly-tree graph with cutset size 1.
+
+  **Level 2** Implement TREE_CSP_SOLVE with directional arc consistency and root-to-leaf assignment. Implement CUTSET_CONDITIONING that: (a) assigns cutset, (b) runs AC-3, (c) solves tree CSP. Compare with pure backtracking on graphs with small vs. large cutsets.
+
+  **Level 3** Prove tree CSP correctness and O(nd²) complexity. Define treewidth: minimum cutset size over all tree decompositions. Prove general CSP is solvable in O(n · d^(w+1)) where w=treewidth. Discuss finding good cutsets (NP-hard in general, but heuristics work). Compare with other structured problems: cycle cutset, hypertree width. When should you use structural methods vs. general backtracking+AC-3?
+answer: "Tree CSPs solve in O(nd²): enforce directional arc consistency leaves→root, then assign root→leaves. Cutset conditioning: enumerate assignments to small variable set (cutset) that makes remaining graph a tree, solve tree CSP for each. Complexity O(d^c · nd²) where c=cutset size. Treewidth w: minimum cutset size over all decompositions. General CSPs solvable in O(n·d^(w+1)). Structure exploitation converts NP-hard to tractable."
+topics:
+  - "Tree-Structured CSP"
+  - "Cutset Conditioning"
+  - "Treewidth"
+  - "Structural Decomposition"
+vocab_answer:
+  - word: "treewidth"
+    definition: "Measure of how tree-like a graph is; minimum cutset size"
+  - word: "cutset"
+    definition: "Set of variables whose removal makes constraint graph a tree"
+  - word: "directional consistency"
+    definition: "Arc consistency enforced in one direction through a tree"
+example_videos:
+  - "https://www.youtube.com/watch?v=hJ-6Ma1veUE"

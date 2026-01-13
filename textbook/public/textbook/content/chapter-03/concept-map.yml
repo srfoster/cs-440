@@ -1,10 +1,19 @@
 concept_map:
-  - category: "Adversarial Search and Games"
+  - category: "Probabilistic Reasoning and Learning"
     concepts:
-      - name: "Minimax, Alpha-Beta, and Expectiminimax"
-        description: "Optimal play in two-player zero-sum games"
+      - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
+        description: "Probabilistic graphical models"
         exam_questions:
-          - "questions/minimax-alphabeta.yml"
-          - "questions/expectiminimax.yml"
-          - "questions/monte-carlo.yml"
-          - "questions/nash-equilibrium.yml"
+          - "questions/bayesian-networks.yml"
+          - "questions/temporal-reasoning.yml"
+          - "questions/supervised-learning.yml"
+  - category: "Neural Networks and Transformers"
+    concepts:
+      - name: "Neural Networks, Backpropagation, and Transformers"
+        description: "Deep learning architectures"
+        exam_questions:
+          - "questions/feedforward-backprop.yml"
+          - "questions/convolution.yml"
+          - "questions/transformer-attention.yml"
+          - "questions/transformer-block.yml"
+          - "questions/language-model-training.yml"

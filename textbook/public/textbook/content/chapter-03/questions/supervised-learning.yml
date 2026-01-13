@@ -1,0 +1,52 @@
+id: "m6-supervised-learning"
+type: "short-answer"
+chapter: 3
+question: |
+  **Implement the supervised learning pipeline: training and evaluation.**
+
+  **Level 0** Discuss how supervised learning differs from the inference-based AI of previous chapters. Instead of reasoning with given knowledge (logic, probability), we learn from data. Why is this paradigm shift crucial for modern AI? Compare learning from examples vs. hand-coding rules. What is the generalization problem: performing well on unseen data?
+
+  **Level 1** Define supervised learning: learn function f: X → Y from labeled examples {(x₁,y₁),...,(xₙ,yₙ)}. Describe the training pipeline:
+  
+  1. **Split data:** Training set (learn parameters) and test set (evaluate generalization)
+  2. **Training loop:** For each epoch, iterate through training examples:
+     - Forward pass: ŷ = model(x)
+     - Loss: L = loss_fn(ŷ, y)  
+     - Backward pass: compute gradients ∇L
+     - Update: params ← params - α∇L (gradient descent)
+  3. **Evaluation:** Compute accuracy/error on test set
+  
+  Give pseudocode for TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs). Demonstrate gradient descent by hand on simple linear regression.
+
+  **Level 2** Implement the pipeline for classification (e.g., digit recognition or iris species). Use a simple neural network with one hidden layer. Include: data loading/splitting, forward/backward passes, SGD optimizer, training loop with loss tracking, test evaluation. Visualize training loss over epochs. Compare training vs. test accuracy to detect overfitting.
+
+  **Level 3** Analyze generalization theory: training error vs. test error, overfitting (model too complex), underfitting (too simple). Discuss regularization techniques: L2 penalty, dropout, early stopping. Prove that gradient descent converges for convex loss functions (linear regression). For non-convex (neural networks), discuss local minima and SGD noise benefits. Compare optimization algorithms: SGD, momentum, Adam. Discuss hyperparameter tuning: learning rate, batch size, architecture. How does this connect to other AI: Bayesian learning (prior over models), reinforcement learning (learning from rewards instead of labels)?
+answer: |
+  Supervised learning trains a model on labeled data. Split data into training and test sets, iterate through epochs updating parameters via gradient descent, then evaluate accuracy on test set.
+  
+  Pseudocode:
+  ```
+  function TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs):
+      (trainSet, testSet) = SPLIT(dataset, ratio=0.8, shuffle=true)
+      
+      for e in 1..epochs:
+          for (x,y) in trainSet:
+              yhat = model.forward(x)
+              L = lossFn(yhat, y)
+              grads = model.backward(L)
+              optimizer.step(model.params, grads)
+      
+      correct = 0
+      total = 0
+      for (x,y) in testSet:
+          yhat = argmax(model.forward(x))
+          if yhat == y: correct += 1
+          total += 1
+      return correct / total
+  ```
+topics:
+  - "Supervised Learning"
+  - "Machine Learning"
+  - "Training Pipeline"
+example_videos:
+  - "https://www.youtube.com/watch?v=aircAruvnKk"

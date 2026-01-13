@@ -1,0 +1,42 @@
+id: "m3-expectiminimax"
+type: "short-answer"
+chapter: 1
+question: |
+  **Extend minimax to stochastic games using Expectiminimax.**
+
+  **Level 0** Discuss how randomness changes adversarial reasoning. Why can't we just use minimax for games with dice? What does "expected utility" mean in this context? Give examples of games that require expectiminimax (backgammon, Monopoly, etc.).
+
+  **Level 1** Describe expectiminimax: MAX nodes (your turn), MIN nodes (opponent's turn), and CHANCE nodes (dice/cards). At CHANCE nodes, compute expected value using outcome probabilities. Give pseudocode for EXPECTIMINIMAX(s, player) that branches on node type and uses OUTCOMES(s) to get (outcome, probability) pairs. Demonstrate by hand on a simple dice game tree.
+
+  **Level 2** Implement expectiminimax for a simple dice game (e.g., a game where players choose to roll 1 or 2 dice and highest total wins). Compare decisions with and without considering probabilities.
+
+  **Level 3** Analyze why alpha-beta pruning doesn't directly apply to expectiminimax (averaging breaks the minimax property). Discuss bounded expectiminimax and Monte Carlo approximations. How does the branching factor from chance nodes affect tractability? Compare expectiminimax complexity with minimax.
+answer: |
+  Expectiminimax extends minimax to handle games with randomness (like dice rolls). CHANCE nodes compute expected values over possible outcomes weighted by their probabilities, while MAX and MIN nodes work as in regular minimax.
+  
+  Pseudocode:
+  ```
+  function EXPECTIMINIMAX(s, player):
+      if TERMINAL(s): return UTILITY(s, player)
+      if NODE_TYPE(s) == "MAX":
+          v = -infinity
+          for a in ACTIONS(s):
+              v = max(v, EXPECTIMINIMAX(RESULT(s,a), player))
+          return v
+      if NODE_TYPE(s) == "MIN":
+          v = +infinity
+          for a in ACTIONS(s):
+              v = min(v, EXPECTIMINIMAX(RESULT(s,a), player))
+          return v
+      if NODE_TYPE(s) == "CHANCE":
+          v = 0
+          for (outcome, p) in OUTCOMES(s):
+              v += p * EXPECTIMINIMAX(outcome, player)
+          return v
+  ```
+topics:
+  - "Expectiminimax"
+  - "Stochastic Games"
+  - "Game Theory"
+example_videos:
+  - "https://www.youtube.com/watch?v=jaFRyzp7yWw"

@@ -1,9 +1,0 @@
-concept_map:
-  - category: "Constraint Satisfaction Problems"
-    concepts:
-      - name: "CSP Representation and Search"
-        description: "Variables, domains, constraints, and backtracking"
-        exam_questions:
-          - "questions/csp-fundamentals.yml"
-          - "questions/ac3-algorithm.yml"
-          - "questions/csp-structure.yml"

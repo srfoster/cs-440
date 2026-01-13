@@ -1,0 +1,25 @@
+id: "m5-unification"
+type: "short-answer"
+chapter: 2
+question: |
+  **Implement unification for first-order logic terms.**
+
+  **Level 0** Discuss why pattern matching is central to symbolic AI. How does unification differ from simple string matching? Why is it needed for logic programming (Prolog), theorem proving, and type inference? Compare with pattern matching in previous chapters (CSP constraints, game tree evaluation).
+
+  **Level 1** Define unification: finding substitution θ such that SUBST(θ, x) = SUBST(θ, y). Explain the most general unifier (MGU). Describe the algorithm: if terms are identical, succeed; if one is a variable, bind it (after occurs check); if both are functions, must have same name/arity and unify arguments pairwise. Give pseudocode for UNIFY(x, y, subst). Demonstrate by hand: unify P(a, X, f(g(Y))) with P(Z, Z, f(W)).
+
+  **Level 2** Implement UNIFY(x, y, subst) with occurs check to prevent infinite structures like X = f(X). Test on examples: Loves(X, X) with Loves(John, Y); P(X, f(X)) with P(g(Y), Z); cases that fail.
+
+  **Level 3** Prove UNIFY returns the most general unifier when one exists. Analyze time complexity (near-linear with union-find optimization, but potentially exponential without occurs check). Discuss role in resolution theorem proving, Prolog query evaluation, and Hindley-Milner type inference. Why is occurs check sometimes omitted in Prolog for efficiency?
+answer: "Unification finds substitutions θ such that SUBST(θ, x) = SUBST(θ, y). Algorithm recursively processes terms: if both are identical, success; if one is a variable, extend substitution; if both are functions with same name/arity, unify arguments pairwise. Occurs check prevents X from unifying with f(X). Returns most general unifier or failure."
+topics:
+  - "Unification"
+  - "First-Order Logic"
+  - "Pattern Matching"
+vocab_answer:
+  - word: "substitution"
+    definition: "A mapping from variables to terms"
+  - word: "occurs check"
+    definition: "Test preventing a variable from unifying with a term containing itself"
+example_videos:
+  - "https://www.youtube.com/watch?v=vXqUZNpPJ8Y"

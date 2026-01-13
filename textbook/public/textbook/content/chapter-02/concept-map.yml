@@ -1,13 +1,17 @@
 concept_map:
-  - category: "Local Search and Optimization"
+  - category: "Constraint Satisfaction Problems"
     concepts:
-      - name: "Objective Functions, Optimization, and Local Search"
-        description: "Defining optimization criteria"
+      - name: "CSP Representation and Search"
+        description: "Variables, domains, constraints, and backtracking"
         exam_questions:
-          - "questions/8queens-objective.yml"
-          - "questions/8queens-hillclimb.yml"
-          - "questions/stochastic-optimization.yml"
-      - name: "Continuous Optimization"
-        description: "Optimization in continuous spaces"
+          - "questions/csp-fundamentals.yml"
+          - "questions/ac3-algorithm.yml"
+          - "questions/csp-structure.yml"
+  - category: "Logic and Inference"
+    concepts:
+      - name: "Unification, Inference, Resolution, and Search"
+        description: "Pattern matching for logical terms"
         exam_questions:
-          - "questions/airport-optimization.yml"
+          - "questions/unification.yml"
+          - "questions/horn-clause-inference.yml"
+          - "questions/resolution.yml"

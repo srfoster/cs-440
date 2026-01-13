@@ -7,3 +7,24 @@ concept_map:
           - "questions/astar-heuristic.yml"
           - "questions/8puzzle-formulation.yml"
           - "questions/search-algorithms.yml"
+  - category: "Local Search and Optimization"
+    concepts:
+      - name: "Objective Functions, Optimization, and Local Search"
+        description: "Defining optimization criteria"
+        exam_questions:
+          - "questions/8queens-objective.yml"
+          - "questions/8queens-hillclimb.yml"
+          - "questions/stochastic-optimization.yml"
+      - name: "Continuous Optimization"
+        description: "Optimization in continuous spaces"
+        exam_questions:
+          - "questions/airport-optimization.yml"
+  - category: "Adversarial Search and Games"
+    concepts:
+      - name: "Minimax, Alpha-Beta, and Expectiminimax"
+        description: "Optimal play in two-player zero-sum games"
+        exam_questions:
+          - "questions/minimax-alphabeta.yml"
+          - "questions/expectiminimax.yml"
+          - "questions/monte-carlo.yml"
+          - "questions/nash-equilibrium.yml"

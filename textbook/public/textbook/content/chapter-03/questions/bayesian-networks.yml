@@ -1,0 +1,32 @@
+id: "m6-bayesian-networks"
+type: "short-answer"
+chapter: 3
+question: |
+  **Perform exact and approximate inference in Bayesian networks.**
+
+  **Level 0** Discuss why probabilistic reasoning matters in AI. How do Bayesian networks exploit conditional independence to compactly represent joint distributions? Compare with propositional logic (Chapter 5): deterministic vs. uncertain reasoning. Why is inference hard in general (NP-hard for exact, but tractable for tree-structured networks)?
+
+  **Level 1** Define Bayesian networks: DAG where nodes are random variables, edges encode dependencies, each node has a CPT (conditional probability table) P(X|Parents(X)). Explain that joint = ∏ P(Xi|Parents(Xi)).
+  
+  **Exact Inference (Enumeration):** To compute P(X|e), sum out hidden variables: P(X|e) = α Σ_h P(X,e,h). Give pseudocode for ENUM_ASK(X, e, bn) and ENUM_ALL(vars, e, bn). Demonstrate by hand on a simple network (e.g., Alarm → Burglary, Earthquake → Alarm).
+  
+  **Approximate Inference (Likelihood Weighting):** When exact inference is too expensive, sample. Generate N samples by: follow topological order, if variable is evidence fix its value and multiply weight by P(evidence|parents), otherwise sample from P(variable|parents). Give pseudocode for LIKELIHOOD_WEIGHTING(X, e, bn, N) and WEIGHTED_SAMPLE(bn, e). Demonstrate sampling process.
+
+  **Level 2** Implement both methods for a Bayesian network with 4-5 variables. Test: compute P(Burglary|Alarm=true) exactly via enumeration, then approximate with 1000 weighted samples. Compare accuracy and runtime.
+
+  **Level 3** Analyze exact inference complexity: naive enumeration O(d^n) where d=domain size, n=variables. Discuss variable elimination: exploit structure to compute in O(d^w) where w=treewidth (analogous to CSP tree-decomposition). Prove likelihood weighting converges to true posterior as N→∞. Discuss why it can be inefficient when evidence is unlikely. Compare with other approximate methods: rejection sampling (wastes samples), Gibbs sampling (MCMC), particle filtering (temporal). When to use each?
+answer: "Bayesian networks use DAG structure and CPTs to represent joint distributions compactly: P(X₁,...,Xₙ) = ∏P(Xᵢ|Parents(Xᵢ)). Exact inference (enumeration): sum over hidden variables, O(d^n) complexity. Variable elimination reduces to O(d^w) where w=treewidth. Approximate inference (likelihood weighting): generate weighted samples by fixing evidence and sampling non-evidence, weight by P(evidence|parents). Converges to true posterior as N→∞, but can be inefficient with unlikely evidence."
+topics:
+  - "Bayesian Networks"
+  - "Probabilistic Inference"
+  - "Likelihood Weighting"
+  - "Variable Elimination"
+vocab_answer:
+  - word: "CPT"
+    definition: "Conditional Probability Table defining P(X|Parents(X))"
+  - word: "evidence"
+    definition: "Observed variable values"
+  - word: "likelihood weighting"
+    definition: "Sampling method that fixes evidence and weights by its probability"
+example_videos:
+  - "https://www.youtube.com/watch?v=G-zirzQFWmk"

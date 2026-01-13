@@ -1,9 +1,0 @@
-concept_map:
-  - category: "Logic and Inference"
-    concepts:
-      - name: "Unification, Inference, Resolution, and Search"
-        description: "Pattern matching for logical terms"
-        exam_questions:
-          - "questions/unification.yml"
-          - "questions/horn-clause-inference.yml"
-          - "questions/resolution.yml"

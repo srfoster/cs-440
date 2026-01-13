@@ -1,9 +1,0 @@
-concept_map:
-  - category: "Probabilistic Reasoning and Learning"
-    concepts:
-      - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
-        description: "Probabilistic graphical models"
-        exam_questions:
-          - "questions/bayesian-networks.yml"
-          - "questions/temporal-reasoning.yml"
-          - "questions/supervised-learning.yml"

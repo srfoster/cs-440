@@ -1,21 +1,12 @@
 concept_map:
   - category: "Local Search and Optimization"
     concepts:
-      - name: "Objective Functions"
+      - name: "Objective Functions, Optimization, and Local Search"
         description: "Defining optimization criteria"
         exam_questions:
           - "questions/8queens-objective.yml"
-      - name: "Hill Climbing"
-        description: "Greedy local search that moves to better neighbors"
-        exam_questions:
           - "questions/8queens-hillclimb.yml"
-      - name: "Simulated Annealing"
-        description: "Stochastic search with probabilistic acceptance of worse states"
-        exam_questions:
           - "questions/simulated-annealing.yml"
-      - name: "Genetic Algorithms"
-        description: "Population-based search inspired by evolution"
-        exam_questions:
           - "questions/genetic-algorithm.yml"
       - name: "Continuous Optimization"
         description: "Optimization in continuous spaces"

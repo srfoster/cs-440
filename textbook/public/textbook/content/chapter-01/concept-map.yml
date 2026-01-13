@@ -4,6 +4,6 @@ concept_map:
       - name: "Agents, Environments, and Search"
         description: "Defining states, actions, and goals for search problems"
         exam_questions:
-          - "questions/8puzzle-formulation.yml"
-          - "questions/bfs-iddfs.yml"
           - "questions/astar-heuristic.yml"
+          - "questions/8puzzle-formulation.yml"
+          - "questions/search-algorithms.yml"

@@ -1,0 +1,67 @@
+id: "m1-search-algorithms"
+type: "short-answer"
+chapter: 1
+question: |
+  **Solve the 8-puzzle problem using uninformed and informed search algorithms.**
+
+  **Level 0** Discuss the significance of search algorithms in AI and the fundamental tradeoffs between time, space, optimality, and completeness. How does adding domain knowledge (heuristics) change search performance?
+
+  **Level 1** For the 8-puzzle problem (using ACTIONS, RESULT, and GOAL_TEST from the previous question), describe and give pseudocode for: (1) BFS - breadth-first search that avoids revisiting states, (2) DLS - depth-limited search that stops expanding beyond a depth limit, (3) IDDFS - iterative deepening that calls DLS with increasing limits, and (4) A* - informed search using f(n)=g(n)+h(n) with Manhattan distance heuristic. Demonstrate each algorithm by hand on a sample 8-puzzle instance.
+
+  **Level 2** Implement all four search algorithms in a language of your choice. Include path reconstruction and compare their performance on multiple 8-puzzle instances.
+
+  **Level 3** Analyze the time and space complexity of each algorithm. Discuss when each is preferred: BFS vs IDDFS for uninformed search, and how A* with Manhattan distance dramatically outperforms both. Explain admissibility and why Manhattan distance never overestimates. How would performance change for the 15-puzzle?  What other search algorithms could be applied to this problem, and how would they compare in terms of performance and optimality?
+answer: "BFS uses a queue (FIFO) to explore states level by level, guaranteeing optimal solutions but requiring O(b^d) space. DLS performs DFS but stops at a depth limit. IDDFS repeatedly runs DLS with increasing limits (0,1,2,...), achieving BFS's optimality with only O(bd) space. A* uses f(n)=g(n)+h(n) with a priority queue, where Manhattan distance sums each tile's distance from its goal position. For hard 8-puzzle instances: BFS/IDDFS explore ~170K states, A* with Manhattan distance explores ~1-5K states—a 30-100x improvement."
+answer_kindergarten: "Imagine solving a sliding tile puzzle. BFS is like trying every possible move one step at a time, then every two-step combination—you'll find the shortest solution but need to remember everything! IDDFS is smarter: try 1 move, then start over and try 2 moves, then 3 moves. A* is the smartest: it looks at how far each tile is from where it should be and focuses on moves that seem most promising first!"
+answer_3rd_grade: "For the 8-puzzle: BFS explores all possible moves systematically—1 move away, 2 moves, 3 moves, etc. It finds the shortest solution but uses lots of memory. IDDFS searches depth 1, restarts and searches depth 2, then 3, saving memory. A* is clever: it adds up two numbers for each puzzle state: how many moves you've made so far, plus a guess of how many moves are left (by counting how far each tile is from its goal spot). It always explores the state with the smallest total first, finding solutions much faster!"
+answer_7th_grade: "BFS maintains a queue of board states, explores level by level, and reconstructs the path using parent pointers. IDDFS runs depth-limited search repeatedly with increasing limits. A* maintains a priority queue ordered by f(n) = g(n) + h(n), where g(n) is moves made so far and h(n) is the Manhattan distance heuristic (sum of each tile's horizontal and vertical distance from its goal position). A* always expands the most promising state first. For the 8-puzzle, A* is dramatically faster because Manhattan distance provides good guidance toward the goal."
+answer_high_school: "BFS: FIFO queue, visited set, parent map for path reconstruction. O(b^d) time and space. IDDFS: Repeatedly calls DLS(depth) for depth=0,1,2,... DLS uses recursion with depth parameter. O(b^d) time, O(bd) space—much better than BFS. A*: Priority queue ordered by f=g+h. For 8-puzzle, Manhattan distance h(s) = Σ |current_row - goal_row| + |current_col - goal_col| for each tile. Manhattan distance is admissible (never overestimates) because each tile must move at least that many steps. A* expands far fewer nodes than BFS/IDDFS: typically 1K-5K states vs 170K states for hard instances."
+answer_undergraduate: "BFS: Complete and optimal for unit costs. Time/space O(b^d) where b≈2-3 for 8-puzzle (average branching factor), d=solution depth. For 8-puzzle, ~50% of random instances have d≤20. Space is the limiting factor. IDDFS: Time O(b^d), space O(bd). Revisits states but last level dominates: overhead = O(b^d / (b-1)) ≈ O(b^d). Preferred when memory-constrained. A*: With admissible h, expands all nodes with f(n) < C* and some with f(n)=C* (C*=optimal cost). Manhattan distance for 8-puzzle is admissible and consistent. Effective branching factor b*: For A* with Manhattan, typically b*≈1.2-1.5 vs b≈2.5 for IDDFS, yielding 30-100x fewer expansions. Time/space still O(b^d) worst-case, but typical performance is dramatically better. For 15-puzzle (d≈50-80), only A* variants (IDA*, pattern databases) are practical."
+topics:
+  - "Search Algorithms"
+  - "BFS"
+  - "Depth-Limited Search"
+  - "IDDFS"
+  - "A* Search"
+  - "Heuristic Functions"
+  - "Manhattan Distance"
+  - "Completeness and Optimality"
+vocab_answer:
+  - word: "queue"
+    definition: "A first-in-first-out (FIFO) data structure"
+  - word: "priority queue"
+    definition: "A data structure that returns elements in order of priority (minimum f-value first for A*)"
+  - word: "heuristic"
+    definition: "An estimate or educated guess used to guide search"
+  - word: "admissible"
+    definition: "A heuristic that never overestimates the true cost to reach the goal"
+  - word: "Manhattan distance"
+    definition: "Sum of horizontal and vertical distances; each tile's displacement from its goal position"
+vocab_kindergarten:
+  - word: "level"
+    definition: "How many steps away something is from where you started"
+  - word: "remember"
+    definition: "To keep information about what you've already seen"
+vocab_3rd_grade:
+  - word: "queue"
+    definition: "A waiting line where the first person in is the first person out"
+  - word: "restart"
+    definition: "To go back to the beginning and start over"
+vocab_7th_grade:
+  - word: "recursion"
+    definition: "When a function calls itself to solve smaller versions of a problem"
+  - word: "parent pointer"
+    definition: "A reference to the previous state that led to the current state"
+vocab_high_school:
+  - word: "FIFO"
+    definition: "First In, First Out - a queue discipline"
+  - word: "backtracking"
+    definition: "Retracing steps from goal to start using stored parent information"
+vocab_undergraduate:
+  - word: "branching factor"
+    definition: "Average number of successors per state"
+  - word: "asymptotic complexity"
+    definition: "Behavior of an algorithm as input size approaches infinity"
+example_videos:
+  - "https://www.youtube.com/watch?v=oDqjPvD54Ss"
+  - "https://www.youtube.com/watch?v=NUgMa5coCoE"

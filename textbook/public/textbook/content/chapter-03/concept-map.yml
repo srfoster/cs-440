@@ -1,19 +1,10 @@
 concept_map:
   - category: "Adversarial Search and Games"
     concepts:
-      - name: "Minimax and Alpha-Beta"
+      - name: "Minimax, Alpha-Beta, and Expectiminimax"
         description: "Optimal play in two-player zero-sum games"
         exam_questions:
           - "questions/minimax-alphabeta.yml"
-      - name: "Stochastic Games"
-        description: "Games with chance elements"
-        exam_questions:
           - "questions/expectiminimax.yml"
-      - name: "Monte Carlo Methods"
-        description: "Stochastic game playing"
-        exam_questions:
           - "questions/monte-carlo.yml"
-      - name: "Game Theory"
-        description: "Strategic reasoning and equilibria"
-        exam_questions:
           - "questions/nash-equilibrium.yml"

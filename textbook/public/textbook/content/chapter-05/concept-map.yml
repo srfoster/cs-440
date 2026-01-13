@@ -1,20 +1,11 @@
 concept_map:
   - category: "Logic and Inference"
     concepts:
-      - name: "Unification"
+      - name: "Unification, Inference, Resolution, and Search"
         description: "Pattern matching for logical terms"
         exam_questions:
           - "questions/unification.yml"
-      - name: "Inference Rules"
-        description: "Forward and backward chaining"
-        exam_questions:
           - "questions/forward-backward-chain.yml"
           - "questions/backward-chaining.yml"
-      - name: "Resolution"
-        description: "Theorem proving via resolution"
-        exam_questions:
           - "questions/resolution.yml"
-      - name: "Inference as Search"
-        description: "Treating inference as state-space search"
-        exam_questions:
           - "questions/inference-search.yml"

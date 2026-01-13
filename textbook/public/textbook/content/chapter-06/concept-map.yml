@@ -1,17 +1,11 @@
 concept_map:
   - category: "Probabilistic Reasoning and Learning"
     concepts:
-      - name: "Bayesian Networks"
+      - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
         description: "Probabilistic graphical models"
         exam_questions:
           - "questions/bayes-net-inference.yml"
           - "questions/likelihood-weighting.yml"
-      - name: "Sequential Models"
-        description: "HMMs and temporal reasoning"
-        exam_questions:
           - "questions/hmm-filtering.yml"
           - "questions/particle-filtering.yml"
-      - name: "Machine Learning Basics"
-        description: "Supervised learning fundamentals"
-        exam_questions:
           - "questions/supervised-learning.yml"

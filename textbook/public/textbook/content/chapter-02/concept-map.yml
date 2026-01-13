@@ -6,8 +6,7 @@ concept_map:
         exam_questions:
           - "questions/8queens-objective.yml"
           - "questions/8queens-hillclimb.yml"
-          - "questions/simulated-annealing.yml"
-          - "questions/genetic-algorithm.yml"
+          - "questions/stochastic-optimization.yml"
       - name: "Continuous Optimization"
         description: "Optimization in continuous spaces"
         exam_questions:

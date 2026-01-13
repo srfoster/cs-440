@@ -1,20 +1,11 @@
 concept_map:
   - category: "Neural Networks and Transformers"
     concepts:
-      - name: "Feedforward Networks"
+      - name: "Neural Networks, Backpropagation, and Transformers"
         description: "Basic neural networks and backpropagation"
         exam_questions:
           - "questions/feedforward-backprop.yml"
-      - name: "Convolutional Networks"
-        description: "CNNs for computer vision"
-        exam_questions:
           - "questions/convolution.yml"
-      - name: "Attention and Transformers"
-        description: "Self-attention mechanisms"
-        exam_questions:
           - "questions/transformer-attention.yml"
           - "questions/transformer-block.yml"
-      - name: "Language Models"
-        description: "Training next-token prediction models"
-        exam_questions:
           - "questions/language-model-training.yml"

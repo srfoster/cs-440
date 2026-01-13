@@ -2,15 +2,17 @@ id: "m3-monte-carlo"
 type: "short-answer"
 chapter: 3
 question: |
-  When the game tree is too large for exact minimax—even with alpha–beta pruning—agents can use Monte Carlo simulation to estimate move quality. A rollout (playout) simulates a complete game to terminal using random (or heuristic) moves, and the outcomes are averaged to estimate expected utility. This matters because Monte Carlo ideas are central in modern game-playing systems (and more broadly in approximate planning under uncertainty).
+  **Use Monte Carlo Tree Search when exact minimax is intractable.**
+
+  **Level 0** Discuss the limitations of minimax/alpha-beta for large games. Why is Go harder than Chess? How does Monte Carlo simulation provide an alternative to exhaustive search? What's the key insight: "playing randomly is informative"?
+
+  **Level 1** Describe simple Monte Carlo move evaluation using random playouts. For each legal move, simulate N random games from the resulting position and track win rate. Give pseudocode for MONTE_CARLO_MOVE(state, player, rolloutsPerMove) and RANDOM_PLAYOUT(state, player). Demonstrate by hand with a simple game.
   
-  **Task:** Write pseudocode for MONTE_CARLO_MOVE(state, player, rolloutsPerMove) and RANDOM_PLAYOUT.
-  
-  **Level 1** Explain MCTS phases: selection, expansion, simulation (rollout), backpropagation. Describe how random playouts estimate move quality.
-  
-  **Level 2** Implement a simple Monte Carlo move selection using random rollouts.
-  
-  **Level 3** Discuss UCB1 formula, exploration-exploitation balance, and why MCTS excels in large branching factor games like Go.
+  Then describe full MCTS with four phases: **Selection** (traverse tree using UCB), **Expansion** (add new node), **Simulation** (random playout), **Backpropagation** (update statistics). Explain the UCB1 formula: score = wins/visits + C * sqrt(ln(parent_visits)/visits).
+
+  **Level 2** Implement simple Monte Carlo move selection with random rollouts for tic-tac-toe or connect-four. Then implement full MCTS with UCB selection. Compare performance and number of simulations needed.
+
+  **Level 3** Analyze the exploration-exploitation trade-off in UCB1. Prove that UCB converges to optimal move selection with enough samples. Discuss why MCTS excels in high-branching games (Go has b≈250 vs Chess b≈35). Compare MCTS with alpha-beta: when is each preferable? Discuss neural network enhancements (AlphaGo).
 answer: "Monte Carlo move selection evaluates each legal move by performing random playouts from the resulting state. For each move, run N simulations playing randomly until game end, record wins/losses, and choose the move with highest win rate. MCTS extends this with tree search, UCB selection, and incremental tree building."
 topics:
   - "Monte Carlo Methods"

@@ -5,19 +5,7 @@ concept_map:
         description: "Variables, domains, and constraints"
         exam_questions:
           - "questions/csp-representation.yml"
-      - name: "Backtracking Search"
-        description: "Systematic search with inference for CSPs"
-        exam_questions:
           - "questions/csp-backtracking.yml"
-      - name: "Arc Consistency"
-        description: "Constraint propagation using AC-3"
-        exam_questions:
           - "questions/ac3-algorithm.yml"
-      - name: "Tree-Structured CSPs"
-        description: "Efficient algorithms for tree-structured problems"
-        exam_questions:
           - "questions/tree-csp.yml"
-      - name: "Advanced CSP Techniques"
-        description: "Cutset conditioning and decomposition"
-        exam_questions:
           - "questions/cutset-conditioning.yml"

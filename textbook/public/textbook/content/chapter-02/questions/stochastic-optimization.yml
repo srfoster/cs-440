@@ -1,0 +1,47 @@
+id: "m2-stochastic-optimization"
+type: "short-answer"
+chapter: 2
+question: |
+  **Solve the 8-Queens problem using stochastic optimization: simulated annealing and genetic algorithms.**
+
+  **Level 0** Discuss how randomness helps overcome the limitations of greedy hill climbing. Compare two paradigms: single-point stochastic search (simulated annealing) vs. population-based search (genetic algorithms). Why is the exploration-exploitation trade-off central to both?
+
+  **Level 1** Using the 8-Queens formulation:
+  
+  **Simulated Annealing:** Describe the metallurgical annealing metaphor. Give pseudocode for SIM_ANNEAL(board, T0, alpha, steps) that accepts improvements always, and worse moves with probability exp(-delta/T). Demonstrate the acceptance probability calculation by hand.
+  
+  **Genetic Algorithm:** Describe the evolutionary components. How is a board represented as a "chromosome"? What is the fitness function? Describe selection, crossover, and mutation. Give pseudocode for GA_8QUEENS(popSize, generations, mutRate). Demonstrate one generation by hand with a small population.
+
+  **Level 2** Implement both algorithms for 8-Queens:
+  
+  **SA Implementation:** Use geometric cooling schedule (T = alpha * T) with RANDOM_NEIGHBOR function. Test various temperature schedules.
+  
+  **GA Implementation:** Use tournament selection (k=3), one-point crossover, and mutation. Track population diversity over generations.
+  
+  Compare both with hill climbing: success rates, iterations to solution, and robustness.
+
+  **Level 3** Analyze theoretical guarantees and practical trade-offs:
+  
+  **Simulated Annealing:** Prove that logarithmic cooling converges to global optimum with probability 1. Why use faster geometric cooling in practice? Analyze temperature's role in exploration vs. exploitation.
+  
+  **Genetic Algorithms:** Discuss the schema theorem (building blocks hypothesis). How do population size, mutation rate, and selection pressure affect convergence and diversity? Why might GAs outperform single-point search for certain landscapes?
+  
+  Compare when to use each: SA for well-defined neighborhoods, GAs for complex recombination, both for escaping local optima.
+answer: "**Simulated annealing** accepts worse moves with probability exp(-delta/T) where temperature T decreases over time (T = alpha * T). This escapes local optima early while converging as T→0. **Genetic algorithms** maintain a population, select parents by fitness, create offspring through crossover and mutation. For 8-Queens: fitness = 1/(1+conflicts), tournament selection picks best of k random, one-point crossover combines board segments, mutation randomly changes positions. Both overcome hill climbing's greedy limitations through controlled randomness."
+topics:
+  - "Simulated Annealing"
+  - "Genetic Algorithms"
+  - "Stochastic Search"
+  - "Evolutionary Computation"
+  - "Population-based Search"
+vocab_answer:
+  - word: "temperature"
+    definition: "A parameter controlling randomness in simulated annealing"
+  - word: "cooling schedule"
+    definition: "The rate at which temperature decreases over time"
+  - word: "crossover"
+    definition: "Combining genetic material from two parents to create offspring"
+  - word: "mutation"
+    definition: "Random changes to maintain diversity in the population"
+example_videos:
+  - "https://www.youtube.com/watch?v=eBmU1ONJ-os"

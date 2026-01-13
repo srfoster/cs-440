@@ -2,9 +2,15 @@ id: "m2-8queens-objective"
 type: "short-answer"
 chapter: 2
 question: |
-  In local search, we do not build solution paths; instead we treat problem-solving as optimization. We define an objective function that scores candidate solutions, and we search for a state with a better score. The 8-queens problem can be approached this way by defining an objective like "number of conflicting queen pairs," which we want to minimize. This matters because many real-world problems are naturally "optimize a score" rather than "reach a goal state through a shortest path."
-  
-  **Task:** Using the representation board[col] = row, write pseudocode for CONFLICTS(board) that returns the number of attacking queen pairs (same row or diagonal).
+  **Formulate the 8-Queens problem as an optimization problem and implement the CONFLICTS objective function.**
+
+  **Level 0** Discuss the difference between path-finding search (Chapter 1) and optimization-based search (Chapter 2). Why is local search appropriate for problems like N-Queens? What are the trade-offs?
+
+  **Level 1** Describe the 8-Queens problem as an optimization problem. Using the representation board[col]=row, explain what constitutes a conflict between queens. Give pseudocode for CONFLICTS(board) that counts attacking queen pairs. Demonstrate by hand on a sample board.
+
+  **Level 2** Implement the CONFLICTS function in a language of your choice. Generate random 8-Queens boards and verify your conflict counting is correct.
+
+  **Level 3** Analyze the time complexity of CONFLICTS(board). Discuss how the objective function landscape affects search: are there many local optima? How does the number of global optima (92 for 8-Queens with symmetries) relate to search difficulty?
 answer: |
   The CONFLICTS function counts pairs of queens that attack each other either on the same row or the same diagonal. For N-Queens represented as board[col]=row, two queens at positions (i, board[i]) and (j, board[j]) conflict if they're on the same row or same diagonal.
   

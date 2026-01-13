@@ -2,7 +2,7 @@ id: "m1-astar-heuristic"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement the A* search algorithm -- A_STAR(start, h) -- for maze navigation using a priority queue ordered by f=g+h. Your implementation should maintain g-costs and support "decrease-key" behavior when a better path to a state is found.**
+  **Implement the A-star search algorithm -- A_STAR(start, h) -- for maze navigation using a priority queue ordered by f=g+h. Your implementation should maintain g-costs and support "decrease-key" behavior when a better path to a state is found.**
 
   **Level 0** Discuss the significance of search in the context of AI.  Discuss A* search and how it differs from uninformed search algorithms like BFS and DFS.
 

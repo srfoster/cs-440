@@ -13,11 +13,7 @@ import { compiledFiles, stats } from './compiled';
 const CONCEPT_MAP_PATHS = [
   'content/chapter-01/concept-map.yml',
   'content/chapter-02/concept-map.yml',
-  'content/chapter-03/concept-map.yml',
-  'content/chapter-04/concept-map.yml',
-  'content/chapter-05/concept-map.yml',
-  'content/chapter-06/concept-map.yml',
-  'content/chapter-07/concept-map.yml'
+  'content/chapter-03/concept-map.yml'
 ];
 
 function AppContent() {

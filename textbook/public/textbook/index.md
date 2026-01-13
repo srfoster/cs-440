@@ -8,104 +8,55 @@ This course provides a comprehensive introduction to artificial intelligence, co
 
 ## Topics
 
-### [Module 1: Intelligent Agents and Search](content/chapter-01/)
+### [Module 1: Search and Games](content/chapter-01/)
 
-**Problem Formulation:**
-* State spaces and problem representation
-* 8-puzzle formulation
-
-**Uninformed Search:**
-* Breadth-First Search (BFS)
-* Iterative Deepening DFS (IDDFS)
+**Intelligent Agents and Search:**
+* State spaces and problem representation (8-puzzle)
+* Uninformed search: BFS, Iterative Deepening DFS
+* Informed search: A* with admissible heuristics
 * Maze navigation algorithms
 
-**Informed Search:**
-* A* search with admissible heuristics
-* Heuristic design and evaluation
-
----
-
-### [Module 2: Local Search and Optimization](content/chapter-02/)
-
-**Hill Climbing:**
-* 8-Queens problem
-* Local optima and plateaus
-
-**Stochastic Methods:**
-* Simulated annealing
-* Genetic algorithms
+**Local Search and Optimization:**
+* Hill climbing and local optima (8-Queens problem)
+* Stochastic methods: Simulated annealing, Genetic algorithms
 * Continuous optimization
 
----
-
-### [Module 3: Adversarial Search and Games](content/chapter-03/)
-
-**Game Playing:**
-* Minimax algorithm
-* Alpha-beta pruning
-* Game tree evaluation
-
-**Stochastic Games:**
+**Adversarial Search:**
+* Minimax algorithm and alpha-beta pruning
+* Expectiminimax for stochastic games
 * Monte Carlo tree search (MCTS)
-* Random rollouts
 * Nash equilibrium basics
 
 ---
 
-### [Module 4: Constraint Satisfaction Problems](content/chapter-04/)
+### [Module 2: Reasoning with Constraints and Logic](content/chapter-02/)
 
-**CSP Formulation:**
-* Variables, domains, and constraints
-* Map coloring and Sudoku
-
-**Search and Inference:**
+**Constraint Satisfaction Problems:**
+* CSP formulation: Variables, domains, constraints
 * Backtracking with forward checking
-* Arc consistency (AC-3)
-* Tree-structured CSPs
+* Arc consistency (AC-3 algorithm)
+* Tree-structured CSPs and cutset conditioning
+
+**Logic and Inference:**
+* Unification algorithm and term matching
+* Forward and backward chaining for Horn clauses
+* Resolution theorem proving
 
 ---
 
-### [Module 5: Logic and Inference](content/chapter-05/)
+### [Module 3: Probabilistic Reasoning and Deep Learning](content/chapter-03/)
 
-**First-Order Logic:**
-* Unification algorithm
-* Term matching and substitution
+**Probabilistic Reasoning:**
+* Bayesian Networks: Exact inference and likelihood weighting
+* Hidden Markov Models (HMMs) and filtering
+* Particle filtering for temporal reasoning
+* Supervised learning fundamentals
 
-**Inference Methods:**
-* Forward chaining
-* Backward chaining
-* Resolution
-
----
-
-### [Module 6: Probabilistic Reasoning and Learning](content/chapter-06/)
-
-**Bayesian Networks:**
-* Exact inference with enumeration
-* Likelihood weighting
-
-**Temporal Models:**
-* Hidden Markov Models (HMMs)
-* Forward algorithm (filtering)
-* Particle filtering
-
-**Supervised Learning:**
-* Training and evaluation
-* Loss functions and optimization
-
----
-
-### [Module 7: Neural Networks and Transformers](content/chapter-07/)
-
-**Deep Learning Fundamentals:**
-* Feedforward networks
-* Backpropagation
-* Convolutional networks
-
-**Modern Architectures:**
+**Neural Networks and Transformers:**
+* Feedforward networks and backpropagation
+* Convolutional networks for computer vision
 * Self-attention mechanism
-* Transformer blocks
-* Language model training
+* Transformer blocks and language model training
 
 ---
 

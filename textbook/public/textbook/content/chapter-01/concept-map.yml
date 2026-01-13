@@ -1,21 +1,9 @@
 concept_map:
   - category: "Intelligent Agents and Search"
     concepts:
-      - name: "Problem Formulation"
+      - name: "Agents, Environments, and Search"
         description: "Defining states, actions, and goals for search problems"
         exam_questions:
           - "questions/8puzzle-formulation.yml"
-      - name: "Uninformed Search"
-        description: "Search strategies that don't use problem-specific knowledge"
-        exam_questions:
-          - "questions/maze-navigation.yml"
           - "questions/bfs-iddfs.yml"
-          - "questions/depth-cutoff.yml"
-      - name: "Informed Search"
-        description: "Search algorithms that use heuristics to guide exploration"
-        exam_questions:
           - "questions/astar-heuristic.yml"
-      - name: "Multi-Agent Systems"
-        description: "Simulating multiple interacting agents"
-        exam_questions:
-          - "questions/boids.yml"

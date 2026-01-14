@@ -2,22 +2,18 @@ id: "m1-8puzzle-formulation"
 type: "short-answer"
 chapter: 1
 question: |
-  **Solve the 8-puzzle problem by formulating it as a search problem.**
+  **Solve the 8-puzzle problem (or a problem of your choice) by formulating it as a search problem.**
 
-  **Level 0** Discuss the significance of state space formulation in AI and how it applies to the 8-puzzle problem.
+  **Level 0** Discuss the significance of state space formulation in AI and how it applies to the problem.  What is the benefit of formulating a problem as a search problem?  What are the key components of a search problem? 
 
-  **Level 1** Describe the state space, actions, and goal test for the 8-puzzle problem, and give pseudocode for the functions ACTIONS(s), RESULT(s,a), and GOAL_TEST(s).  Demonstrate searching the state space by hand.  (You may assume states are represented as 3×3 lists of integers, where 0 represents the blank tile.)
+  **Level 1** Describe the state space, actions, and goal test for the 8-puzzle problem.  Demonstrate a BFS search of the state space by drawing part of the search tree.  
+  
+  **Level 2** Implement a solution to the 8-puzzle problem in a language of your choice by using A* search. (HINT: Use Manhattan distance as your heuristic)
 
-  **Level 2** Implement a solution to the 8-puzzle problem in a language of your choice.
+  **Level 3** Formally analyze the time and space complexity of various search algorithms (BFS, DFS with iterative deepening, and A*).
+  Discuss the impact of heuristic choice on A* search performance and optimality. Provide examples of admissible heuristics for the 8-puzzle problem.
 
-  **Level 3** Analyze the time and space complexity of your solution. Discuss how the choice of search algorithm (BFS, DFS, A*, etc.) affects performance and optimality.  Discuss the concept of heuristics and how they can be used to improve search performance in the context of the 8-puzzle problem.  How might things change in a larger puzzle (e.g., 15-puzzle) or a different grid size?
-
-answer: "The 8-puzzle requires three key functions: ACTIONS(s) returns valid moves based on the blank tile's position (UP, DOWN, LEFT, RIGHT within grid bounds), RESULT(s,a) creates a new state by swapping the blank with an adjacent tile, and GOAL_TEST(s) checks if the state matches the goal configuration [[1,2,3],[4,5,6],[7,8,0]]. This formulation enables any search algorithm to solve the puzzle."
-answer_kindergarten: "The 8-puzzle is like a sliding tile game. You have 8 numbered tiles and one empty space in a small square. You can slide tiles into the empty space. We need to tell the computer: which tiles can move right now, what happens when we move a tile, and when we've won the game by getting all the tiles in the right order."
-answer_3rd_grade: "To solve the 8-puzzle with a computer, we need three special instructions: 1) Check which way the empty space can move (up, down, left, or right, but not off the board), 2) Make a new puzzle by sliding a tile into the empty space, and 3) Check if all the numbers are in order from 1 to 8 with the empty space at the bottom right."
-answer_7th_grade: "The 8-puzzle problem formulation uses three functions. ACTIONS(s) finds where the blank (0) is located and returns which directions it can move without going outside the 3×3 grid. RESULT(s,a) creates a copy of the state, finds the blank, and swaps it with the neighboring tile in the specified direction. GOAL_TEST(s) compares the current state with the goal state [[1,2,3],[4,5,6],[7,8,0]]. These functions provide everything a search algorithm needs to find a solution."
-answer_high_school: "Problem formulation in the 8-puzzle requires precise function definitions. ACTIONS(s) locates the blank tile at position (r,c) and returns a list of valid moves: 'UP' if r>0, 'DOWN' if r<2, 'LEFT' if c>0, 'RIGHT' if c<2. RESULT(s,a) performs a deep copy of state s, calculates the new blank position based on action a, swaps the blank with the target tile, and returns the new state. GOAL_TEST(s) performs an equality check against the canonical goal configuration. This abstraction allows separation of problem definition from search strategy."
-answer_undergraduate: "The 8-puzzle exemplifies state-space search problem formulation. The state space consists of all possible 3×3 configurations with tiles {0,1,2,3,4,5,6,7,8}, though only 9!/2 = 181,440 states are reachable from any given initial state due to parity constraints. ACTIONS(s): Θ(1) operation computing valid moves from blank position. RESULT(s,a): Θ(n²) for grid copying, though optimizable with persistent data structures. GOAL_TEST(s): Θ(n²) equality check. The formulation's key insight is that by abstracting the problem into these three functions plus a cost function (uniform cost = 1 per move), we can apply any search algorithm (BFS, A*, IDA*, etc.) without modifying the search code itself."
+answer: "The 8-puzzle requires three key functions: ACTIONS(s) returns valid moves based on the blank tile's position (UP, DOWN, LEFT, RIGHT within grid bounds), RESULT(s,a) creates a new state by swapping the blank with an adjacent tile, and GOAL_TEST(s) checks if the state matches the goal configuration [[1,2,3],[4,5,6],[7,8,0]]. This formulation enables any search algorithm to solve the puzzle.  The 8-puzzle exemplifies state-space search problem formulation. The state space consists of all possible 3×3 configurations with tiles {0,1,2,3,4,5,6,7,8}, though only 9!/2 = 181,440 states are reachable from any given initial state due to parity constraints. ACTIONS(s): Θ(1) operation computing valid moves from blank position. RESULT(s,a): Θ(n²) for grid copying, though optimizable with persistent data structures. GOAL_TEST(s): Θ(n²) equality check. The formulation's key insight is that by abstracting the problem into these three functions plus a cost function (uniform cost = 1 per move), we can apply any search algorithm (BFS, A*, IDA*, etc.) without modifying the search code itself."
 topics:
   - "Problem Formulation"
   - "State Space"
@@ -29,31 +25,17 @@ vocab_answer:
     definition: "A move or operation that transforms one state into another"
   - word: "goal test"
     definition: "A function that determines whether a state is the desired solution"
-vocab_kindergarten:
-  - word: "tile"
-    definition: "One of the numbered squares in the puzzle"
-  - word: "empty space"
-    definition: "The spot where no tile is, where you can slide tiles into"
-vocab_3rd_grade:
-  - word: "function"
-    definition: "A set of instructions that does a specific job"
-  - word: "grid"
-    definition: "A pattern of squares arranged in rows and columns"
-vocab_7th_grade:
-  - word: "deep copy"
-    definition: "Making a complete duplicate of data so changes don't affect the original"
-  - word: "valid moves"
-    definition: "Actions that are allowed according to the rules of the problem"
-vocab_high_school:
-  - word: "abstraction"
-    definition: "Hiding complex details behind simple interfaces"
-  - word: "canonical"
-    definition: "The standard or official version of something"
-vocab_undergraduate:
   - word: "parity constraints"
     definition: "Mathematical restrictions on which configurations can be reached from others"
   - word: "persistent data structures"
     definition: "Data structures that preserve previous versions when modified"
 example_videos:
+  - "https://www.youtube.com/watch?v=EPgALpUMUhU"
+  - "https://www.youtube.com/watch?v=nmWGhb9E4es"
+  - "https://www.youtube.com/watch?v=X88dBuZnBtA"
+  - "https://www.youtube.com/watch?v=OXG04zPBsZ8"
+  - "https://www.youtube.com/watch?v=GuCzYxHa7iA"
+  - "https://www.youtube.com/watch?v=wbWUJjD2oCo"
+  - "https://www.youtube.com/watch?v=kF5fT7Um5bE" 
   - "https://www.youtube.com/watch?v=YUBvjEdBZZk"
   - "https://www.youtube.com/watch?v=JYj-K4PuUCY"

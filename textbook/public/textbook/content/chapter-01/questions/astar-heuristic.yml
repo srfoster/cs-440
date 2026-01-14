@@ -2,7 +2,7 @@ id: "m1-astar-heuristic"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement the A-star search algorithm -- A_STAR(start, h) -- for maze navigation.**
+  **Implement the A-star search algorithm for maze navigation.**
 
   **Level 0** Discuss the significance of search in the context of AI.  Discuss how A* search (informed search) differs from algorithms like BFS and DFS (uninformed search).
 

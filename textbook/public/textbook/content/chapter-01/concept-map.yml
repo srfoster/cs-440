@@ -6,7 +6,6 @@ concept_map:
         exam_questions:
           - "questions/astar-heuristic.yml"
           - "questions/8puzzle-formulation.yml"
-          - "questions/search-algorithms.yml"
   - category: "Local Search and Optimization"
     concepts:
       - name: "Objective Functions, Optimization, and Local Search"

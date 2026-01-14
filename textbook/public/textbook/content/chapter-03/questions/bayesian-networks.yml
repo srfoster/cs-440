@@ -2,25 +2,353 @@ id: "m6-bayesian-networks"
 type: "short-answer"
 chapter: 3
 question: |
-  **Diagnose influenza using Bayesian networks with exact and approximate inference.**
+  **Diagnose influenza using Bayesian networks with exact inference, Monte Carlo sampling, and MCMC.**
 
-  You're building a medical diagnosis system for flu. Patient presents with Fever and Cough. What's P(Flu|Fever, Cough)? The challenge: Flu, Cold, and Allergy have overlapping symptoms. Network structure: Season → Flu (flu more likely in winter), Flu → Fever, Flu → Cough, Flu → Fatigue, Cold → Fever, Cold → Cough, Allergy → Cough. Each variable binary (yes/no). Naive joint distribution: P(Season, Flu, Cold, Allergy, Fever, Cough, Fatigue) requires 2⁷=128 entries. With Bayesian network: only Σ 2^(parents+1) entries, exploiting conditional independence. Example: Fever depends only on Flu and Cold, not Season or Allergy. This matters because real medical systems have hundreds of diseases and symptoms—explicit joint distributions are impossible, but structured models work.
+  You're building a medical diagnosis system for flu. Patient presents with Fever and Cough. What's P(Flu|Fever, Cough)? The challenge: Flu, Cold, and Allergy have overlapping symptoms. Network structure: Season → Flu (flu more likely in winter), Flu → Fever, Flu → Cough, Flu → Fatigue, Cold → Fever, Cold → Cough, Allergy → Cough. Each variable binary (yes/no). Naive joint distribution: P(Season, Flu, Cold, Allergy, Fever, Cough, Fatigue) requires 2⁷=128 entries. With Bayesian network: only Σ 2^(parents+1) entries, exploiting conditional independence. Example: Fever depends only on Flu and Cold, not Season or Allergy. This matters because real medical systems have hundreds of diseases and symptoms—exact distributions are impossible, but structured models with sampling work.
 
-  **Level 0** Discuss why probabilistic reasoning differs from logic (Chapter 2). Logic: "If Flu then Fever" (deterministic). Probability: "P(Fever|Flu)=0.9" (uncertain). Why does medicine need uncertainty? Symptoms overlap, tests are imperfect, individual variation. Compare with CSP (Chapter 2): there constraints are hard (Sudoku cell = 5 or not), here probabilistic (Fever likely given Flu, but not certain). Why is inference hard? Exact inference NP-hard for general networks, but tractable for tree-structured networks (like CSP treewidth).
+  When exact inference is intractable (complex networks, continuous variables), Monte Carlo methods provide a solution: generate samples from the posterior distribution and estimate probabilities by counting. This connects to Chapter 1's MCTS: there we sampled game trajectories to evaluate moves; here we sample variable assignments to estimate posteriors. Monte Carlo Markov Chain (MCMC) methods like Gibbs sampling are foundational to modern Bayesian inference—used in probabilistic programming (PyMC, Stan), Bayesian deep learning, and generative models.
+
+  **Level 0** Discuss why probabilistic reasoning differs from logic (Chapter 2). Logic: "If Flu then Fever" (deterministic). Probability: "P(Fever|Flu)=0.9" (uncertain). Why does medicine need uncertainty? Symptoms overlap, tests are imperfect, individual variation. Compare with CSP (Chapter 2): there constraints are hard (Sudoku cell = 5 or not), here probabilistic (Fever likely given Flu, but not certain). 
+  
+  Why is inference hard? Exact inference NP-hard for general networks, but tractable for tree-structured networks (like CSP treewidth). 
+  
+  Discuss the progression of inference methods: (1) **Exact** works for small networks, (2) **Likelihood weighting** samples efficiently but suffers from unlikely evidence, (3) **Rejection sampling** wastes samples, (4) **MCMC/Gibbs** samples from the actual posterior distribution by constructing a Markov chain that converges to the target. Compare to Chapter 1: hill climbing gets stuck (greedy), simulated annealing uses randomness to escape (stochastic), Gibbs sampling uses randomness to explore probability distributions (Monte Carlo).
 
   **Level 1** Formulate flu diagnosis as Bayesian network. Variables: Season={Winter, Summer}, Flu, Cold, Allergy, Fever, Cough, Fatigue (all binary except Season). Edges: Season → Flu (P(Flu|Winter)=0.1, P(Flu|Summer)=0.01), Flu → Fever (P(Fever|Flu)=0.9), Cold → Fever (P(Fever|Cold)=0.7), combine with noisy-OR: P(Fever|Flu, Cold) = 1 - (1-0.9)(1-0.7) = 0.97. Similarly Flu → Cough (0.8), Cold → Cough (0.6), Allergy → Cough (0.9), combine with noisy-OR. Flu → Fatigue (0.95).
   
-  **Exact Inference via Enumeration:** Query: P(Flu|Fever=yes, Cough=yes). Formula: P(Flu|e) = α P(Flu, e) = α Σ_{hidden} P(Flu, e, hidden). Hidden variables: Season, Cold, Allergy, Fatigue. Enumerate all 2⁴=16 combinations. Example: P(Flu=yes, Fever=yes, Cough=yes, Season=Winter, Cold=no, Allergy=no, Fatigue=yes) = P(Season=Winter) × P(Flu=yes|Winter) × P(Cold=no) × P(Allergy=no) × P(Fever=yes|Flu=yes,Cold=no) × P(Cough=yes|Flu=yes,Cold=no,Allergy=no) × P(Fatigue=yes|Flu=yes). Sum over all 16, normalize. Pseudocode: ENUM_ASK(X, e, bn): return NORMALIZE([ENUM_ALL(X=true, e), ENUM_ALL(X=false, e)]). ENUM_ALL(vars, e): if empty, return 1; else pick variable Y, if Y observed return P(Y=e[Y]|parents) × ENUM_ALL(rest, e); else return Σ_{y} P(Y=y|parents) × ENUM_ALL(rest, e).
+  **Exact Inference via Enumeration:** Query: P(Flu|Fever=yes, Cough=yes). Formula: P(Flu|e) = α P(Flu, e) = α Σ_{hidden} P(Flu, e, hidden). Hidden variables: Season, Cold, Allergy, Fatigue. Enumerate all 2⁴=16 combinations. Example: P(Flu=yes, Fever=yes, Cough=yes, Season=Winter, Cold=no, Allergy=no, Fatigue=yes) = P(Season=Winter) × P(Flu=yes|Winter) × P(Cold=no) × P(Allergy=no) × P(Fever=yes|Flu=yes,Cold=no) × P(Cough=yes|Flu=yes,Cold=no,Allergy=no) × P(Fatigue=yes|Flu=yes). Sum over all 16, normalize. 
   
-  **Approximate Inference via Likelihood Weighting:** Generate N=1000 samples. For each sample: (1) Sample Season ~ P(Season) (e.g., Winter with probability 0.5). (2) Sample Flu ~ P(Flu|Season). (3) Fever is evidence (Fever=yes), so don't sample—fix Fever=yes and multiply weight w ×= P(Fever=yes|Flu,Cold). (4) Similarly fix Cough=yes, multiply w ×= P(Cough=yes|Flu,Cold,Allergy). (5) Sample other variables. After 1000 samples, estimate P(Flu=yes|e) ≈ (sum of w where Flu=yes) / (sum of all w). Pseudocode: LIKELIHOOD_WEIGHTING(X, e, bn, N): for i=1..N: (x,w) = WEIGHTED_SAMPLE(bn, e), if x[X]=true: W[true]+=w else W[false]+=w. Return NORMALIZE(W).
+  Pseudocode: 
+  ```
+  ENUM_ASK(X, e, bn): 
+    return NORMALIZE([ENUM_ALL(X=true, e), ENUM_ALL(X=false, e)])
+  
+  ENUM_ALL(vars, e): 
+    if vars empty: return 1
+    Y = FIRST(vars)
+    if Y observed in e: 
+      return P(Y=e[Y]|parents) × ENUM_ALL(REST(vars), e)
+    else: 
+      return Σ_{y} P(Y=y|parents) × ENUM_ALL(REST(vars), e)
+  ```
+  
+  **Likelihood Weighting (Basic Monte Carlo):** Generate N=1000 samples. For each sample: (1) Sample Season ~ P(Season) (e.g., Winter with probability 0.5). (2) Sample Flu ~ P(Flu|Season). (3) Fever is evidence (Fever=yes), so don't sample—fix Fever=yes and multiply weight w ×= P(Fever=yes|Flu,Cold). (4) Similarly fix Cough=yes, multiply w ×= P(Cough=yes|Flu,Cold,Allergy). (5) Sample other variables. After 1000 samples, estimate P(Flu=yes|e) ≈ (sum of w where Flu=yes) / (sum of all w). 
+  
+  Pseudocode:
+  ```
+  LIKELIHOOD_WEIGHTING(X, e, bn, N): 
+    W = {true: 0, false: 0}
+    for i=1..N:
+      (x, w) = WEIGHTED_SAMPLE(bn, e)
+      W[x[X]] += w
+    return NORMALIZE(W)
+  
+  WEIGHTED_SAMPLE(bn, e):
+    w = 1; x = {}
+    for each variable Xi in topological order:
+      if Xi in e:  # Evidence variable
+        x[Xi] = e[Xi]
+        w *= P(Xi=e[Xi] | parents(Xi))
+      else:  # Non-evidence variable
+        x[Xi] = SAMPLE(P(Xi | parents(Xi)))
+    return (x, w)
+  ```
+  
+  **Problem with likelihood weighting:** If evidence is unlikely (e.g., rare disease), most samples get tiny weights → high variance. Need better method.
+  
+  **Gibbs Sampling (MCMC):** Instead of sampling from prior and reweighting, sample directly from posterior P(vars|evidence). Algorithm: (1) Initialize all non-evidence variables randomly. (2) Fix evidence variables (Fever=yes, Cough=yes). (3) For each iteration: For each non-evidence variable Xi, resample Xi from P(Xi | MarkovBlanket(Xi), evidence) where Markov Blanket = parents + children + children's parents. (4) After burn-in period (discard first 100 samples), count: P(Flu=yes|e) ≈ (# samples where Flu=yes) / (total samples).
+  
+  **Example Gibbs iteration:**
+  ```
+  Evidence: Fever=yes, Cough=yes
+  Initial state: Season=Winter, Flu=no, Cold=yes, Allergy=no, Fatigue=yes
+  
+  Iteration 1:
+    - Sample Season ~ P(Season | Flu): 
+      P(Winter|Flu=no) ∝ P(Flu=no|Winter)P(Winter) = 0.9 × 0.5
+      P(Summer|Flu=no) ∝ P(Flu=no|Summer)P(Summer) = 0.99 × 0.5
+      → Season = Summer (higher probability)
+    
+    - Sample Flu ~ P(Flu | Season, Fever, Cough, Fatigue):
+      Markov blanket = {Season, Fever, Cough, Fatigue}
+      P(Flu=yes | mb) ∝ P(Flu=yes|Season) × P(Fever=yes|Flu=yes,Cold) × 
+                       P(Cough=yes|Flu=yes,Cold,Allergy) × P(Fatigue=yes|Flu=yes)
+      Calculate both Flu=yes and Flu=no, normalize, sample
+      → Flu = yes (evidence strongly suggests flu)
+    
+    - Sample Cold ~ P(Cold | Flu, Fever, Cough):
+      Similar calculation with Markov blanket
+      → Cold = no
+    
+    - Sample Allergy ~ P(Allergy | Cough):
+      → Allergy = no
+    
+    - Sample Fatigue ~ P(Fatigue | Flu):
+      → Fatigue = yes
+  
+  New state: Season=Summer, Flu=yes, Cold=no, Allergy=no, Fatigue=yes
+  
+  After 1000 iterations (discard first 100 burn-in):
+  Count Flu=yes: 720 times
+  P(Flu=yes | Fever=yes, Cough=yes) ≈ 720/900 = 0.80
+  ```
+  
+  Pseudocode:
+  ```
+  GIBBS_SAMPLING(X, e, bn, N):
+    counts = {true: 0, false: 0}
+    x = random_assignment(non_evidence_variables)
+    set evidence variables: x[Xi] = e[Xi] for all Xi in e
+    
+    for i=1..N:
+      for each non-evidence variable Xj:
+        # Sample from conditional distribution given Markov blanket
+        x[Xj] = SAMPLE(P(Xj | MarkovBlanket(Xj), e))
+      
+      if i > BURN_IN:  # Skip burn-in period
+        counts[x[X]] += 1
+    
+    return NORMALIZE(counts)
+  
+  P(Xi=v | MarkovBlanket, e):
+    # Markov blanket = parents + children + children's other parents
+    prob = P(Xi=v | parents(Xi))  # Prior from parents
+    for each child Yj of Xi:
+      prob *= P(Yj | parents(Yj))  # Likelihood from children
+    return prob  # (unnormalized, must normalize over Xi's values)
+  ```
 
-  **Level 2** Implement both methods for flu diagnosis network. Build network with 7 variables, CPTs as described (use noisy-OR for combining influences). Exact inference: ENUM_ASK for P(Flu|Fever=yes, Cough=yes). Should get ≈50-60% (depends on exact CPTs). Approximate: 1000 likelihood-weighted samples, compare with exact. Test sensitivity: P(Flu|Fever=yes, Cough=yes, Fatigue=yes) should be much higher (≈80-90%). Plot: Number of samples vs. error from true posterior.
+  **Level 2** Implement all three methods for flu diagnosis network. Build network with 7 variables, CPTs as described (use noisy-OR for combining influences). 
+  
+  (1) **Exact inference**: ENUM_ASK for P(Flu|Fever=yes, Cough=yes). Should get ≈50-60% (depends on exact CPTs). 
+  
+  (2) **Likelihood weighting**: 1000 samples, compare with exact. Test sensitivity: P(Flu|Fever=yes, Cough=yes, Fatigue=yes) should be much higher (≈80-90%). Plot: Number of samples vs. error from true posterior.
+  
+  (3) **Gibbs sampling**: Implement with burn-in=200, samples=2000. Compare convergence with likelihood weighting. Plot trace of P(Flu=yes) over iterations to visualize convergence.
+  
+  **Python Implementation Template:**
+  ```python
+  import numpy as np
+  import random
+  
+  class BayesianNetwork:
+      def __init__(self):
+          # Define CPTs
+          self.P_season = {'Winter': 0.5, 'Summer': 0.5}
+          self.P_flu_given_season = {
+              'Winter': 0.1, 'Summer': 0.01
+          }
+          # ... more CPTs
+      
+      def sample_from_prior(self):
+          """Sample one complete assignment from prior."""
+          season = random.choices(['Winter', 'Summer'], 
+                                  weights=[0.5, 0.5])[0]
+          flu = random.random() < self.P_flu_given_season[season]
+          # ... sample other variables
+          return {'Season': season, 'Flu': flu, ...}
+      
+      def likelihood_weighting(self, query_var, evidence, N=1000):
+          """Estimate P(query_var | evidence) via weighted sampling."""
+          weights = {True: 0.0, False: 0.0}
+          
+          for _ in range(N):
+              sample = {}
+              weight = 1.0
+              
+              # Sample in topological order
+              for var in self.get_topological_order():
+                  if var in evidence:
+                      sample[var] = evidence[var]
+                      weight *= self.get_probability(var, sample[var], sample)
+                  else:
+                      sample[var] = self.sample_variable(var, sample)
+              
+              weights[sample[query_var]] += weight
+          
+          total = sum(weights.values())
+          return {k: v/total for k, v in weights.items()}
+      
+      def gibbs_sampling(self, query_var, evidence, N=1000, burn_in=200):
+          """Estimate P(query_var | evidence) via MCMC."""
+          # Initialize random state
+          state = self.random_state(evidence)
+          counts = {True: 0, False: 0}
+          
+          for i in range(N):
+              # Resample each non-evidence variable
+              for var in self.get_non_evidence_vars(evidence):
+                  state[var] = self.sample_from_markov_blanket(
+                      var, state, evidence
+                  )
+              
+              # Count after burn-in
+              if i >= burn_in:
+                  counts[state[query_var]] += 1
+          
+          total = sum(counts.values())
+          return {k: v/total for k, v in counts.items()}
+      
+      def sample_from_markov_blanket(self, var, state, evidence):
+          """Sample var given its Markov blanket."""
+          probs = {}
+          
+          # Try both values
+          for value in [True, False]:
+              state_copy = state.copy()
+              state_copy[var] = value
+              
+              # Compute unnormalized probability
+              prob = self.get_probability(var, value, state_copy)
+              
+              # Multiply by likelihoods from children
+              for child in self.get_children(var):
+                  prob *= self.get_probability(
+                      child, state_copy[child], state_copy
+                  )
+              
+              probs[value] = prob
+          
+          # Normalize and sample
+          total = sum(probs.values())
+          probs = {k: v/total for k, v in probs.items()}
+          return random.choices([True, False], 
+                               weights=[probs[True], probs[False]])[0]
+  
+  # Test all methods
+  bn = BayesianNetwork()
+  evidence = {'Fever': True, 'Cough': True}
+  
+  exact = bn.exact_inference('Flu', evidence)
+  lw = bn.likelihood_weighting('Flu', evidence, N=1000)
+  gibbs = bn.gibbs_sampling('Flu', evidence, N=2000, burn_in=200)
+  
+  print(f"Exact:    P(Flu|e) = {exact[True]:.3f}")
+  print(f"LW:       P(Flu|e) = {lw[True]:.3f}")
+  print(f"Gibbs:    P(Flu|e) = {gibbs[True]:.3f}")
+  ```
 
-  **Level 3** Prove joint distribution factorization: P(X₁,...,Xₙ) = ∏ P(Xᵢ|Parents(Xᵢ)) captures all independencies in DAG via d-separation. Analyze exact inference complexity: naive enumeration O(dⁿ) where d=domain size, n=variables. For flu: O(2⁷) = 128. Variable elimination: exploit network structure, eliminate variables in good order, complexity O(d^(w+1)) where w=induced width (related to treewidth). For tree-structured networks: O(nd²). Prove likelihood weighting converges: by law of large numbers, sample mean → true expectation as N→∞. Discuss why LW can be inefficient: if evidence unlikely (P(Fever=yes,Cough=yes|Flu=no) ≈50%), many samples get low weight, high variance. Compare with rejection sampling (wastes samples rejecting inconsistent ones), Gibbs sampling (MCMC, samples from joint), particle filtering (for temporal—next question). Real medical networks: 100s of nodes (symptoms, diseases, risk factors), hybrid discrete/continuous, learned from data (CPTs estimated from patient records).
-answer: "Bayesian networks use DAG structure and CPTs to represent joint distributions compactly: P(X₁,...,Xₙ) = ∏P(Xᵢ|Parents(Xᵢ)). Exact inference (enumeration): sum over hidden variables, O(d^n) complexity. Variable elimination reduces to O(d^w) where w=treewidth. Approximate inference (likelihood weighting): generate weighted samples by fixing evidence and sampling non-evidence, weight by P(evidence|parents). Converges to true posterior as N→∞, but can be inefficient with unlikely evidence."
+  **Level 3** 
+  
+  **Prove joint distribution factorization:** P(X₁,...,Xₙ) = ∏ P(Xᵢ|Parents(Xᵢ)) captures all independencies in DAG via d-separation. 
+  
+  **Analyze exact inference complexity:** Naive enumeration O(d^n) where d=domain size, n=variables. For flu: O(2⁷) = 128. Variable elimination: exploit network structure, eliminate variables in good order, complexity O(d^(w+1)) where w=induced width (related to treewidth). For tree-structured networks: O(nd²).
+  
+  **Prove Monte Carlo convergence:** 
+  
+  *Likelihood Weighting:* By law of large numbers, sample mean → true expectation as N→∞. However, LW can be inefficient: if evidence unlikely (P(Fever=yes,Cough=yes|Flu=no) small), many samples get low weight → high variance. Effective sample size = (Σwᵢ)² / Σwᵢ² can be much less than N.
+  
+  *Gibbs Sampling (MCMC):* Much more sophisticated convergence guarantee.
+  
+  **Theorem (Gibbs Sampling Convergence):** Under mild conditions (irreducibility, aperiodicity), the Gibbs sampler's distribution converges to the true posterior P(X|e) as number of iterations → ∞.
+  
+  **Proof sketch:**
+  
+  1. **Markov Chain:** Gibbs constructs a Markov chain where:
+     - States = possible assignments to non-evidence variables
+     - Transition = resample one variable given others
+     - Each transition has probability > 0 (irreducible)
+  
+  2. **Stationary Distribution:** The posterior P(X|e) is the stationary distribution:
+     
+     If we sample from P(X|e) and apply Gibbs transition, we still have P(X|e).
+     
+     Why? When sampling Xᵢ ~ P(Xᵢ | X₋ᵢ, e), the joint remains P(X|e):
+     ```
+     P(X|e) = P(Xᵢ, X₋ᵢ | e) 
+            = P(Xᵢ | X₋ᵢ, e) · P(X₋ᵢ | e)
+     ```
+     This is exactly what Gibbs does: keep X₋ᵢ, resample Xᵢ.
+  
+  3. **Convergence:** By Markov chain theory (Perron-Frobenius), any irreducible, aperiodic Markov chain converges to its unique stationary distribution.
+     
+     Therefore: lim_{t→∞} P_t(X) = P(X|e) regardless of initial state.
+  
+  **Mixing Time:** How long until convergence? Depends on network structure:
+  - Loosely connected variables: Fast mixing (O(n log n) iterations)
+  - Highly correlated variables: Slow mixing (exponential in worst case)
+  - **Rule of thumb:** Run 10× the network diameter after burn-in
+  
+  **Why Gibbs beats Likelihood Weighting:**
+  
+  | Property | Likelihood Weighting | Gibbs Sampling |
+  |----------|---------------------|----------------|
+  | **Samples from** | Prior P(X) | Posterior P(X\|e) |
+  | **Evidence handling** | Fix & weight | Fix & condition |
+  | **Effective samples** | Low if evidence unlikely | All samples useful |
+  | **Convergence** | IID → fast convergence | Correlated → slower |
+  | **When to use** | Simple networks, likely evidence | Complex networks, rare evidence |
+  
+  **Example demonstrating difference:**
+  ```
+  Network: A → B → C → D → E (chain)
+  Evidence: E = true (P(E=true) = 0.01, rare event)
+  Query: P(A | E=true)
+  
+  Likelihood Weighting:
+  - Sample A, B, C, D from prior
+  - Fix E=true, weight by P(E=true | D)
+  - Most samples: D doesn't cause E → weight ≈ 0.01
+  - Need 1000s of samples to get 10 useful ones
+  
+  Gibbs Sampling:
+  - Start with E=true (evidence)
+  - Resample D | C, E → favors values causing E
+  - Resample C | B, D → influenced by D
+  - Propagates evidence backward efficiently
+  - All samples from P(A,B,C,D | E=true)
+  ```
+  
+  **Comparison with other MCMC methods:**
+  
+  - **Rejection Sampling:** Sample from prior, reject inconsistent with evidence. Wasteful! If evidence has probability 0.01, reject 99% of samples.
+  
+  - **Metropolis-Hastings:** More general than Gibbs. Proposes random changes, accepts/rejects based on ratio of probabilities. Gibbs is special case where all proposals accepted.
+  
+  - **Hamiltonian Monte Carlo (HMC):** Uses gradient information for continuous variables. Much faster mixing than Gibbs for high-dimensional continuous distributions. Used in Stan, PyMC.
+  
+  **Connection to Chapter 1 Search:** 
+  
+  | Chapter 1 | Chapter 3 (Bayesian) |
+  |-----------|---------------------|
+  | Hill climbing | Exact inference (greedy) |
+  | Simulated annealing | MCMC (random moves) |
+  | MCTS (game trees) | Monte Carlo inference (probability distributions) |
+  | Random restarts | Multiple MCMC chains |
+  
+  Both use randomness to escape local traps and explore complex spaces!
+  
+  **Real-world applications:**
+  
+  - **Medical diagnosis:** 100s of nodes (symptoms, diseases, risk factors), hybrid discrete/continuous, learned from data (CPTs estimated from patient records). Gibbs sampling enables inference when exact methods fail.
+  
+  - **Probabilistic programming:** PyMC3, Stan, Edward use HMC/NUTS (advanced MCMC) to automatically infer posteriors for user-specified models.
+  
+  - **Bayesian deep learning:** Use MCMC to sample from posterior over neural network weights → uncertainty quantification.
+  
+  - **Generative models:** Diffusion models, energy-based models use MCMC to generate samples.
+  
+  - **Particle filtering:** MCMC for temporal reasoning (next question's topic).
+  
+  The key insight: **When exact computation is intractable, Monte Carlo sampling provides approximate answers with convergence guarantees.** This is one of the most important ideas in modern AI and statistics (Metropolis algorithm = #1 algorithm of 20th century by some rankings).
+answer: |
+  **Bayesian Networks:** Use DAG structure and CPTs to represent joint distributions compactly: P(X₁,...,Xₙ) = ∏P(Xᵢ|Parents(Xᵢ)).
+  
+  **Exact inference (enumeration):** Sum over hidden variables, O(d^n) complexity. Variable elimination reduces to O(d^w) where w=treewidth. Tractable for small networks.
+  
+  **Likelihood weighting (Monte Carlo):** Generate weighted samples by fixing evidence and sampling non-evidence variables, weight by P(evidence|parents). Converges to true posterior as N→∞ (law of large numbers), but can be inefficient with unlikely evidence (high variance, low effective sample size).
+  
+  **Gibbs sampling (MCMC):** Construct Markov chain that samples directly from posterior P(X|e). Initialize state, then iteratively resample each non-evidence variable from P(Xᵢ | MarkovBlanket(Xᵢ), evidence). After burn-in, all samples drawn from target posterior. 
+  
+  **Key advantage of MCMC:** Samples from actual posterior (not reweighted prior), so all samples useful even with rare evidence. Convergence guaranteed by Markov chain theory: P(X|e) is stationary distribution, irreducible chain converges regardless of initialization.
+  
+  **Trade-offs:** Exact inference fails for large networks, likelihood weighting wastes samples with unlikely evidence, Gibbs sampling works for complex networks but requires burn-in and may mix slowly with highly correlated variables. MCMC methods (Gibbs, Metropolis-Hastings, HMC) are foundation of modern Bayesian inference.
 topics:
   - "Bayesian Networks"
   - "Probabilistic Inference"
+  - "Monte Carlo Methods"
+  - "MCMC"
+  - "Gibbs Sampling"
   - "Likelihood Weighting"
   - "Variable Elimination"
 vocab_answer:
@@ -30,5 +358,17 @@ vocab_answer:
     definition: "Observed variable values"
   - word: "likelihood weighting"
     definition: "Sampling method that fixes evidence and weights by its probability"
+  - word: "MCMC"
+    definition: "Markov Chain Monte Carlo - sampling methods that converge to target distribution"
+  - word: "Gibbs sampling"
+    definition: "MCMC method that samples each variable from its conditional distribution"
+  - word: "Markov blanket"
+    definition: "Parents, children, and children's other parents - sufficient for conditional independence"
+  - word: "burn-in"
+    definition: "Initial MCMC iterations discarded before chain converges"
+  - word: "mixing time"
+    definition: "Number of MCMC steps needed to approximate target distribution"
 example_videos:
   - "https://www.youtube.com/watch?v=G-zirzQFWmk"
+  - "https://www.youtube.com/watch?v=Fae0j1WN1zA"
+  - "https://www.youtube.com/watch?v=hn0bi-iMdZY"

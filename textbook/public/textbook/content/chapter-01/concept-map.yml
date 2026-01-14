@@ -24,5 +24,3 @@ concept_map:
         exam_questions:
           - "questions/minimax-alphabeta.yml"
           - "questions/expectiminimax.yml"
-          - "questions/monte-carlo.yml"
-          - "questions/nash-equilibrium.yml"

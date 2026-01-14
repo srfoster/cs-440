@@ -12,7 +12,580 @@ question: |
 
   **Level 3** Prove alpha-beta correctness: returns same value as minimax.  Formally, analyze complexity.  
 
-answer: "Minimax computes optimal play by recursively evaluating MAX (maximizer's turn) and MIN (minimizer's turn) layers. Alpha-beta pruning eliminates branches that cannot affect the final decision by maintaining alpha (best MAX option) and beta (best MIN option) bounds. If beta ≤ alpha, remaining siblings can be pruned. Optimal move ordering achieves O(b^(d/2)) vs. O(b^d) for minimax."
+answer: |
+  **Level 0: Single-Agent vs. Adversarial Search**
+
+  **Fundamental Difference: Control vs. Uncertainty**
+
+  *Single-agent search (8-puzzle):*
+  - Full control over state transitions
+  - Goal: Find sequence of actions reaching goal state
+  - Search for shortest/cheapest path
+  - Deterministic: Know outcome of each action
+  - Success criterion: Reach goal state
+
+  *Adversarial search (Connect-4):*
+  - Interleaved control: You alternate with opponent
+  - Goal: Reach winning state despite opponent's actions
+  - Search for guaranteed win strategy
+  - Uncertain: Opponent chooses actions to thwart you
+  - Success criterion: Win against optimal opponent
+
+  **Why opponents change everything:**
+  - Can't just plan your own moves (opponent interferes)
+  - Must reason about opponent's best responses
+  - Need contingency plans for every opponent choice
+  - Search tree branches on both players' actions
+
+  ---
+
+  **Zero-Sum Games:**
+
+  Connect-4 is **zero-sum**: one player's gain equals other's loss.
+
+  ```
+  Utility(MAX) + Utility(MIN) = 0
+  ```
+
+  If MAX wins (+1), MIN loses (-1): +1 + (-1) = 0
+
+  **Implications:**
+  - Players have completely opposing goals
+  - No cooperation or compromise possible
+  - MAX maximizes score, MIN minimizes score (same as MIN maximizing their own negative score)
+  - Simplifies analysis: Only need one utility function
+
+  Examples: Chess, checkers, tic-tac-toe, poker (fixed pot)
+  Non-examples: Trading games (both can benefit), stochastic games (external randomness)
+
+  ---
+
+  **"Assume Optimal Opponent" Rationality:**
+
+  **Why reasonable:**
+  - Provides guaranteed lower bound on performance
+  - If you can beat optimal opponent, you beat anyone
+  - Makes problem tractable (deterministic search)
+  - Standard in competitive games (chess engines)
+
+  **Formal principle (Minimax Theorem):**
+  Against optimal play, minimax strategy guarantees:
+  - You don't lose when winning position exists
+  - You achieve best possible outcome
+
+  **When assumption breaks:**
+  - Opponent makes mistakes → your strategy is conservative (missed opportunities)
+  - Solution: Opponent modeling (Bayesian game theory)
+  - But: Simpler and safer to assume optimal play
+
+  ---
+
+  **Shortest Path (8-puzzle) vs. Guaranteed Win (Connect-4):**
+
+  | Aspect | 8-Puzzle | Connect-4 |
+  |--------|----------|-----------|
+  | **Goal** | Single goal state | Any winning state |
+  | **Optimality** | Shortest path | Guaranteed win |
+  | **Search output** | Action sequence | Strategy (move for each opponent response) |
+  | **Tree size** | Paths from start | All possible games |
+  | **Evaluation** | Path cost | Utility at terminal |
+
+  In 8-puzzle: Path [Right, Down, Left] is solution
+  In Connect-4: Strategy is if-then tree: "If opp plays col 3, I play col 4; if opp plays col 2, I play col 5..."
+
+  ---
+
+  **Why Connect-4 Needs Evaluation Functions:**
+
+  **Problem: Game tree is too large to search completely**
+
+  Connect-4 complexity:
+  - Board: 7 columns × 6 rows = 42 positions
+  - Average game length: ~36 moves
+  - Branching factor: ~7 (columns)
+  - Full tree size: ~7^36 ≈ 10^30 nodes
+  - Computation: Impossible to search to end
+
+  **Solution: Depth-limited search with evaluation function**
+
+  Instead of:
+  ```
+  Terminal states → Exact utility (win/lose/draw)
+  ```
+
+  Use:
+  ```
+  Non-terminal states at depth limit → Estimated utility from heuristic
+  ```
+
+  Evaluation function estimates "how good is this position?"
+  - Not perfect, but good enough
+  - Example: Count 3-in-a-row threats, control center column
+  - Trade-off: Search depth vs. evaluation accuracy
+
+  ---
+
+  **Level 1: Formalization and Minimax Demonstration**
+
+  **Connect-4 Game Formalization:**
+
+  ```
+  State S:
+    - 7×6 board matrix
+    - board[row][col] ∈ {EMPTY, RED, YELLOW}
+    - Current player: MAX (RED) or MIN (YELLOW)
+
+  Actions(S):
+    - Set of legal columns: {c | board[0][c] = EMPTY}
+    - Drop disc in column c (falls to lowest empty row)
+
+  Terminal(S):
+    - Four-in-a-row (horizontal, vertical, diagonal): WIN/LOSS
+    - Board full: DRAW
+    - Otherwise: False
+
+  Utility(S, player):
+    - +1 if player wins
+    - -1 if player loses
+    - 0 if draw
+  ```
+
+  ---
+
+  **Minimax Demonstration (Small Tree):**
+
+  Simplified Connect-4 position (MAX to move):
+
+  ```
+                        [ROOT]
+                       MAX to move
+                    /      |      \
+                Col 1    Col 2   Col 3
+                  /         |         \
+              [A]         [B]         [C]
+           MIN to move  MIN to move  MIN to move
+            /    \       /    \       /    \
+          Col1  Col3   Col1  Col2   Col2  Col3
+           /      \     /      \     /      \
+         [A1]   [A2]  [B1]   [B2]  [C1]   [C2]
+       TERMINAL  |   TERMINAL  |     |   TERMINAL
+        +1    MIN to|   -1   MIN to  |     0
+              move  |        move    |
+              / \   |        / \     |
+          Col2 Col3 |     Col1 Col3  |
+           /     \  |      /     \   |
+         [A2a][A2b]|   [B2a] [B2b] |
+          -1    0  |     +1    -1   |
+                  [A2]              [C1]
+                 Utility           MIN to move
+                                   /    \
+                                Col1  Col3
+                                 /      \
+                              [C1a]   [C1b]
+                               +1      -1
+  ```
+
+  **Computing Minimax Values Bottom-Up:**
+
+  ```
+  Step 1: Evaluate leaf nodes (terminal states)
+    A1 = +1 (MAX wins)
+    A2a = -1 (MIN wins)
+    A2b = 0 (draw)
+    B1 = -1 (MIN wins)
+    B2a = +1 (MAX wins)
+    B2b = -1 (MIN wins)
+    C1a = +1 (MAX wins)
+    C1b = -1 (MIN wins)
+    C2 = 0 (draw)
+
+  Step 2: MIN nodes (choose minimum)
+    A2 = min(-1, 0) = -1
+    B2 = min(+1, -1) = -1
+    C1 = min(+1, -1) = -1
+
+  Step 3: MIN nodes (choose minimum)
+    A = min(+1, -1) = -1
+    B = min(-1, -1) = -1
+    C = min(-1, 0) = -1
+
+  Step 4: MAX node (choose maximum)
+    ROOT = max(-1, -1, -1) = -1
+
+  Decision: All moves lead to loss against optimal play!
+  (In reality, MAX is in losing position)
+  ```
+
+  Better example where MAX has winning move:
+
+  ```
+              [ROOT]
+               MAX
+            /    |    \
+          -1    +1    0
+           ↑     ↑    ↑
+         Col1  Col2  Col3
+
+  MAX chooses Col2 → Guaranteed win (+1)
+  ```
+
+  ---
+
+  **Alpha-Beta Pruning on Same Tree:**
+
+  Alpha-Beta maintains bounds:
+  - **α (alpha)**: Best value MAX can guarantee (lower bound)
+  - **β (beta)**: Best value MIN can guarantee (upper bound)
+
+  Initially: α = -∞, β = +∞
+
+  **Pruning rule:** If β ≤ α, prune remaining children (they won't affect parent)
+
+  ```
+              [ROOT]  α=-∞, β=+∞
+               MAX
+            /    |    \
+          [A]   [B]   [C]
+         MIN    MIN    MIN
+  ```
+
+  **Evaluating A:**
+  ```
+  A: α=-∞, β=+∞ (inherited)
+     Check A1: value=+1
+     β = min(+∞, +1) = +1  (MIN can force at most +1)
+     Check A2a: value=-1
+     β = min(+1, -1) = -1
+     No need to check A2b! (MIN already found -1, won't choose worse)
+  
+  A returns -1 to ROOT
+  ROOT: α = max(-∞, -1) = -1
+  ```
+
+  **Evaluating B:**
+  ```
+  B: α=-1, β=+∞ (α inherited from ROOT)
+     Check B1: value=-1
+     β = min(+∞, -1) = -1
+     Now β=-1 ≤ α=-1 → PRUNE! Don't evaluate B2
+     
+  B returns -1 to ROOT (or worse, doesn't matter)
+  ROOT: α = max(-1, -1) = -1
+  ```
+
+  **Evaluating C:**
+  ```
+  C: α=-1, β=+∞
+     Check C1a: value=+1
+     β = min(+∞, +1) = +1
+     Check C1b: value=-1
+     β = min(+1, -1) = -1
+     C1 returns -1
+     Check C2: value=0
+     C returns min(-1, 0) = -1
+  
+  ROOT: α = max(-1, -1) = -1
+  ```
+
+  **Pruned nodes:** A2b, B2, B2a, B2b (4 nodes saved out of 12 total)
+
+  ---
+
+  **Level 2: Implementation**
+
+  ```python
+  import math
+
+  class Connect4:
+      def __init__(self):
+          self.board = [[0] * 7 for _ in range(6)]  # 0=empty, 1=RED, 2=YELLOW
+          self.current_player = 1  # RED starts
+      
+      def get_legal_moves(self):
+          """Return list of columns that aren't full."""
+          return [col for col in range(7) if self.board[0][col] == 0]
+      
+      def make_move(self, col):
+          """Drop disc in column, return row it landed in."""
+          for row in range(5, -1, -1):
+              if self.board[row][col] == 0:
+                  self.board[row][col] = self.current_player
+                  self.current_player = 3 - self.current_player  # Toggle 1↔2
+                  return row
+          return None
+      
+      def undo_move(self, col, row):
+          """Remove disc from board."""
+          self.board[row][col] = 0
+          self.current_player = 3 - self.current_player
+      
+      def check_winner(self):
+          """Check if game is over. Returns 1, 2, 0 (draw), or None."""
+          # Check horizontal, vertical, diagonal
+          for row in range(6):
+              for col in range(7):
+                  if self.board[row][col] == 0:
+                      continue
+                  player = self.board[row][col]
+                  
+                  # Horizontal
+                  if col <= 3:
+                      if all(self.board[row][col+i] == player for i in range(4)):
+                          return player
+                  
+                  # Vertical
+                  if row <= 2:
+                      if all(self.board[row+i][col] == player for i in range(4)):
+                          return player
+                  
+                  # Diagonal /
+                  if row <= 2 and col <= 3:
+                      if all(self.board[row+i][col+i] == player for i in range(4)):
+                          return player
+                  
+                  # Diagonal \
+                  if row >= 3 and col <= 3:
+                      if all(self.board[row-i][col+i] == player for i in range(4)):
+                          return player
+          
+          # Check draw
+          if all(self.board[0][col] != 0 for col in range(7)):
+              return 0
+          
+          return None  # Game continues
+      
+      def evaluate(self, player):
+          """
+          Evaluation function for non-terminal states.
+          Count threats: 4-in-a-row patterns weighted by completion.
+          """
+          score = 0
+          opponent = 3 - player
+          
+          # Helper: count threats in a window of 4 positions
+          def score_window(window, player):
+              player_count = window.count(player)
+              opp_count = window.count(3 - player)
+              empty_count = window.count(0)
+              
+              # Can't make 4-in-a-row if opponent has pieces here
+              if opp_count > 0 and player_count > 0:
+                  return 0
+              
+              # Score based on how many of our pieces are in line
+              if player_count == 4:
+                  return 1000  # Winning threat
+              elif player_count == 3 and empty_count == 1:
+                  return 5     # One move from winning
+              elif player_count == 2 and empty_count == 2:
+                  return 2     # Building threat
+              
+              # Penalize opponent threats
+              if opp_count == 3 and empty_count == 1:
+                  return -50   # Must block!
+              
+              return 0
+          
+          # Check all horizontal windows
+          for row in range(6):
+              for col in range(4):
+                  window = [self.board[row][col+i] for i in range(4)]
+                  score += score_window(window, player)
+          
+          # Check all vertical windows
+          for row in range(3):
+              for col in range(7):
+                  window = [self.board[row+i][col] for i in range(4)]
+                  score += score_window(window, player)
+          
+          # Check all diagonal / windows
+          for row in range(3):
+              for col in range(4):
+                  window = [self.board[row+i][col+i] for i in range(4)]
+                  score += score_window(window, player)
+          
+          # Check all diagonal \ windows
+          for row in range(3, 6):
+              for col in range(4):
+                  window = [self.board[row-i][col+i] for i in range(4)]
+                  score += score_window(window, player)
+          
+          # Bonus for center column control
+          center_col = [self.board[row][3] for row in range(6)]
+          score += center_col.count(player) * 3
+          
+          return score
+      
+      def minimax_alpha_beta(self, depth, alpha, beta, maximizing_player):
+          """
+          Minimax with alpha-beta pruning.
+          
+          Returns: (best_score, best_column)
+          """
+          winner = self.check_winner()
+          
+          # Terminal states
+          if winner == 1:  # RED wins
+              return (10000, None)
+          elif winner == 2:  # YELLOW wins
+              return (-10000, None)
+          elif winner == 0:  # Draw
+              return (0, None)
+          
+          # Depth limit reached
+          if depth == 0:
+              score = self.evaluate(player=1)  # Evaluate from RED's perspective
+              return (score, None)
+          
+          legal_moves = self.get_legal_moves()
+          
+          if maximizing_player:  # RED's turn (MAX)
+              max_score = -math.inf
+              best_col = legal_moves[0]
+              
+              for col in legal_moves:
+                  row = self.make_move(col)
+                  score, _ = self.minimax_alpha_beta(depth-1, alpha, beta, False)
+                  self.undo_move(col, row)
+                  
+                  if score > max_score:
+                      max_score = score
+                      best_col = col
+                  
+                  alpha = max(alpha, score)
+                  if beta <= alpha:
+                      break  # Beta cutoff (MIN won't choose this branch)
+              
+              return (max_score, best_col)
+          
+          else:  # YELLOW's turn (MIN)
+              min_score = math.inf
+              best_col = legal_moves[0]
+              
+              for col in legal_moves:
+                  row = self.make_move(col)
+                  score, _ = self.minimax_alpha_beta(depth-1, alpha, beta, True)
+                  self.undo_move(col, row)
+                  
+                  if score < min_score:
+                      min_score = score
+                      best_col = col
+                  
+                  beta = min(beta, score)
+                  if beta <= alpha:
+                      break  # Alpha cutoff (MAX won't choose this branch)
+              
+              return (min_score, best_col)
+      
+      def get_best_move(self, depth=6):
+          """Find best move using minimax with alpha-beta."""
+          score, col = self.minimax_alpha_beta(
+              depth, 
+              alpha=-math.inf, 
+              beta=math.inf,
+              maximizing_player=(self.current_player == 1)
+          )
+          return col
+
+  # Example usage
+  game = Connect4()
+  best_move = game.get_best_move(depth=6)
+  print(f"Best move for RED: column {best_move}")
+  ```
+
+  ---
+
+  **Level 3: Proof and Complexity Analysis**
+
+  **Theorem: Alpha-Beta Returns Same Value as Minimax**
+
+  **Proof by induction on tree depth:**
+
+  *Base case (depth 0, leaf nodes):*
+  - Both return utility of terminal state
+  - No pruning at leaves → identical
+
+  *Inductive step:*
+
+  Assume alpha-beta = minimax for all subtrees of depth k.
+
+  Consider node at depth k+1:
+
+  **Case 1: MAX node**
+  - Minimax returns max of children's values
+  - Alpha-beta returns max of evaluated children
+  - Key: Pruning only occurs when β ≤ α
+  - When we prune child c: We know β ≤ α
+    - β is best MIN can achieve in c's subtree
+    - α is best MAX can already achieve elsewhere
+    - Since MAX chooses maximum, c won't be chosen anyway
+    - Therefore: pruning c doesn't change MAX's decision
+  
+  **Case 2: MIN node**
+  - Symmetric argument with α and β roles swapped
+
+  By induction, alpha-beta returns same value as minimax at root. QED.
+
+  ---
+
+  **Complexity Analysis:**
+
+  **Minimax (no pruning):**
+  - Branching factor: b = 7 (average legal moves)
+  - Depth: d = 6
+  - Time: O(b^d) = O(7^6) ≈ 117,649 nodes
+  - Space: O(bd) = O(42) for recursion stack
+
+  **Alpha-Beta (worst case):**
+  - Same as minimax: O(b^d)
+  - Occurs when moves ordered randomly (no pruning)
+
+  **Alpha-Beta (best case - optimal move ordering):**
+  - Best move evaluated first at each node
+  - Time: O(b^(d/2))
+  - Proof sketch:
+    - At MAX nodes: evaluate best child first → rest likely pruned
+    - At MIN nodes: evaluate best (for MIN) child first → rest likely pruned
+    - Effectively doubles search depth for same time
+    - O(7^3) ≈ 343 nodes for depth 6 (vs. 117,649)
+
+  **Best-case derivation:**
+  ```
+  Depth d alternates MAX/MIN:
+  - d/2 MAX levels: Each checks 1 child fully + b-1 pruned
+  - d/2 MIN levels: Each checks 1 child fully + b-1 pruned
+  
+  Nodes = b^(d/2) * b^(d/2) = b^d for optimal ordering? No!
+  
+  Correct analysis:
+  - First child at each level: Explored fully (depth d-1)
+  - Remaining b-1 children: Only root explored (depth 1)
+  
+  Total = b^(d/2) + (b-1) * b^((d-1)/2) + ... ≈ 2b^(d/2) - 1
+  ```
+
+  **Practical performance:**
+  - Random ordering: ~30-50% pruning
+  - Good heuristic ordering: ~70-90% pruning
+  - Optimal ordering: ~95% pruning
+
+  **Move ordering heuristics:**
+  1. Search center columns first (more likely to be good)
+  2. Try moves that create threats
+  3. Iterative deepening with transposition tables
+  4. Killer move heuristic (moves good in similar positions)
+
+  ---
+
+  **Practical Improvements:**
+
+  1. **Iterative Deepening**: Search depth 1, 2, 3, ..., using previous results to order moves
+  2. **Transposition Tables**: Cache evaluated positions (many paths reach same state)
+  3. **Aspiration Windows**: Narrow α-β window based on expected score
+  4. **Principal Variation Search**: Verify best move from previous iteration first
+  5. **Quiescence Search**: Extend search in tactical positions (forced sequences)
+
+  With these techniques, modern Connect-4 solvers search depth 20+ in real-time.
 topics:
   - "Minimax"
   - "Alpha-Beta Pruning"

@@ -1,15 +1,15 @@
 concept_map:
-  - category: "Constraint Satisfaction Problems"
+  - category: "Constraint Satisfaction and Logic"
     concepts:
-      - name: "CSP Representation and Search"
-        description: "Variables, domains, constraints, and backtracking"
+      - name: "CSP, Horn Clauses, and Inference"
+        description: "Constraint satisfaction problems and logic programming"
         exam_questions:
           - "questions/csp-fundamentals.yml"
-  - category: "Logic and Inference"
-    concepts:
-      - name: "Unification, Inference, Resolution, and Search"
-        description: "Pattern matching for logical terms"
-        exam_questions:
-          - "questions/unification.yml"
           - "questions/horn-clause-inference.yml"
-          - "questions/resolution.yml"
+  - category: "Probabilistic Reasoning and Learning"
+    concepts:
+      - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
+        description: "Probabilistic graphical models"
+        exam_questions:
+          - "questions/bayesian-networks.yml"
+          - "questions/temporal-reasoning.yml"

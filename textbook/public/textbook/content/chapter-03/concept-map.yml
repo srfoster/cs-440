@@ -1,17 +1,10 @@
 concept_map:
-  - category: "Probabilistic Reasoning and Learning"
-    concepts:
-      - name: "Bayesian Networks, Hidden Markov Models, and Probabilistic Inference"
-        description: "Probabilistic graphical models"
-        exam_questions:
-          - "questions/bayesian-networks.yml"
-          - "questions/temporal-reasoning.yml"
-          - "questions/supervised-learning.yml"
   - category: "Neural Networks and Transformers"
     concepts:
       - name: "Neural Networks, Backpropagation, and Transformers"
         description: "Deep learning architectures"
         exam_questions:
+          - "questions/supervised-learning.yml"
           - "questions/feedforward-backprop.yml"
           - "questions/convolution.yml"
           - "questions/transformer-attention.yml"

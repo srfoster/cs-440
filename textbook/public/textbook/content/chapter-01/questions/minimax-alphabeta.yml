@@ -4,19 +4,14 @@ chapter: 1
 question: |
   **Play optimal Connect-4 using Minimax and Alpha-Beta pruning.**
 
-  Connect-4 is a two-player game played on a 7-column × 6-row vertical grid. Players alternate dropping colored discs into columns, where each disc falls to the lowest available position. The goal is to connect four of your discs vertically, horizontally, or diagonally. Unlike tic-tac-toe (9^9 ≈ 10^9 states, easily exhaustive), Connect-4 has roughly 10^13 positions—small enough to solve with alpha-beta pruning but large enough to require smart optimization. This makes it the perfect domain for understanding how adversarial search scales.
+  **Level 0** Discuss the shift from single-agent search (8-puzzle) to adversarial search in Connect-4. Why does having an opponent fundamentally change the problem? What makes Connect-4 "zero-sum"? Why is "assume optimal opponent" reasonable here? Compare the ideas of searching for shortest path (8-puzzle) vs searching for a guaranteed win against perfect play.  Why does Connect-4 require evaluation functions rather than solving to terminal states?
 
-  **Level 0** Discuss the shift from single-agent search (8-puzzle, Chapter 1) to adversarial search in Connect-4. Why does having an opponent fundamentally change the problem? What makes Connect-4 "zero-sum"? Why is "assume optimal opponent" reasonable here? Compare: in 8-puzzle we search for shortest path; in Connect-4 we search for guaranteed win against perfect play.
-
-  **Level 1** Describe minimax for Connect-4. State = board configuration (7×6 grid), Actions = drop disc in non-full column (up to 7 choices), Terminal = 4-in-a-row or full board, Utility = +1 (win), -1 (loss), 0 (draw). MAX (your turn) maximizes utility, MIN (opponent) minimizes.
+  **Level 1** Formalize the State, Actions, Terminal, and Utility for Connect-4.  Demonstrate minimax decision making on a small Connect-4 game tree. Show how the minimax values are computed bottom-up, and how the optimal move is selected at the root.  Then describe how alpha-beta pruning works on the same tree. Show how alpha and beta values are updated, and identify which branches are pruned.
   
-  Give pseudocode for MINIMAX_DECISION(board, player) and helpers MAX_VALUE(board) and MIN_VALUE(board) using TERMINAL, UTILITY, ACTIONS, RESULT. Demonstrate by hand on a Connect-4 position 3 moves from end.
-  
-  Then describe alpha-beta pruning on Connect-4. Alpha = best MAX can guarantee, beta = best MIN can guarantee. When beta ≤ alpha at a MIN node, prune remaining children (MAX already has better option elsewhere). Give pseudocode for ALPHABETA_DECISION with AB_MAX and AB_MIN. Demonstrate pruning: show a Connect-4 game tree where evaluating left column first prunes several right columns.
+  **Level 2** Implement minimax with alpha-beta for Connect-4 with depth limit 6 (look 6 moves ahead). Use evaluation function: count 4-in-a-row threats weighted by how many of your discs are in them. 
 
-  **Level 2** Implement minimax and alpha-beta for Connect-4 with depth limit 6 (look 6 moves ahead). Use evaluation function: count 4-in-a-row threats weighted by how many of your discs are in them. Compare nodes expanded: minimax vs alpha-beta, different column orderings (center-first is often best). Why does checking center columns first improve pruning?
+  **Level 3** Prove alpha-beta correctness: returns same value as minimax.  Formally, analyze complexity.  
 
-  **Level 3** Prove alpha-beta correctness: returns same value as minimax. Analyze complexity: Connect-4 branching factor b≈7, naive minimax O(7^d). With optimal move ordering, alpha-beta achieves O(7^(d/2))—depth 12 instead of depth 6! Discuss move ordering heuristics for Connect-4: (1) try center columns first (more winning positions), (2) killer moves (moves that caused cutoffs before), (3) iterative deepening (use shallow search to order deep search). Why does Connect-4 require evaluation functions rather than solving to terminal states?
 answer: "Minimax computes optimal play by recursively evaluating MAX (maximizer's turn) and MIN (minimizer's turn) layers. Alpha-beta pruning eliminates branches that cannot affect the final decision by maintaining alpha (best MAX option) and beta (best MIN option) bounds. If beta ≤ alpha, remaining siblings can be pruned. Optimal move ordering achieves O(b^(d/2)) vs. O(b^d) for minimax."
 topics:
   - "Minimax"

@@ -2,25 +2,80 @@ id: "m7-language-model-training"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement the training loop for autoregressive language models.**
+  **Train a transformer language model on TinyShakespeare to generate Elizabethan prose.**
 
-  **Level 0** Discuss the deceptive simplicity of LLM training: predict the next token. This single objective yields: grammar, facts, reasoning, coding ability. Why does next-token prediction work so well? It's a dense supervision signal (every token provides feedback), and language contains compressed knowledge about the world. Compare with: image classification (single label per image), reinforcement learning (sparse rewards). Historical context: statistical language models (n-grams), neural LMs (RNNs), transformer LMs (GPT, 2018), scaling laws (2020).
+  TinyShakespeare corpus: 1MB of Shakespeare plays (~1M characters, ~200K words). Task: predict next token given context. Training: see "To be, or not to" → predict "be". See "To be, or not to be" → predict ":". Every token in the corpus provides training signal. After training on billions of such predictions, model learns: grammar ("to be" not "to be is"), facts ("Hamlet" is character in Danish play), style (iambic pentameter), and surprisingly, reasoning (logical inference from context). Why does next-token prediction work so well? Language compresses world knowledge: to predict "The capital of France is __", model must know geography. This deceptively simple objective yields ChatGPT's capabilities. This matters because LLM training is the foundation of modern AI, with applications from code generation (GitHub Copilot) to scientific discovery (AlphaFold).
 
-  **Level 1** Define autoregressive language modeling: P(text) = P(t₁) P(t₂|t₁) P(t₃|t₁,t₂) ... P(tₙ|t₁,...,tₙ₋₁). At training time, given sequence [t₁, t₂, ..., tₙ], predict tᵢ₊₁ from [t₁,...,tᵢ] for all i. Use causal masking so position i cannot see future tokens.
+  **Level 0** Discuss evolution of language modeling. N-grams (1990s): P(wᵢ|wᵢ₋₁,...,wᵢ₋ₙ) via counting, limited context (n≤5). RNN LMs (2010s): P(wᵢ|hᵗ) where hᵗ = RNN(hᵗ₋₁, wᵗ), unlimited context but vanishing gradients. Transformer LMs (2018+): P(wᵢ|w₁,...,wᵢ₋₁) via self-attention, parallel training, scales to billions of parameters. Why GPT architecture won: (1) Next-token objective is dense supervision (every token = label), vs. other tasks like question-answering (sparse labels). (2) Autoregressive = flexible at test time (generate, classify, translate all via same model). (3) Scales: more data + more compute + more parameters = better performance (scaling laws).
+
+  **Level 1** **Training Pipeline for TinyShakespeare:**
   
-  **Training pipeline:**
-  1. **Tokenization:** Convert text to integers via BPE/WordPiece tokenizer (vocab ~50K)
-  2. **Batching:** Sample sequences of length L (e.g., 2048) from corpus
-  3. **Forward:** Model outputs logits (T × vocab_size)
-  4. **Loss:** Cross-entropy between logits[i] and target[i+1], averaged over all positions
-  5. **Backward:** Compute gradients via backpropagation
-  6. **Update:** Apply optimizer (AdamW with lr schedule, weight decay)
+  **Step 1: Tokenization.** Convert text to integers. Character-level (simple): vocab = {a-z, A-Z, punctuation, space}, ~100 tokens. Subword (better): Byte-Pair Encoding (BPE) learns ~50K tokens (e.g., "Hamlet" = one token, "question" = "quest"+"ion"). Shakespeare corpus → ~200K tokens.
   
-  Give pseudocode for TRAIN_LM(corpus, tokenizer, model, optimizer, steps, seqLen, batchSize). Demonstrate loss calculation on 5-token sequence.
+  **Step 2: Batching.** Sample sequences of length L (context window, e.g., L=256). For sequence [t₁, t₂, ..., tₗ], create training pairs: input = [t₁, ..., tₗ], targets = [t₂, ..., tₗ₊₁]. Batch size B=32 → 32 sequences per update.
+  
+  **Step 3: Forward Pass.** Embed tokens: X = TokenEmbed(tokens) + PosEmbed(positions), shape (L×d). Pass through 12 transformer blocks (previous question): H = Block₁₂(...Block₁(X)...). Output logits: Z = H W_out + b_out, shape (L×vocab_size).
+  
+  **Step 4: Loss.** For each position i in [0, L-1], lossᵢ = CrossEntropy(Z[i], target[i]) = -log(softmax(Z[i])[target[i]]). Total loss = mean over L positions and B batch.
+  
+  **Step 5: Backward + Update.** Compute gradients via backpropagation through all 12 blocks. Update with AdamW optimizer: θ ← θ - α (mᵗ/(√vᵗ + ε) + λθ) where mᵗ, vᵗ are momentum terms, λ=weight decay.
+  
+  Pseudocode:
+  ```
+  TRAIN_LM_TINYSHAKESPEARE(corpus_text, model, tokenizer, optimizer, steps, L=256, B=32):
+    tokens = tokenizer.encode(corpus_text)  # [t1, t2, ..., tN], N~200K
+    
+    for step in 1..steps:
+      # Sample batch
+      batchX, batchY = [], []
+      for b in 1..B:
+        i = random_int(0, len(tokens) - L - 1)
+        x = tokens[i : i+L]       # input sequence
+        y = tokens[i+1 : i+L+1]   # targets (shifted by 1)
+        batchX.append(x)
+        batchY.append(y)
+      
+      # Forward
+      X = model.embed(batchX)  # (B, L, d)
+      for block in model.blocks:
+        X = block(X)
+      logits = X @ model.W_out + model.b_out  # (B, L, vocab)
+      
+      # Loss
+      L = 0
+      for b in 1..B:
+        for i in 1..L:
+          L += CROSS_ENTROPY(logits[b,i], batchY[b,i])
+      L = L / (B * L)
+      
+      # Backward + update
+      grads = model.backward(L)
+      optimizer.step(model.params, grads)
+      
+      if step % 100 == 0:
+        perplexity = exp(L)
+        print(f"Step {step}, Loss {L:.3f}, Perplexity {perplexity:.1f}")
+    
+    return model
+  ```
+  
+  Perplexity = exp(loss), measures uncertainty. Perplexity=50 → model has 50 plausible next tokens on average. Lower = better. TinyShakespeare: start ~100, end ~10-20.
+  
+  Demonstrate: 5-token sequence ["To", "be", ",", "or", "not"]. Logits at position 2 (after seeing "To be") are [0.1, 0.5, 3.2, 0.8, ...] for vocab. Target = "," (index 2). Loss = -log(softmax(logits)[2]) = -log(exp(3.2) / Σ exp(...)) ≈ 0.5.
 
-  **Level 2** Implement LM training on small corpus (e.g., TinyShakespeare). Use 6-layer transformer with 512 model dim, 8 heads, context length 256. Track perplexity = exp(avg_loss). Implement teacher forcing: use ground truth tokens as context, not model predictions. Generate text via sampling: given prompt, predict next token, append, repeat. Compare temperature: low (confident, repetitive) vs high (diverse, incoherent).
+  **Level 2** Implement TinyShakespeare LM. Model: 6-layer transformer, d=384, 6 heads, context length=256. Tokenizer: character-level (simple) or BPE. Train for 5000 steps. Track loss and perplexity. **Generation:** After training, generate text via autoregressive sampling: (1) Start with prompt "HAMLET: To be", (2) Forward pass → logits for next token, (3) Sample from softmax(logits / temperature), (4) Append sampled token, (5) Repeat. Temperature: T=0.1 (deterministic, repetitive), T=0.7 (balanced), T=1.5 (creative, incoherent). Test: prompt="ROMEO:", generate 100 tokens. Should produce Shakespeare-like text ("O, that I were a glove upon that hand, that I might touch that cheek!").
+  
+  Compare teacher forcing (training uses ground truth context) vs. autoregressive generation (uses model's own predictions). Training is stable (no error propagation), generation can drift (one bad prediction leads to more).
 
-  **Level 3** Analyze scaling laws: loss scales as power law in compute, data, parameters (L ∝ C^(-α)). GPT-3 (175B params) vs GPT-4 (rumored 1T+): bigger is better, but diminishing returns. Discuss training challenges: (1) memory - mixed precision (FP16), gradient checkpointing, model parallelism, (2) stability - gradient clipping, warm-up schedule, (3) data - curriculum learning, data filtering. Compare training objectives: next-token (GPT), masked (BERT), denoising (T5). Discuss instruction tuning (fine-tuning on QA pairs) and RLHF (reinforcement learning from human feedback). Why GPT architecture won: simplicity, parallelization, emergent capabilities at scale.
+  **Level 3** **Scaling Laws (Kaplan et al. 2020):** Loss L ∝ N^(-α) where N=parameters, α≈0.07. Doubling compute ⇒ constant loss reduction. GPT-2 (1.5B params, loss ~3.0) → GPT-3 (175B params, loss ~2.2). Implication: bigger = better, no saturation yet (GPT-4 rumored 1T+ params). Compute budget: C = 6ND where D=tokens. Optimal allocation: N ∝ C^0.73, D ∝ C^0.27 (spend more on model size than data for fixed compute).
+  
+  **Training Challenges:** (1) Memory: GPT-3 175B params × 4 bytes = 700GB, doesn't fit one GPU. Solutions: model parallelism (split layers across GPUs), mixed precision (FP16 for activations, FP32 for gradients), gradient checkpointing (recompute activations during backward, trade compute for memory). (2) Stability: large models diverge. Solutions: gradient clipping (max norm=1), learning rate warmup (start small, increase linearly), careful initialization. (3) Data quality: CommonCrawl has spam, bias. Filter via heuristics + model-based scoring.
+  
+  **Training Objectives:** Next-token (GPT): autoregressive P(tᵢ|t₁,...,tᵢ₋₁). Masked (BERT): predict random masked tokens ("Hamlet is [MASK] character"). Denoising (T5): corrupt input, predict original. GPT wins for generation tasks due to autoregressive nature.
+  
+  **Post-Training:** Base LM (trained on TinyShakespeare) generates Shakespeare-like text but doesn't follow instructions. Instruction tuning: fine-tune on (instruction, response) pairs ("Summarize Hamlet Act 1 → Hamlet meets ghost..."). RLHF (reinforcement learning from human feedback): train reward model from human preferences, optimize LM via PPO to maximize reward. This yields ChatGPT's helpful/harmless/honest behavior.
+  
+  **Emergent Capabilities:** Small models (GPT-2 124M): generate coherent paragraphs. Medium (GPT-2 1.5B): factual knowledge, simple reasoning. Large (GPT-3 175B): few-shot learning (examples in prompt → generalize), arithmetic, translation without fine-tuning. Scaling → qualitative leaps, not just quantitative gains.
 answer: |
   Training a language model involves predicting the next token given previous tokens. Sample sequences from the corpus, compute cross-entropy loss on next-token predictions, and update parameters via backpropagation.
   

@@ -2,22 +2,37 @@ id: "m5-resolution"
 type: "short-answer"
 chapter: 2
 question: |
-  **Prove logical entailment using resolution and refutation.**
+  **Prove that Stefan betrayed Elena using resolution and refutation in a tangled web of soap opera logic.**
 
-  **Level 0** Discuss the completeness of resolution: why is having a single inference rule that's both sound and complete remarkable? Compare with Horn clause methods (previous question) which are restricted to a fragment. What does "refutation proof" mean? Why prove by contradiction? Compare with proof strategies in mathematics.
+  Your soap opera has complex rules with disjunctions: "Either Elena loves Stefan or she loves Damon" (Loves(Elena, Stefan) ∨ Loves(Elena, Damon)). "If Elena loves Stefan, and Stefan kissed Caroline, then Elena is heartbroken or leaves town" (Loves(Elena, Stefan) ∧ Kissed(Stefan, Caroline) → Heartbroken(Elena) ∨ Leaves(Elena)). Query: Does Stefan betray Elena? (Betrayed(Stefan, Elena)). Horn clause methods (previous question) can't handle disjunctions efficiently. Resolution can: a single, complete inference rule for all of first-order logic. The twist: prove by contradiction (refutation). Assume ¬Betrayed(Stefan, Elena), derive a contradiction (empty clause ☐), conclude KB ⊨ Betrayed(Stefan, Elena). This matters because resolution is the foundation of automated theorem proving and modern SAT solvers.
 
-  **Level 1** Define resolution rule: from clauses (A ∨ B) and (¬B ∨ C), derive (A ∨ C). Explain CNF (conjunctive normal form): conjunction of disjunctions. Describe resolution theorem proving algorithm:
+  **Level 0** Discuss why resolution is remarkable: one inference rule handles all logic. Horn clauses (previous) required specialized forward/backward chaining. General logic with disjunctions needs case-splitting (exponential). Resolution: (A ∨ B) and (¬B ∨ C) → (A ∨ C). Why refutation? Can't enumerate all consequences (infinite). Instead: assume ¬query, derive absurdity. Compare with proof by contradiction in math: prove √2 irrational by assuming rational, deriving 2 | odd number, contradiction.
+
+  **Level 1** Define resolution for soap opera KB. Conjunctive normal form (CNF): conjunction of clauses (disjunctions). Example: Loves(Elena, Stefan) ∧ (Heartbroken(Elena) ∨ Leaves(Elena)) ∧ ¬Leaves(Elena). Each clause: disjunction of literals.
   
-  1. Convert KB ∪ {¬query} to CNF
-  2. Repeatedly select clause pairs and resolve
-  3. If empty clause ☐ derived, KB ⊨ query
-  4. If no new clauses, return false
+  Resolution rule: From clauses (L₁ ∨ ... ∨ Lₘ ∨ A) and (K₁ ∨ ... ∨ Kₙ ∨ ¬A), derive resolvent (L₁ ∨ ... ∨ Lₘ ∨ K₁ ∨ ... ∨ Kₙ). Complementary literals A and ¬A "cancel."
   
-  Give pseudocode for RESOLUTION_ENTAILS(KB_clauses, q) and RESOLVE(c1, c2). Demonstrate by hand: prove (A→B) ∧ (B→C) ∧ A ⊨ C using resolution.
+  Algorithm RESOLUTION_ENTAILS(KB, query): (1) Convert KB ∪ {¬query} to CNF clauses. (2) Repeat: pick two clauses with complementary literals, resolve them, add resolvent. (3) If empty clause ☐ derived: contradiction, so KB ⊨ query. (4) If no new clauses: KB ⊭ query.
+  
+  Demonstrate on love triangle: KB: (1) Loves(Elena, Stefan), (2) Kissed(Stefan, Caroline), (3) Loves(Elena, Stefan) ∧ Kissed(Stefan, Caroline) → Betrayed(Stefan, Elena). Convert to CNF: (1) Loves(Elena, Stefan), (2) Kissed(Stefan, Caroline), (3) ¬Loves(Elena, Stefan) ∨ ¬Kissed(Stefan, Caroline) ∨ Betrayed(Stefan, Elena). Query: Betrayed(Stefan, Elena). Negate: ¬Betrayed(Stefan, Elena). Add clause (4) ¬Betrayed(Stefan, Elena). Resolve (3) and (4) on Betrayed: (¬Loves(Elena, Stefan) ∨ ¬Kissed(Stefan, Caroline)). Call this (5). Resolve (1) and (5) on Loves: ¬Kissed(Stefan, Caroline). Call this (6). Resolve (2) and (6) on Kissed: ☐ (empty clause). Contradiction! Therefore KB ⊨ Betrayed(Stefan, Elena).
+  
+  Pseudocode:
+  ```
+  RESOLUTION_ENTAILS(KB, query):
+    clauses = CNF(KB ∪ {¬query})
+    new = {}
+    while true:
+      for each pair (cᵢ, c_j) in clauses:
+        resolvents = RESOLVE(cᵢ, c_j)
+        if ☐ in resolvents: return true
+        new = new ∪ resolvents
+      if new ⊆ clauses: return false
+      clauses = clauses ∪ new
+  ```
 
-  **Level 2** Implement resolution theorem prover. Include CNF conversion and RESOLVE function (find complementary literals, combine remaining literals). Test on examples: modus ponens, transitivity of implication, puzzles like "All Greeks are mortal, Socrates is Greek, therefore Socrates is mortal."
+  **Level 2** Implement resolution theorem prover for soap opera KB. CNF conversion: (1) Eliminate ↔, (2) Eliminate →: (A → B) becomes (¬A ∨ B), (3) Move ¬ inward (De Morgan's laws), (4) Distribute ∨ over ∧. RESOLVE(c₁, c₂): find literal L in c₁ and ¬L in c₂, return (c₁ \ {L}) ∪ (c₂ \ {¬L}). Test: (1) Modus ponens: (A → B) ∧ A ⊨ B. (2) Love triangle transitivity: Loves(Elena, Stefan) ∧ (Loves(Elena, Stefan) → Jealous(Caroline, Elena)) ∧ (Jealous(Caroline, Elena) → Schemes(Caroline)) ⊨ Schemes(Caroline). (3) Disjunctive case: (Loves(Elena, Stefan) ∨ Loves(Elena, Damon)) ∧ ¬Loves(Elena, Damon) ⊨ Loves(Elena, Stefan).
 
-  **Level 3** Prove soundness and refutation completeness (Robinson's theorem): if KB ⊨ q, resolution will find a proof. Discuss why completeness requires refutation (can't enumerate all consequences). Analyze complexity: resolution can have exponential blowup in clause size and number. Discuss strategies: unit preference (clauses with one literal), set of support, subsumption. Compare propositional resolution with first-order resolution (requires unification). Why is resolution the basis for Prolog and modern SAT solvers?
+  **Level 3** Prove soundness: resolution rule preserves truth (if parents true, resolvent true). Prove refutation completeness (Robinson 1965): if KB ⊨ query, resolution on KB ∪ {¬query} derives ☐. Intuition: resolution systematically explores all ways to combine clauses; if inconsistency exists, it's found. Complexity: exponential in worst case (clause size and number grow). Strategies to improve: (1) Unit preference: prioritize clauses with one literal (unit resolution), (2) Set of support: always resolve at least one clause derived from ¬query, (3) Subsumption: discard clause if subsumed by another. First-order resolution: requires unification (previous question) to match predicates with variables. Example: Loves(X, mother_of(X)) and ¬Loves(Elena, mother_of(Elena)) resolve if X=Elena. SAT solvers: modern CDCL (conflict-driven clause learning) extends resolution with learning and backtracking. Prolog: uses resolution for query answering (SLD resolution, linear with Horn clauses).
 answer: |
   Resolution theorem proving works by converting KB ∪ {¬q} to CNF and repeatedly resolving pairs of clauses. If the empty clause is derived, KB ⊨ q.
   

@@ -2,19 +2,56 @@ id: "m7-transformer-attention"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement self-attention, the core mechanism of transformers.**
+  **Generate Shakespearean text using self-attention, the core mechanism of transformers.**
 
-  **Level 0** Discuss why RNNs were limiting: sequential processing prevents parallelization, long sequences suffer from vanishing gradients. How does attention solve this? Direct connections between all positions, allowing information flow in O(1) steps (not O(T) sequential steps). Why is this revolutionary? Transformers can process entire sequences in parallel during training, scaling to millions of tokens. Compare with previous sequence models: HMMs (Chapter 6) use fixed Markov assumptions, RNNs maintain hidden state sequentially.
+  Task: train a language model on TinyShakespeare (1MB of Shakespeare plays) to generate text like "To be, or not to be: that is the question." Challenge: RNNs process sequentially (word 1, then word 2, then...), slow and can't parallelize. Long-range dependencies ("To be" ... 50 words later ... "is") suffer from vanishing gradients. Self-attention solves both: (1) Every word attends to every other word in parallel (no sequential bottleneck), (2) Direct connections between all positions (long-range dependencies in O(1) steps, not O(T) sequential steps). Result: Transformers train 10-100× faster than RNNs, scale to millions of tokens (GPT-4 context: 128K tokens). This matters because attention revolutionized NLP (BERT 2018, GPT-2 2019, GPT-3 2020), then spread to vision (ViT 2021), multimodal (CLIP, DALL-E), and more.
 
-  **Level 1** Define self-attention: given input sequence X (T × d), compute Q=XW_Q, K=XW_K, V=XW_V (learned projections). Attention scores: S = QK^T/√d (T × T matrix where S[i,j] = how much position i attends to position j). Weights: A = softmax(S, axis=1) (each row sums to 1). Output: Y = AV (weighted sum of values).
+  **Level 0** Discuss RNN limitations. RNN maintains hidden state hᵗ, updated sequentially: hᵗ₊₁ = f(hᵗ, xᵗ₊₁). Problems: (1) Sequential: can't parallelize, slow on GPUs. (2) Vanishing gradients: ∂hᵀ/∂h₀ ∝ Wᵀ, vanishes for large T. (3) Fixed context: hᵗ must compress all history. Attention solution: Every token can "look at" all previous tokens directly. Query: "what am I looking for?" Key: "what do I have?" Value: "content to retrieve." Example: generating "question" after "To be, or not to be: that is the _", model attends strongly to "be" (repeated motif) and "is" (grammatical agreement). Compare with HMMs (Chapter 3): HMMs also sequential, but transformers have no Markov assumption (any token can attend to any past token).
+
+  **Level 1** **Self-Attention for TinyShakespeare:** Input: sequence of tokens [t₁, t₂, ..., tᵀ] (words or subwords, e.g., ["To", "be", ",", "or", "not"]). Embed each token: xᵢ = Embed(tᵢ), get X (T×d matrix, d=model dimension like 512).
   
-  Why scaling by √d? Prevents dot products from growing large (softmax saturates). Why QKV separate? Q = "what I'm looking for", K = "what I have", V = "content to retrieve".
+  **Step 1: Project to Q, K, V.**
+  Q = X W_Q (T×d_k, where d_k=d/num_heads, e.g., 64)
+  K = X W_K (T×d_k)
+  V = X W_V (T×d_v, often d_v=d_k)
   
-  Give pseudocode for ATTENTION(Q, K, V). Demonstrate by hand on 3-token sequence.
+  Why separate? Q = "what I want" (e.g., token "question" has query for related words). K = "what I offer" (e.g., token "be" has key indicating verb). V = "my content" (e.g., token "be" has value with semantic info).
+  
+  **Step 2: Compute Attention Scores.**
+  S = Q Kᵀ / √d_k (T×T matrix, S[i,j] = how much position i attends to j)
+  Why scale by √d_k? Dot products grow with dimension (d_k=64 ⇒ dot products ~64 in magnitude), causes softmax saturation. Scaling normalizes.
+  
+  **Step 3: Softmax to get Weights.**
+  A = softmax(S, dim=1) (each row i: A[i,j] = probability of attending to position j)
+  For language modeling, mask future positions: S[i,j] = -∞ for j > i (causal masking), so model can't "cheat" by seeing future words.
+  
+  **Step 4: Weighted Sum of Values.**
+  Y = A V (T×d_v, Y[i] = Σ_j A[i,j] V[j], weighted combination of values)
+  
+  Pseudocode:
+  ```
+  ATTENTION(Q, K, V, mask=None):
+    d_k = K.shape[-1]
+    S = (Q @ K.T) / sqrt(d_k)  # (T x T)
+    if mask: S = S + mask  # add -inf for future positions
+    A = softmax(S, dim=1)
+    Y = A @ V
+    return Y, A
+  ```
+  
+  Demonstrate by hand: 3-token sequence ["To", "be", "or"]. Embeddings x₁=[1,0], x₂=[0,1], x₃=[1,1] (toy 2D). W_Q, W_K, W_V identity (simplified). Compute Q, K, S=QKᵀ, A=softmax(S), Y=AV. Show attention weights: "or" attends to "To" (0.4) and "be" (0.6).
 
-  **Level 2** Implement single-head self-attention. Test on simple sequences: (1) positional patterns (attending to previous tokens), (2) content-based (attending to similar words). Visualize attention weights as heatmap. Implement multi-head attention: run h parallel attention heads with different W_Q, W_K, W_V, concatenate outputs, project with W_O.
+  **Level 2** Implement single-head self-attention for TinyShakespeare. Input: sequence of 128 tokens (Shakespeare characters or BPE subwords). Embedding dimension d=256. Project to Q, K, V (each 256×64). Compute attention, apply causal mask. Visualize attention heatmap: position i (rows) vs. position j (columns). Observe: (1) Diagonal strong (local context), (2) Some long-range (e.g., attending to subject noun 20 tokens back for verb agreement), (3) Causal mask: upper triangle is zero (can't attend to future).
+  
+  **Multi-Head Attention:** Run h=8 attention heads in parallel with different W_Q, W_K, W_V. Concatenate outputs, project with W_O. Why multi-head? Different heads learn different patterns: head 1 = previous word (bigram), head 2 = distant subject, head 3 = punctuation, head 4 = semantic similarity. Implement MULTI_HEAD_ATTENTION(X, num_heads=8). Test: generating text, which heads activate for which tokens?
 
-  **Level 3** Analyze complexity: attention is O(T²d) for sequence length T. Why is this problematic for long sequences? Discuss efficient variants: sparse attention, linear attention, Flash Attention (memory-efficient). Explain multi-head benefits: different heads learn different patterns (syntax, semantics, positional). Compare attention with: (1) RNN: O(T) sequential steps vs O(1) parallel, (2) CNN: fixed receptive field vs global context. Discuss causal masking for autoregressive LMs: prevent position i from attending to j>i. Why did attention succeed? Parallelization + long-range dependencies + no inductive bias (learns patterns from data).
+  **Level 3** **Complexity Analysis:** Attention: S = QKᵀ is (T×d_k)(d_k×T) = O(T² d_k). For T=128, d_k=64: ≈81×128×64 = 660K ops. Dominates for long sequences. GPT-3: context length T=2048, so T² = 4M. GPT-4: T=128K, so T² = 16B! Problem: quadratic in sequence length. Solutions: (1) Sparse attention (Longformer, BigBird): attend to local + random + global positions, O(T log T). (2) Linear attention (Performer, RWKV): approximate softmax(QKᵀ)V with kernels, O(Td²). (3) Flash Attention (Dao 2022): memory-efficient attention via tiling, still O(T²) but 2-4× faster in practice.
+  
+  **Why Multi-Head?** Single head: one attention pattern. Multi-head: diverse patterns. Example from GPT-2 analysis: Head 0 attends to previous token (bigrams: "to be", "or not"). Head 5 attends to commas/periods (sentence boundaries). Head 9 attends to matching quotes/parentheses. Head 14 semantic: "king" attends to "queen", "man" to "woman". Each head specializes.
+  
+  **Comparison with RNN/CNN:** RNN: O(T) sequential steps (slow), O(Td²) compute (matrix multiply hᵗ per step). CNN: O(k) receptive field grows linearly with layers, needs O(log T) layers for global context. Attention: O(1) path length (direct connections), O(T²d) compute, fully parallel. Trade-off: speed vs. quadratic cost. For T<10K, attention wins. For T>100K, need sparse/linear variants.
+  
+  **Why Attention Succeeded?** (1) Parallelization: trains on GPUs efficiently (RNNs don't). (2) Long-range dependencies: direct paths, no vanishing gradients. (3) No inductive bias: learns from data (vs. CNN's locality bias, RNN's sequential bias). With enough data (billions of tokens), data-driven beats hand-designed biases. This enabled scaling laws: bigger models (GPT-3: 175B params) + more data (CommonCrawl: 1T tokens) = better performance.
 answer: "Self-attention computes attention(Q,K,V) = softmax(QK^T/sqrt(d)) * V, where Q,K,V are learned linear projections of input. Each position attends to all positions (unlike RNNs' sequential processing). Transformer blocks stack attention + feedforward with residual connections and layer norm. This parallel architecture enables efficient training on GPUs and captures long-range dependencies better than RNNs."
 topics:
   - "Attention Mechanisms"

@@ -2,19 +2,55 @@ id: "m7-convolution"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement convolutional layers for computer vision.**
+  **Build a convolutional neural network (CNN) to recognize handwritten digits (MNIST) with 99% accuracy.**
 
-  **Level 0** Discuss why fully-connected layers are impractical for images: an image with 224×224×3 pixels has ~150K dimensions, requiring millions of parameters. How do convolutions solve this? Three key ideas: (1) local connectivity (each neuron only sees a small patch), (2) weight sharing (same filter applied everywhere), (3) translation invariance (detecting edges anywhere in the image). Compare with biological vision: receptive fields in the visual cortex.
+  MNIST images are 28×28 pixels. Flattening to 784-dimensional vectors (previous question) loses spatial structure: pixels (10,10) and (10,11) are neighbors, but this is invisible to fully-connected layers. Worse: a 28×28 image flattened to 784 dims requires 784×128 ≈ 100K parameters for one hidden layer. For 224×224 images (ImageNet), that's 50K×128 = 6.4M parameters per layer--explosion! Convolutional layers solve this: (1) Local connectivity: each neuron sees only a small patch (e.g., 3×3), not entire image. (2) Weight sharing: same 3×3 filter applied to all positions, so 9 parameters instead of 784×128. (3) Translation invariance: detecting "vertical edge" at position (5,5) uses same filter as at (10,15). Result: CNNs dominate vision tasks with 100-1000× fewer parameters than fully-connected.
 
-  **Level 1** Define 2D convolution: slide a k×k filter (kernel) across an H×W image, computing dot products. For position (i,j), output = Σ_a Σ_b image[i+a][j+b] * kernel[a][b]. Output dimensions: (H-k+1) × (W-k+1) with stride=1, no padding.
+  **Level 0** Discuss biological inspiration: receptive fields in visual cortex (Hubel & Wiesel 1959). Neurons respond to edges/bars in specific positions, organized in hierarchies (V1 edges → V2 textures → V4 object parts → IT objects). CNNs mimic this: early layers detect edges, later layers combine into complex patterns. Why fully-connected doesn't scale: For 224×224 RGB image, 150K input dimensions. One hidden layer with 4096 neurons = 614M parameters (600MB of memory). Convolutional: 64 filters of 3×3×3 = 1728 parameters (negligible). Compare with transformers (next questions): CNNs dominated 2012-2020 (AlexNet, ResNet), now Vision Transformers (ViT) competitive but CNNs still efficient for small data/compute.
+
+  **Level 1** **2D Convolution for MNIST Edge Detection:** Input: 28×28 MNIST digit. Filter (kernel): 3×3 matrix, e.g., vertical edge detector:
+  ```
+  [[-1, 0, 1],
+   [-1, 0, 1],
+   [-1, 0, 1]]
+  ```
+  Convolution: Slide filter across image. At position (i,j), output = Σ_a Σ_b image[i+a, j+b] × filter[a,b]. Example: position (5,5), multiply 3×3 patch centered at (5,5) with filter element-wise, sum. Output dimensions: (28-3+1) × (28-3+1) = 26×26 (no padding, stride=1).
   
-  Extensions: **Stride** s (skip s pixels per step), **Padding** p (add p zeros around border), **Multiple channels** (RGB input, multiple filters). Output size: ⌊(H+2p-k)/s⌋ + 1.
+  **Stride and Padding:** Stride s: skip s pixels per step (reduces output size). Padding p: add p zeros around border (preserves size). Output size: ⌊(H + 2p - k)/s⌋ + 1 where H=height, k=kernel size.
   
-  Give pseudocode for CONV2D(image, kernel, stride=1, padding=0). Demonstrate 3×3 filter detecting horizontal edges on a simple image.
+  **Multi-channel Convolution:** MNIST is grayscale (1 channel), but general images have RGB (3 channels). Filter becomes 3×3×3 (k×k×C_in). Multiple filters: 64 filters ⇒ 64 output channels. Each filter learns different feature (horizontal edges, vertical edges, diagonals, textures).
+  
+  Pseudocode:
+  ```
+  CONV2D(image, kernel, stride=1, padding=0):
+    H, W = image.shape
+    kH, kW = kernel.shape
+    # Add padding
+    padded = zero_pad(image, padding)
+    outH = (H + 2*padding - kH) // stride + 1
+    outW = (W + 2*padding - kW) // stride + 1
+    output = zeros(outH, outW)
+    
+    for i in range(0, outH):
+      for j in range(0, outW):
+        patch = padded[i*stride : i*stride+kH, j*stride : j*stride+kW]
+        output[i, j] = sum(patch * kernel)
+    return output
+  ```
+  
+  Demonstrate: 5×5 MNIST patch (digit "1", vertical bar at column 2). Apply vertical edge detector. Output large at column 2 (edge detected).
+  
+  **MaxPooling:** Downsample by taking max in each 2×2 window. 26×26 → 13×13. Provides translation invariance (small shifts don't change max) and reduces compute.
 
-  **Level 2** Implement CONV2D with stride and padding. Test filters: vertical edge detector [[1,0,-1],[1,0,-1],[1,0,-1]], horizontal edge detector (transpose), Gaussian blur. Implement a simple CNN: conv→ReLU→maxpool→conv→ReLU→maxpool→flatten→fully-connected. Train on MNIST or CIFAR-10.
+  **Level 2** **Implement MNIST CNN:** Architecture: Input (28×28×1) → Conv1 (32 filters, 3×3, ReLU) → MaxPool (2×2) → Conv2 (64 filters, 3×3, ReLU) → MaxPool (2×2) → Flatten → Dense (128 neurons, ReLU) → Dense (10 neurons, softmax). Details: Conv1 output: (26×26×32) after conv, (13×13×32) after pool. Conv2: (11×11×64) after conv, (5×5×64) after pool. Flatten: 5×5×64 = 1600 dims. First dense: 1600×128 weights. Output: 128×10.
+  
+  Implement: CONV2D with stride/padding, MAXPOOL, forward pass, backpropagation (convolutional layer gradients: flip kernel, convolve with upstream gradient). Train on MNIST for 10 epochs. Should achieve 99%+ accuracy (vs. 97-98% for fully-connected). Visualize learned filters: Conv1 filters look like edge detectors (Gabor-like patterns). Test on "adversarial" digit: add imperceptible noise, prediction flips (famous CNN vulnerability).
 
-  **Level 3** Analyze parameter efficiency: fully-connected layer for 224×224 images with 256 hidden units = 12M params. Convolutional layer with 256 filters of size 3×3 = 2K params (1000× reduction). Discuss receptive field growth through layers. Compare CNN architectures: LeNet (1998), AlexNet (2012), VGG (deeper stacks), ResNet (skip connections), modern vision transformers (ViT replaces convolution with attention). Why did CNNs dominate vision 2012-2020? Why are transformers now competitive?
+  **Level 3** **Parameter Efficiency Analysis:** Fully-connected MNIST (784 → 128 → 10): (784×128) + (128×10) = 101,632 parameters. Convolutional (32 filters 3×3, then 64 filters 3×3, then 1600×128, 128×10): (3×3×1×32) + (3×3×32×64) + (1600×128) + (128×10) = 288 + 18,432 + 204,800 + 1,280 = 224,800. Wait, more parameters? But key: fully-connected doesn't scale to larger images. 224×224 ImageNet: FC would be 150K×128 = 19M parameters first layer. CNN: still just 3×3×3×64 = 1,728 parameters for first conv (1000× savings!).
+  
+  **Receptive Field Growth:** Each Conv1 neuron sees 3×3 patch. After pooling (stride 2), each Conv2 neuron sees 2×2 Conv1 outputs, each covering 3×3, so Conv2 receptive field ≈ 6×6. After second pool, Dense layer sees entire 28×28 image indirectly. Deep CNNs: stack many layers, exponential receptive field growth (ResNet-50: layer 50 sees ~224×224 despite each conv being 3×3).
+  
+  **Historical CNNs:** LeNet (LeCun 1998): first CNN for MNIST, 2 conv layers, 99% accuracy. AlexNet (Krizhevsky 2012): won ImageNet, 5 conv layers, ReLU (vs. sigmoid), dropout, GPUs. VGG (Simonyan 2014): very deep (16-19 layers), all 3×3 convs. ResNet (He 2015): 50-152 layers with residual connections (x + f(x)), solved vanishing gradients. EfficientNet (Tan 2019): optimized depth/width/resolution jointly. Vision Transformers (Dosovitskiy 2021): replace convolution with self-attention (next questions). Why did CNNs dominate 2012-2020? Built-in inductive bias (locality, translation invariance) works well for vision with limited data. Why transformers now competitive? Scale to huge datasets (billions of images), no inductive bias (learns from data).
 answer: |
   Convolution is a fundamental operation in CNNs that applies a filter (kernel) across an image to detect features. The kernel slides over the image, computing dot products at each position.
   

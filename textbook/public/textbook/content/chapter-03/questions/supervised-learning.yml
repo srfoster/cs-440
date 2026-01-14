@@ -2,25 +2,49 @@ id: "m6-supervised-learning"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement the supervised learning pipeline: training and evaluation.**
+  **Train a neural network for disease classification using the supervised learning pipeline.**
 
-  **Level 0** Discuss how supervised learning differs from the inference-based AI of previous chapters. Instead of reasoning with given knowledge (logic, probability), we learn from data. Why is this paradigm shift crucial for modern AI? Compare learning from examples vs. hand-coding rules. What is the generalization problem: performing well on unseen data?
+  You have medical records: 10,000 patients with symptoms (fever, cough, fatigue, age, ...) and diagnoses (flu, COVID-19, common cold, healthy). Task: train a model to predict diagnosis from symptoms. This is supervised learning: learn function f: symptoms → diagnosis from labeled examples. Unlike previous chapters (search, logic, probability with hand-coded rules), here the model learns patterns from data. Training loop: (1) Forward pass: input symptoms, compute predicted diagnosis, (2) Loss: how wrong is prediction?, (3) Backward pass: compute gradients of loss w.r.t. parameters, (4) Update: adjust parameters to reduce loss. Repeat until loss small. Then test on new patients. This matters because modern AI (image recognition, language models, disease diagnosis) is data-driven: too complex for hand-coded rules, but trainable from examples. Same pipeline works for MNIST digit recognition (next question's domain) or any classification task.
 
-  **Level 1** Define supervised learning: learn function f: X → Y from labeled examples {(x₁,y₁),...,(xₙ,yₙ)}. Describe the training pipeline:
+  **Level 0** Discuss paradigm shift from inference to learning. Previous chapters: given knowledge (8-puzzle heuristic, Sudoku constraints, Horn clauses, disease Bayesian network), perform inference. Here: given data, learn the knowledge. Why? Hand-coding is infeasible for complex domains (millions of symptoms-disease patterns, or 784-pixel digits). Supervised learning: learn from labeled examples (symptoms → flu). Unsupervised: find patterns without labels (cluster patient types). Reinforcement: learn from rewards (game-playing). Compare generalization problem: training error vs. test error. Overfitting: memorizing training data (e.g., "if patient has exactly fever=38.2°C, cough=yes, fatigue=high, then flu") vs. learning patterns ("fever + cough + fatigue → likely flu").
+
+  **Level 1** **Disease Classification Pipeline:** Dataset: 10,000 patients, each with feature vector x = [fever (continuous 0-1), cough (binary), fatigue (0-10), age, ...] and label y = {flu, COVID, cold, healthy}. Neural network model: Input layer (N features) → Hidden layer (100 neurons, ReLU activation) → Output layer (4 neurons, softmax for class probabilities). Parameters: weights W¹, W², biases b¹, b².
   
-  1. **Split data:** Training set (learn parameters) and test set (evaluate generalization)
-  2. **Training loop:** For each epoch, iterate through training examples:
-     - Forward pass: ŷ = model(x)
-     - Loss: L = loss_fn(ŷ, y)  
-     - Backward pass: compute gradients ∇L
-     - Update: params ← params - α∇L (gradient descent)
-  3. **Evaluation:** Compute accuracy/error on test set
+  **Training Steps:**
+  1. **Split data:** 8000 training (learn parameters), 2000 test (evaluate generalization).
+  2. **Initialize:** Randomize W¹, W², b¹, b² (small values, e.g., Xavier initialization).
+  3. **Training loop (100 epochs):** For each epoch: Shuffle training data. For each patient (x,y): (a) Forward: h = ReLU(W¹x + b¹), ŷ = softmax(W²h + b²). (b) Loss: L = CrossEntropy(ŷ, y) = -log(ŷ[y]). (c) Backward: Compute ∇_W², ∇_b², ∇_W¹, ∇_b¹ via backpropagation. (d) Update: W² ← W² - α∇_W², etc. (α=learning rate, e.g., 0.01).
+  4. **Evaluation:** For each test patient: ŷ = model(x), predicted = argmax(ŷ). Accuracy = (# correct) / 2000.
   
-  Give pseudocode for TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs). Demonstrate gradient descent by hand on simple linear regression.
+  Pseudocode:
+  ```
+  TRAIN_EVAL(dataset, model, lossFn, optimizer, epochs):
+    (trainSet, testSet) = SPLIT(dataset, ratio=0.8, shuffle=true)
+    for e in 1..epochs:
+      for (x,y) in trainSet:
+        yhat = model.forward(x)
+        L = lossFn(yhat, y)
+        grads = model.backward(L)
+        optimizer.step(model.params, grads)
+    
+    correct = 0
+    for (x,y) in testSet:
+      yhat_class = argmax(model.forward(x))
+      if yhat_class == y: correct += 1
+    return correct / len(testSet)
+  ```
+  
+  Demonstrate gradient descent by hand: Simple logistic regression on 2D data (2 features, binary classification). Initialize w=0, show 3 iterations of gradient descent.
 
-  **Level 2** Implement the pipeline for classification (e.g., digit recognition or iris species). Use a simple neural network with one hidden layer. Include: data loading/splitting, forward/backward passes, SGD optimizer, training loop with loss tracking, test evaluation. Visualize training loss over epochs. Compare training vs. test accuracy to detect overfitting.
+  **Level 2** Implement full pipeline for disease classification or MNIST digits (28×28 pixels, 10 classes). Use simple 2-layer network: input → hidden (128 neurons, ReLU) → output (softmax). Training: SGD with learning rate 0.01, 50 epochs. Track training loss per epoch (should decrease). Evaluate test accuracy (should be 85-95% for MNIST with this simple model, 70-80% for synthetic disease data). Visualize: (1) Plot training loss vs. epoch, (2) Test accuracy vs. epoch. Observe overfitting: if training accuracy >> test accuracy, model is memorizing. Solutions: regularization (L2 penalty on weights), dropout (randomly zero neurons during training), early stopping (stop when test accuracy plateaus).
 
-  **Level 3** Analyze generalization theory: training error vs. test error, overfitting (model too complex), underfitting (too simple). Discuss regularization techniques: L2 penalty, dropout, early stopping. Prove that gradient descent converges for convex loss functions (linear regression). For non-convex (neural networks), discuss local minima and SGD noise benefits. Compare optimization algorithms: SGD, momentum, Adam. Discuss hyperparameter tuning: learning rate, batch size, architecture. How does this connect to other AI: Bayesian learning (prior over models), reinforcement learning (learning from rewards instead of labels)?
+  **Level 3** **Generalization Theory:** Training error E_train = average loss on training data. Test error E_test = average on new data. Goal: minimize E_test. Overfitting: E_train low, E_test high (model too complex, e.g., 1M parameters for 1K examples). Underfitting: both high (model too simple, e.g., linear model for nonlinear data). VC dimension: measure of model complexity; generalization bound E_test ≤ E_train + O(√(d/n)) where d=VC dimension, n=training size. For disease classifier: more data ⇒ better generalization.
+  
+  **Optimization Theory:** Convex loss (linear regression, logistic regression): gradient descent provably converges to global minimum, rate O(1/t) or O(exp(-t)) with strong convexity. Non-convex (neural networks): many local minima, but SGD noise helps escape bad minima. Momentum: v ← βv + ∇L, params ← params - αv (accelerates). Adam: adaptive learning rates per parameter (commonly used).
+  
+  **Regularization:** L2: add λ||W||² to loss (penalize large weights, prefers smooth functions). Dropout: during training, randomly set neuron activations to 0 with probability p=0.5 (forces redundancy, reduces co-adaptation). Early stopping: monitor test accuracy, stop training when it stops improving.
+  
+  **Connections:** Bayesian learning: place prior over parameters, training = computing posterior (neural nets are maximum likelihood or MAP estimation). Reinforcement learning (Chapter 3): no labels, learn from rewards (e.g., game outcomes). Next questions: specific neural architectures (feedforward/backprop, convolutional for images like MNIST, transformers for language).
 answer: |
   Supervised learning trains a model on labeled data. Split data into training and test sets, iterate through epochs updating parameters via gradient descent, then evaluate accuracy on test set.
   

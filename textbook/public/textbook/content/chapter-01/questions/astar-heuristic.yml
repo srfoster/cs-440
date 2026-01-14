@@ -2,54 +2,21 @@ id: "m1-astar-heuristic"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement the A-star search algorithm -- A_STAR(start, h) -- for maze navigation using a priority queue ordered by f=g+h. Your implementation should maintain g-costs and support "decrease-key" behavior when a better path to a state is found.**
+  **Implement the A-star search algorithm -- A_STAR(start, h) -- for maze navigation.**
 
-  **Level 0** Discuss the significance of search in the context of AI.  Discuss A* search and how it differs from uninformed search algorithms like BFS and DFS.
+  **Level 0** Discuss the significance of search in the context of AI.  Discuss how A* search (informed search) differs from algorithms like BFS and DFS (uninformed search).
 
-  **Level 1** For a sample maze, demonstrate A* search showing the priority queue and distance updates. Give pseudocode.
+  **Level 1** For a sample maze, demonstrate A* search showing the priority queue and distance updates.  Give pseudocode.
 
   **Level 2** Implement A* search in a language of your choice, including path reconstruction.
 
   **Level 3** Analyze the time and space complexity of A* search. Explain how the choice of heuristic h affects performance and optimality. Discuss admissible heuristics and give examples.
-answer: "A* search uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n and h(n) is the estimated cost from n to goal. It maintains a priority queue (open list) ordered by f-value. A* is optimal when h is admissible (never overestimates). Better heuristics (higher h while staying admissible) explore fewer nodes. Manhattan distance is a classic admissible heuristic for grid-based problems."
-answer_undergraduate: "A* optimally solves shortest-path problems when h is admissible. Proof of optimality: Suppose suboptimal goal G2 with f(G2) < f(G1) where G1 is optimal. Let n be an unexpanded node on optimal path to G1. Then f(n) = g(n) + h(n) ≤ g(n) + h*(n) = f*(n) = C* (optimal cost). But f(G2) = g(G2) > C*, contradicting f(G2) < f(G1) = C*. Time/space: O(b^d) in worst case, but effective branching factor depends on h accuracy. A* with consistent h expands nodes in order of increasing g-value, equivalent to Dijkstra's on an implicit graph. Heuristic quality measured by effective branching factor b*: N = 1 + b* + (b*)^2 + ... + (b*)^d where N is nodes expanded. Well-designed heuristics can reduce b* dramatically. Pattern databases, linear conflict, and disjoint pattern additivity are advanced techniques for creating powerful admissible heuristics."
+answer: "A* search uses f(n) = g(n) + h(n) where g(n) is the actual cost from start to n and h(n) is the estimated cost from n to goal. It maintains a priority queue (open list) ordered by f-value. A* is optimal when h is admissible (never overestimates). Better heuristics (higher h while staying admissible) explore fewer nodes. Manhattan distance is a classic admissible heuristic for grid-based problems.\n\nA* optimally solves shortest-path problems when h is admissible. Proof of optimality: Suppose suboptimal goal G2 with f(G2) < f(G1) where G1 is optimal. Let n be an unexpanded node on optimal path to G1. Then f(n) = g(n) + h(n) ≤ g(n) + h*(n) = f*(n) = C* (optimal cost). But f(G2) = g(G2) > C*, contradicting f(G2) < f(G1) = C*. Time/space: O(b^d) in worst case, but effective branching factor depends on h accuracy. A* with consistent h expands nodes in order of increasing g-value, equivalent to Dijkstra's on an implicit graph. Heuristic quality measured by effective branching factor b*: N = 1 + b* + (b*)^2 + ... + (b*)^d where N is nodes expanded. Well-designed heuristics can reduce b* dramatically. Pattern databases, linear conflict, and disjoint pattern additivity are advanced techniques for creating powerful admissible heuristics."
 topics:
   - "A* Search"
   - "Heuristic Functions"
   - "Informed Search"
   - "Optimality"
-vocab_answer:
-  - word: "admissible"
-    definition: "A heuristic that never overestimates the true cost to reach the goal"
-  - word: "priority queue"
-    definition: "A data structure that returns elements in order of priority (typically minimum value first)"
-  - word: "Manhattan distance"
-    definition: "The sum of horizontal and vertical distances, named after the grid layout of Manhattan"
-vocab_kindergarten:
-  - word: "guess"
-    definition: "To think about what might happen without knowing for sure"
-  - word: "total"
-    definition: "The amount you get when you add things together"
-vocab_3rd_grade:
-  - word: "priority"
-    definition: "Which things are more important to do first"
-  - word: "estimate"
-    definition: "A smart guess about a number or amount"
-vocab_7th_grade:
-  - word: "successor"
-    definition: "A state that can be reached directly from the current state"
-  - word: "extract"
-    definition: "To take out or remove (in this case, from a priority queue)"
-vocab_high_school:
-  - word: "consistent"
-    definition: "A heuristic where h(n) ≤ cost(n,n') + h(n') for any edge"
-  - word: "optimal path"
-    definition: "The shortest or lowest-cost path from start to goal"
-vocab_undergraduate:
-  - word: "effective branching factor"
-    definition: "A measure of search efficiency: the average number of nodes generated per level"
-  - word: "pattern database"
-    definition: "Precomputed exact costs for subproblems used as heuristic values"
 example_videos:
   - "https://www.youtube.com/watch?v=ySN5Wnu88nE"
   - "https://www.youtube.com/watch?v=6TsL96NAZCo"

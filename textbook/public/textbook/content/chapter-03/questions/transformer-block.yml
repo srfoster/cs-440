@@ -2,29 +2,52 @@ id: "m7-transformer-block"
 type: "short-answer"
 chapter: 3
 question: |
-  **Implement a complete transformer block.**
+  **Build a complete transformer block to generate Shakespearean text, understanding the architecture that powers GPT.**
 
-  **Level 0** Discuss the transformer architecture philosophy: repeating identical blocks stacked deeply (GPT-3 has 96 blocks). Why is modularity powerful? Each block refines representations, and stacking allows learning hierarchical patterns. Compare with CNN (convolutional blocks) and ResNet (residual blocks). What innovations made deep transformers trainable: residual connections (gradient flow), layer normalization (stable activations), careful initialization?
+  GPT-3 has 96 transformer blocks stacked identically. Each block: self-attention (attend to previous tokens) + feedforward (process each token independently) + residual connections (gradient highways) + layer normalization (stable training). Why identical blocks? Modularity: each block refines representations, stacking enables hierarchical learning (early: syntax/bigrams, middle: phrases, late: semantics/long-range coherence). TinyShakespeare example: Block 1 learns "to be" bigrams, Block 12 learns iambic pentameter, Block 24 learns character consistency ("Hamlet speaks philosophically"). This matters because the transformer block is the fundamental unit of modern AI—same architecture for GPT (language), ViT (vision), Whisper (speech), AlphaFold (proteins).
 
-  **Level 1** Define transformer block components:
-  
-  1. **Multi-head self-attention sublayer:**
-     - Compute attention: A = MultiHeadAttention(X)
-     - Residual connection: X' = X + A  
-     - Layer norm: X1 = LayerNorm(X')
-  
-  2. **Position-wise feedforward sublayer:**
-     - Two-layer MLP: F = GELU(X1*W1 + b1)*W2 + b2
-     - Residual: X'' = X1 + F
-     - Layer norm: Y = LayerNorm(X'')
-  
-  **Residual connections:** X + f(X) allows gradients to flow directly backward. **Layer normalization:** normalize across features (not batch), stabilizes training.
-  
-  Give pseudocode for TRANSFORMER_BLOCK(X, params). Show dimensions at each step for T=10 tokens, d=512 model dimension.
+  **Level 0** Discuss deep network training challenges: vanishing gradients (previous question), internal covariate shift (layer inputs change during training, causing instability). Residual connections (ResNet 2015): y = x + f(x) instead of y = f(x). Why this helps: gradient ∂y/∂x = 1 + ∂f/∂x, always has path with gradient=1 ("gradient highway"). Without residuals: 96-layer network would have gradients ∝ W⁹⁶, vanishing. With residuals: effective depth is adaptive (network learns to use as many layers as needed). Layer normalization (Ba 2016): normalize each token's features independently. Why not batch norm? Batch norm normalizes across batch (bad for variable-length sequences, order matters). Layer norm: per-example, works for sequences. Compare with CNN blocks (conv+ReLU+pool) and RNN cells—transformers: attention+FFN+residual+norm.
 
-  **Level 2** Implement transformer block with multi-head attention (8 heads), feedforward (4d intermediate dimension), GELU activation, residuals, and layer norm. Stack 6 blocks to build encoder. Test on sequence classification task. Visualize attention patterns in different layers: early layers learn positional patterns, later layers learn semantic relations.
+  **Level 1** **Transformer Block for TinyShakespeare Generation:** Input X: (T×d) sequence of token embeddings, e.g., T=128 tokens ("To be, or not to be..."), d=512 model dimension.
+  
+  **Sublayer 1: Multi-Head Self-Attention**
+  1. Compute A = MULTI_HEAD_ATTENTION(X, X, X) with causal mask (can't attend to future). Output: (T×d).
+  2. Residual connection: X' = X + A
+  3. Layer norm: X₁ = LayerNorm(X'), normalizes each token: X₁[i] = (X'[i] - mean(X'[i])) / sqrt(var(X'[i]) + ε)
+  
+  **Sublayer 2: Position-Wise Feedforward**
+  1. Two-layer MLP applied to each token independently: F = GELU(X₁ W¹ + b¹) W² + b². Dimensions: W¹ is d×4d (expands to 2048), W² is 4d×d (projects back to 512). GELU: smooth ReLU, GELU(x) ≈ x φ(x) where φ=Gaussian CDF.
+  2. Residual: X'' = X₁ + F
+  3. Layer norm: Y = LayerNorm(X'')
+  
+  Output Y: (T×d), same shape as input. Stack 24 such blocks for GPT-2 Small.
+  
+  Pseudocode:
+  ```
+  TRANSFORMER_BLOCK(X, params):
+    # X: (T x d)
+    # Attention sublayer
+    A = MULTI_HEAD_ATTENTION(X, X, X, params.attn_weights, causal_mask=True)
+    X1 = LAYER_NORM(X + A, params.ln1_gamma, params.ln1_beta)
+    
+    # Feedforward sublayer
+    H = GELU(X1 @ params.W1 + params.b1)  # (T x 4d)
+    F = H @ params.W2 + params.b2         # (T x d)
+    Y = LAYER_NORM(X1 + F, params.ln2_gamma, params.ln2_beta)
+    return Y
+  ```
+  
+  Demonstrate dimensions: T=10 tokens, d=512. Input (10×512). Attention (10×512). FFN intermediate (10×2048), output (10×512). Total parameters per block: Attention ≈ 4d² = 1M, FFN = 2×d×4d = 4M. Total ≈5M per block. GPT-2 Small (12 blocks): 60M params in blocks + embeddings/output.
 
-  **Level 3** Analyze residual connection theory: without residuals, gradients ∝ (W^T)^L vanish/explode. With residuals: gradient highway, effective depth is adaptive. Discuss layer norm vs batch norm: layer norm normalizes per example (independent of batch), crucial for variable-length sequences. Compare transformer variants: encoder-only (BERT, classification), decoder-only (GPT, generation), encoder-decoder (T5, translation). Discuss architectural choices: pre-norm vs post-norm (where layer norm is placed), GLU vs GELU activation, learned vs sinusoidal positional encoding. Why 512-768-1024 model dimensions? Power of 2 for GPU efficiency, large enough for rich representations.
+  **Level 2** Implement full transformer block for TinyShakespeare. Input: tokenized Shakespeare sequence (use BPE tokenizer, vocab≈50K). Embeddings: token embedding (vocab_size×d) + positional encoding (learned or sinusoidal). Stack 6 blocks. Output: linear layer d→vocab_size, softmax. Train to predict next character: Loss = CrossEntropy(logits[i], target[i+1]) averaged over sequence. After training, generate text: Start with prompt "HAMLET:", sample next token from softmax probabilities, append, repeat. Test: (1) Greedy decoding (argmax), (2) Temperature sampling (divide logits by T before softmax: T=0.1 deterministic, T=1 balanced, T=2 creative). Observe: T=0.5 generates coherent Shakespeare-like text ("To be, or not to be; that is the question"). Visualize attention across layers: Layer 1 attends to previous word, Layer 6 attends to subject of sentence 20 tokens back.
+
+  **Level 3** **Residual Connection Theory:** Without residuals: gradient ∂L/∂X₀ = ∂L/∂Xₗ ∏_{i=1}^L ∂Xᵢ/∂Xᵢ₋₁. If |∂Xᵢ/∂Xᵢ₋₁| < 1, product vanishes. With residuals: Xᵢ = Xᵢ₋₁ + fᵢ(Xᵢ₋₁), so ∂Xᵢ/∂Xᵢ₋₁ = I + ∂fᵢ/∂Xᵢ₋₁ ≈ I (if ∂f small). Gradient: ∂L/∂X₀ = ∂L/∂Xₗ (1 + Σ ∂fᵢ), contains term 1 (gradient highway). Enables training 1000+ layer networks (though transformers typically use 24-96 layers, enough for language).
+  
+  **Layer Norm vs. Batch Norm:** Batch norm: normalize across batch dimension, μ = mean over batch, σ² = var over batch. Problem for sequences: (1) Variable length (padding needed), (2) Order matters (batch of "To be" and "be To" should normalize differently, but batch norm mixes them). Layer norm: normalize across feature dimension, μ = mean over d features of single token. Independent of batch, works for any sequence length. Pre-norm vs. post-norm: Post-norm (original Transformer 2017): X₁ = LN(X + Attn(X)). Pre-norm (GPT-2): X₁ = X + Attn(LN(X)). Pre-norm trains more stably (gradients flow through residual even if LN diverges).
+  
+  **Architectural Variants:** Encoder-only (BERT): bidirectional attention (no causal mask), used for classification ("Is this spam?"). Decoder-only (GPT): causal attention, used for generation ("Continue this text"). Encoder-decoder (T5, BART): encoder processes input bidirectionally, decoder generates autoregressively, used for translation/summarization. GPT dominates because generation is flexible: classification = generate "Yes"/"No", translation = generate French after English prompt.
+  
+  **Model Dimensions:** GPT-2 Small: d=768, 12 layers, 12 heads, 117M params. GPT-2 Large: d=1280, 36 layers, 1.5B params. GPT-3: d=12288, 96 layers, 96 heads, 175B params. Why powers of 2 or multiples of 64? GPU/TPU efficiency (matrix multiplies optimized for these sizes). Why 512-1024-12288? Larger d = more representational capacity, but diminishing returns. Scaling laws (Kaplan 2020): loss ∝ N^(-α) where N=params. Doubling compute ⇒ constant improvement. This drove GPT-3, GPT-4, LLaMA, etc.
 answer: |
   A transformer block combines multi-head self-attention with a feedforward network, using residual connections and layer normalization. This architecture enables powerful sequence modeling.
   

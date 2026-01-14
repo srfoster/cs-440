@@ -2,15 +2,28 @@ id: "m5-unification"
 type: "short-answer"
 chapter: 2
 question: |
-  **Implement unification for first-order logic terms.**
+  **Unify logical expressions about tangled romantic relationships using the unification algorithm.**
 
-  **Level 0** Discuss why pattern matching is central to symbolic AI. How does unification differ from simple string matching? Why is it needed for logic programming (Prolog), theorem proving, and type inference? Compare with pattern matching in previous chapters (CSP constraints, game tree evaluation).
+  You're writing a Prolog-style system to reason about a soap opera. The show has rules like "Loves(X, mother_of(X))" (everyone loves their mother), "Betrayed(X, Y) ⇐ Loves(X, Y) ∧ Kissed(Y, rival_of(X))" (betrayal = kissing your rival), and queries like "Who did Elena betray?" represented as Betrayed(Elena, ?). To answer queries, you need unification: matching logical patterns with substitutions. Example: does Loves(Elena, mother_of(Elena)) match Loves(X, Y)? Yes, with θ = {X/Elena, Y/mother_of(Elena)}. Does Loves(Elena, Elena) match Loves(X, mother_of(X))? No, because Elena ≠ mother_of(Elena). Unification finds the most general substitution that makes two expressions identical, powering theorem provers, type checkers, and logic programming. This matters because symbolic reasoning—manipulating structured expressions, not just numbers—underlies much of classical AI.
 
-  **Level 1** Define unification: finding substitution θ such that SUBST(θ, x) = SUBST(θ, y). Explain the most general unifier (MGU). Describe the algorithm: if terms are identical, succeed; if one is a variable, bind it (after occurs check); if both are functions, must have same name/arity and unify arguments pairwise. Give pseudocode for UNIFY(x, y, subst). Demonstrate by hand: unify P(a, X, f(g(Y))) with P(Z, Z, f(W)).
+  **Level 0** Discuss why unification isn't just string matching. Example: Loves(X, X) (narcissist) doesn't unify with Loves(Stefan, Elena) because Stefan ≠ Elena after substitution. But Loves(X, X) does unify with Loves(Damon, Damon), with θ = {X/Damon}. Compare with CSP (previous): there we checked constraints on values; here we find substitutions making logical terms identical. Why is unification central to Prolog, theorem proving, type inference? Because it's the core operation for pattern matching in symbolic systems.
 
-  **Level 2** Implement UNIFY(x, y, subst) with occurs check to prevent infinite structures like X = f(X). Test on examples: Loves(X, X) with Loves(John, Y); P(X, f(X)) with P(g(Y), Z); cases that fail.
+  **Level 1** Define unification for romantic drama predicates. Terms: constants (Elena, Stefan), variables (X, Y), functions (mother_of(X), rival_of(X)). Substitution θ: mapping variables to terms (e.g., {X/Elena, Y/Stefan}). Goal: find θ such that SUBST(θ, term₁) = SUBST(θ, term₂). Most general unifier (MGU): θ with no unnecessary bindings.
+  
+  Algorithm UNIFY(x, y, θ):
+  1. If x and y identical after applying θ, return θ
+  2. If x is variable, return UNIFY_VAR(x, y, θ)
+  3. If y is variable, return UNIFY_VAR(y, x, θ)
+  4. If x and y are functions: must have same name (e.g., both mother_of) and arity. Unify arguments pairwise.
+  5. Else fail
+  
+  UNIFY_VAR(var, term, θ): if var already bound in θ, unify its value with term; else if term is var, succeed; else if var occurs in term (occurs check), fail (prevents X = mother_of(X)); else bind var to term.
+  
+  Demonstrate by hand: Unify Betrayed(Elena, mother_of(X)) with Betrayed(Y, mother_of(Stefan)). Steps: Betrayed matches, so unify arguments. Elena vs Y: bind Y/Elena. mother_of(X) vs mother_of(Stefan): same function, so unify X vs Stefan, bind X/Stefan. Result θ = {Y/Elena, X/Stefan}.
 
-  **Level 3** Prove UNIFY returns the most general unifier when one exists. Analyze time complexity (near-linear with union-find optimization, but potentially exponential without occurs check). Discuss role in resolution theorem proving, Prolog query evaluation, and Hindley-Milner type inference. Why is occurs check sometimes omitted in Prolog for efficiency?
+  **Level 2** Implement UNIFY(x, y, θ) with occurs check for soap opera knowledge base. Represent terms as nested structures (e.g., ["Loves", "X", ["mother_of", "X"]]). Test cases: (1) Loves(Elena, X) with Loves(Y, Stefan) → θ = {Y/Elena, X/Stefan}. (2) Loves(X, X) with Loves(Elena, Stefan) → fail. (3) Betrayed(X, mother_of(X)) with Betrayed(Elena, mother_of(Elena)) → θ = {X/Elena}. (4) Loves(X, Y) with Loves(mother_of(Z), Z) → θ = {X/mother_of(Z), Y/Z}. (5) Occurs check: Loves(X, mother_of(X)) with Loves(mother_of(Y), Y) → complex, should succeed with Y/mother_of(Y)? No, occurs check fails.
+
+  **Level 3** Prove UNIFY correctness: if θ returned, SUBST(θ, x) = SUBST(θ, term₂) and θ is most general (any other unifier θ' is instance of θ). Analyze complexity: with union-find for substitution tracking, near-linear O(n log n) where n = term size. Without occurs check: can be exponential (infinite unfolding). Discuss why occurs check sometimes omitted in Prolog: efficiency trade-off; most programs don't create circular terms. Connect to Prolog query evaluation: queries like ?- Betrayed(Elena, W) trigger unification with KB rules. Connect to type inference: Hindley-Milner unifies type variables (e.g., unify List(α) with List(Int) gives α/Int).
 answer: "Unification finds substitutions θ such that SUBST(θ, x) = SUBST(θ, y). Algorithm recursively processes terms: if both are identical, success; if one is a variable, extend substitution; if both are functions with same name/arity, unify arguments pairwise. Occurs check prevents X from unifying with f(X). Returns most general unifier or failure."
 topics:
   - "Unification"

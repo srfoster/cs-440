@@ -5,8 +5,6 @@ concept_map:
         description: "Variables, domains, constraints, and backtracking"
         exam_questions:
           - "questions/csp-fundamentals.yml"
-          - "questions/ac3-algorithm.yml"
-          - "questions/csp-structure.yml"
   - category: "Logic and Inference"
     concepts:
       - name: "Unification, Inference, Resolution, and Search"

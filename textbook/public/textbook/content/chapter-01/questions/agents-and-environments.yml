@@ -1,0 +1,19 @@
+id: "m2-8queens-objective"
+type: "short-answer"
+chapter: 1
+question: |
+  **Implement a simple multi-agent system**
+
+  **Level 0**  Discuss the concept of agents and environments.  Give examples of different types of agents (simple reflex, model-based, goal-based, utility-based) and environments (fully/partially observable, deterministic/stochastic, episodic/sequential). 
+
+  **Level 1**  Give some examples of famous multi-agent systems, or modifications thereof, that illustrate the above concepts.
+
+  **Level 2**  Implement a simple multi-agent system in a language of your choice.
+
+  **Level 3**  ...
+answer: |
+topics:
+  - "Agents"
+  - "Environments"
+example_videos:
+  - "https://www.youtube.com/watch?v=xouin83ebxE"

@@ -4,9 +4,6 @@ concept_map:
       - name: "Neural Networks, Backpropagation, and Transformers"
         description: "Deep learning architectures"
         exam_questions:
-          - "questions/supervised-learning.yml"
-          - "questions/feedforward-backprop.yml"
+          - "questions/neural-networks.yml"
           - "questions/convolution.yml"
-          - "questions/transformer-attention.yml"
-          - "questions/transformer-block.yml"
           - "questions/language-model-training.yml"

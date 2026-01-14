@@ -1,0 +1,33 @@
+id: "m7-feedforward-backprop"
+type: "short-answer"
+chapter: 3
+question: |
+  **Implement forward and backward propagation on a neural network**
+
+  **Level 0** 
+
+  **Level 1**
+
+  **Level 2** 
+
+  **Level 3** 
+  
+  **Vanishing/Exploding Gradients:** In deep networks, gradients ∝ (∂f/∂z)ᴸ where L=layers. If |∂f/∂z| < 1 (sigmoid), gradients vanish (→0). If > 1, explode (→∞). Solutions: (1) ReLU: ∂ReLU/∂z = 1 for z>0, gradients flow cleanly. (2) Residual connections (ResNet): f(x) = x + g(x), gradients += ∂g, always have path with gradient=1. (3) Batch normalization: normalize layer inputs, stabilizes gradients.
+  
+  **Initialization:** Random small weights (e.g., W ~ N(0, 0.01)) cause vanishing activations in deep nets. Xavier: W ~ N(0, √(2/(n_in+n_out))) keeps variance constant across layers. He initialization (for ReLU): W ~ N(0, √(2/n_in)).
+  
+  **Optimizers:** SGD: W ← W - α∇L. Momentum: v ← βv + ∇L, W ← W - αv (accelerates, smooths). Adam: adaptive learning rates per parameter, combines momentum + RMSProp. Most popular for training large models.
+  
+  **Backpropagation Complexity:** Forward: O(parameters) operations (matrix multiplies). Backward: also O(parameters) via reverse-mode automatic differentiation. This scalability enables billion-parameter models (GPT, next questions).
+answer: "Forward pass: z1 = W1*x + b1, h = ReLU(z1), z2 = W2*h + b2, p = softmax(z2). Loss: L = -log(p[y]). Backward pass: dz2 = p (with dz2[y] -= 1 for cross-entropy gradient), propagate through W2 to get dh, apply ReLU derivative to get dz1, compute weight gradients dW1, dW2, db1, db2. Update: W -= lr * dW."
+topics:
+  - "Neural Networks"
+  - "Backpropagation"
+  - "Gradient Descent"
+vocab_answer:
+  - word: "activation function"
+    definition: "Non-linear function applied to neuron outputs (e.g., ReLU, sigmoid)"
+  - word: "gradient"
+    definition: "Vector of partial derivatives indicating direction of steepest increase"
+example_videos:
+  - "https://www.youtube.com/watch?v=Ilg3gGewQ5U"

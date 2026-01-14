@@ -2,9 +2,7 @@ id: "m7-convolution"
 type: "short-answer"
 chapter: 3
 question: |
-  **Build a convolutional neural network (CNN) to recognize handwritten digits (MNIST) with 99% accuracy.**
-
-  MNIST images are 28×28 pixels. Flattening to 784-dimensional vectors (previous question) loses spatial structure: pixels (10,10) and (10,11) are neighbors, but this is invisible to fully-connected layers. Worse: a 28×28 image flattened to 784 dims requires 784×128 ≈ 100K parameters for one hidden layer. For 224×224 images (ImageNet), that's 50K×128 = 6.4M parameters per layer--explosion! Convolutional layers solve this: (1) Local connectivity: each neuron sees only a small patch (e.g., 3×3), not entire image. (2) Weight sharing: same 3×3 filter applied to all positions, so 9 parameters instead of 784×128. (3) Translation invariance: detecting "vertical edge" at position (5,5) uses same filter as at (10,15). Result: CNNs dominate vision tasks with 100-1000× fewer parameters than fully-connected.
+  **Build a convolutional neural network (CNN) to recognize handwritten digits from the MNIST dataset.**
 
   **Level 0** Discuss biological inspiration: receptive fields in visual cortex (Hubel & Wiesel 1959). Neurons respond to edges/bars in specific positions, organized in hierarchies (V1 edges → V2 textures → V4 object parts → IT objects). CNNs mimic this: early layers detect edges, later layers combine into complex patterns. Why fully-connected doesn't scale: For 224×224 RGB image, 150K input dimensions. One hidden layer with 4096 neurons = 614M parameters (600MB of memory). Convolutional: 64 filters of 3×3×3 = 1728 parameters (negligible). Compare with transformers (next questions): CNNs dominated 2012-2020 (AlexNet, ResNet), now Vision Transformers (ViT) competitive but CNNs still efficient for small data/compute.
 

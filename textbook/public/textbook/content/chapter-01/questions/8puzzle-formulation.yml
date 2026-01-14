@@ -2,7 +2,7 @@ id: "m1-8puzzle-formulation"
 type: "short-answer"
 chapter: 1
 question: |
-  **Solve the 8-puzzle problem (or a problem of your choice) by formulating it as a search problem.**
+  **Solve the 8-puzzle problem by formulating it as a search problem.**
 
   **Level 0** Discuss the significance of state space formulation in AI and how it applies to the problem.  What is the benefit of formulating a problem as a search problem?  What are the key components of a search problem? 
 

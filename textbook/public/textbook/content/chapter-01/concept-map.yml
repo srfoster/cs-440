@@ -12,7 +12,6 @@ concept_map:
         description: "Defining optimization criteria"
         exam_questions:
           - "questions/8queens-objective.yml"
-          - "questions/8queens-hillclimb.yml"
           - "questions/stochastic-optimization.yml"
       - name: "Continuous Optimization"
         description: "Optimization in continuous spaces"

@@ -4,11 +4,11 @@ chapter: 1
 question: |
   **Solve the airport placement problem using continuous optimization.**
 
-  **Level 0** Discuss the difference between discrete optimization (8-Queens) and continuous optimization (airport placement). When is "state space as a graph" not the right model? Why don't discrete search methods work well here?
+  **Level 0** Discuss the difference between discrete optimization (8-Queens) and continuous optimization (airport placement). When is "state space as a graph" not the right model?  What the significance of "gradient descent" and how does it help us find optimal solutions in continuous spaces?
 
-  **Level 1** Describe the airport placement problem: find (x,y) that minimizes weighted sum of squared distances to towns. Give pseudocode for AIRPORT_OBJECTIVE(x,y,towns) and RANDOM_SEARCH_CONTINUOUS(towns, bounds, iters). Demonstrate by hand with 3 towns.
+  **Level 1** Formally define the airport placement problem.  Demonstrate by hand, with 3 towns, how to compute the objective function for a given airport location.  Demonstrate how a random search algorithm might find the optimal location.
 
-  **Level 2** Implement both functions. Compare random search with gradient descent (compute partial derivatives ∂f/∂x and ∂f/∂y analytically). Visualize the objective function as a heat map.
+  **Level 2** Using a language of your choice, implement a solution using gradient descent (compute partial derivatives ∂f/∂x and ∂f/∂y analytically). Visualize the objective function as a heat map.
 
   **Level 3** Prove that the optimal solution is the weighted centroid: x* = Σ(w_i * x_i)/Σw_i. Analyze why this problem has a single global optimum (convex function). Discuss how this differs from the 8-Queens landscape. Generalize to other continuous optimization problems: when can we use calculus vs. metaheuristics?
 answer: |

@@ -4,103 +4,883 @@ chapter: 3
 question: |
   **Train a transformer language model on TinyShakespeare to generate Elizabethan prose.**
 
-  TinyShakespeare corpus: 1MB of Shakespeare plays (~1M characters, ~200K words). Task: predict next token given context. Training: see "To be, or not to" → predict "be". See "To be, or not to be" → predict ":". Every token in the corpus provides training signal. After training on billions of such predictions, model learns: grammar ("to be" not "to be is"), facts ("Hamlet" is character in Danish play), style (iambic pentameter), and surprisingly, reasoning (logical inference from context). Why does next-token prediction work so well? Language compresses world knowledge: to predict "The capital of France is __", model must know geography. This deceptively simple objective yields ChatGPT's capabilities. This matters because LLM training is the foundation of modern AI, with applications from code generation (GitHub Copilot) to scientific discovery (AlphaFold).
+  **Level 0** Discuss evolution of language modeling (from N-grams to RNNs to Transformers). Why did the GPT architecture win over alternatives?  What is a transformer language model and how does it work?  What is the next-token prediction objective?
 
-  **Level 0** Discuss evolution of language modeling. N-grams (1990s): P(wᵢ|wᵢ₋₁,...,wᵢ₋ₙ) via counting, limited context (n≤5). RNN LMs (2010s): P(wᵢ|hᵗ) where hᵗ = RNN(hᵗ₋₁, wᵗ), unlimited context but vanishing gradients. Transformer LMs (2018+): P(wᵢ|w₁,...,wᵢ₋₁) via self-attention, parallel training, scales to billions of parameters. Why GPT architecture won: (1) Next-token objective is dense supervision (every token = label), vs. other tasks like question-answering (sparse labels). (2) Autoregressive = flexible at test time (generate, classify, translate all via same model). (3) Scales: more data + more compute + more parameters = better performance (scaling laws).
-
-  **Level 1** **Training Pipeline for TinyShakespeare:**
+  **Level 1** Describe and diagram the training loop for a transformer language model.  Show the key steps (tokenization, batching, forward pass, loss computation, backward pass, parameter update.  Give pseudocode for the training loop.  What is perplexity and how does it relate to loss?
   
-  **Step 1: Tokenization.** Convert text to integers. Character-level (simple): vocab = {a-z, A-Z, punctuation, space}, ~100 tokens. Subword (better): Byte-Pair Encoding (BPE) learns ~50K tokens (e.g., "Hamlet" = one token, "question" = "quest"+"ion"). Shakespeare corpus → ~200K tokens.
+  **Level 2** Implement a simple transformer language model in a language of your choice.  Train it on the TinyShakespeare dataset and generate some sample text.  Plot training loss and perplexity over time.
   
-  **Step 2: Batching.** Sample sequences of length L (context window, e.g., L=256). For sequence [t₁, t₂, ..., tₗ], create training pairs: input = [t₁, ..., tₗ], targets = [t₂, ..., tₗ₊₁]. Batch size B=32 → 32 sequences per update.
+  **Level 3** Analyze the training process.  How does the choice of hyperparameters (learning rate, batch size, sequence length) affect training?  What are common pitfalls (e.g., overfitting, underfitting, vanishing gradients) and how can they be mitigated?  Discuss the limitations of this approach and potential improvements (e.g., larger models, more data, better architectures).
   
-  **Step 3: Forward Pass.** Embed tokens: X = TokenEmbed(tokens) + PosEmbed(positions), shape (L×d). Pass through 12 transformer blocks (previous question): H = Block₁₂(...Block₁(X)...). Output logits: Z = H W_out + b_out, shape (L×vocab_size).
-  
-  **Step 4: Loss.** For each position i in [0, L-1], lossᵢ = CrossEntropy(Z[i], target[i]) = -log(softmax(Z[i])[target[i]]). Total loss = mean over L positions and B batch.
-  
-  **Step 5: Backward + Update.** Compute gradients via backpropagation through all 12 blocks. Update with AdamW optimizer: θ ← θ - α (mᵗ/(√vᵗ + ε) + λθ) where mᵗ, vᵗ are momentum terms, λ=weight decay.
-  
-  Pseudocode:
-  ```
-  TRAIN_LM_TINYSHAKESPEARE(corpus_text, model, tokenizer, optimizer, steps, L=256, B=32):
-    tokens = tokenizer.encode(corpus_text)  # [t1, t2, ..., tN], N~200K
-    
-    for step in 1..steps:
-      # Sample batch
-      batchX, batchY = [], []
-      for b in 1..B:
-        i = random_int(0, len(tokens) - L - 1)
-        x = tokens[i : i+L]       # input sequence
-        y = tokens[i+1 : i+L+1]   # targets (shifted by 1)
-        batchX.append(x)
-        batchY.append(y)
-      
-      # Forward
-      X = model.embed(batchX)  # (B, L, d)
-      for block in model.blocks:
-        X = block(X)
-      logits = X @ model.W_out + model.b_out  # (B, L, vocab)
-      
-      # Loss
-      L = 0
-      for b in 1..B:
-        for i in 1..L:
-          L += CROSS_ENTROPY(logits[b,i], batchY[b,i])
-      L = L / (B * L)
-      
-      # Backward + update
-      grads = model.backward(L)
-      optimizer.step(model.params, grads)
-      
-      if step % 100 == 0:
-        perplexity = exp(L)
-        print(f"Step {step}, Loss {L:.3f}, Perplexity {perplexity:.1f}")
-    
-    return model
-  ```
-  
-  Perplexity = exp(loss), measures uncertainty. Perplexity=50 → model has 50 plausible next tokens on average. Lower = better. TinyShakespeare: start ~100, end ~10-20.
-  
-  Demonstrate: 5-token sequence ["To", "be", ",", "or", "not"]. Logits at position 2 (after seeing "To be") are [0.1, 0.5, 3.2, 0.8, ...] for vocab. Target = "," (index 2). Loss = -log(softmax(logits)[2]) = -log(exp(3.2) / Σ exp(...)) ≈ 0.5.
-
-  **Level 2** Implement TinyShakespeare LM. Model: 6-layer transformer, d=384, 6 heads, context length=256. Tokenizer: character-level (simple) or BPE. Train for 5000 steps. Track loss and perplexity. **Generation:** After training, generate text via autoregressive sampling: (1) Start with prompt "HAMLET: To be", (2) Forward pass → logits for next token, (3) Sample from softmax(logits / temperature), (4) Append sampled token, (5) Repeat. Temperature: T=0.1 (deterministic, repetitive), T=0.7 (balanced), T=1.5 (creative, incoherent). Test: prompt="ROMEO:", generate 100 tokens. Should produce Shakespeare-like text ("O, that I were a glove upon that hand, that I might touch that cheek!").
-  
-  Compare teacher forcing (training uses ground truth context) vs. autoregressive generation (uses model's own predictions). Training is stable (no error propagation), generation can drift (one bad prediction leads to more).
-
-  **Level 3** **Scaling Laws (Kaplan et al. 2020):** Loss L ∝ N^(-α) where N=parameters, α≈0.07. Doubling compute ⇒ constant loss reduction. GPT-2 (1.5B params, loss ~3.0) → GPT-3 (175B params, loss ~2.2). Implication: bigger = better, no saturation yet (GPT-4 rumored 1T+ params). Compute budget: C = 6ND where D=tokens. Optimal allocation: N ∝ C^0.73, D ∝ C^0.27 (spend more on model size than data for fixed compute).
-  
-  **Training Challenges:** (1) Memory: GPT-3 175B params × 4 bytes = 700GB, doesn't fit one GPU. Solutions: model parallelism (split layers across GPUs), mixed precision (FP16 for activations, FP32 for gradients), gradient checkpointing (recompute activations during backward, trade compute for memory). (2) Stability: large models diverge. Solutions: gradient clipping (max norm=1), learning rate warmup (start small, increase linearly), careful initialization. (3) Data quality: CommonCrawl has spam, bias. Filter via heuristics + model-based scoring.
-  
-  **Training Objectives:** Next-token (GPT): autoregressive P(tᵢ|t₁,...,tᵢ₋₁). Masked (BERT): predict random masked tokens ("Hamlet is [MASK] character"). Denoising (T5): corrupt input, predict original. GPT wins for generation tasks due to autoregressive nature.
-  
-  **Post-Training:** Base LM (trained on TinyShakespeare) generates Shakespeare-like text but doesn't follow instructions. Instruction tuning: fine-tune on (instruction, response) pairs ("Summarize Hamlet Act 1 → Hamlet meets ghost..."). RLHF (reinforcement learning from human feedback): train reward model from human preferences, optimize LM via PPO to maximize reward. This yields ChatGPT's helpful/harmless/honest behavior.
-  
-  **Emergent Capabilities:** Small models (GPT-2 124M): generate coherent paragraphs. Medium (GPT-2 1.5B): factual knowledge, simple reasoning. Large (GPT-3 175B): few-shot learning (examples in prompt → generalize), arithmetic, translation without fine-tuning. Scaling → qualitative leaps, not just quantitative gains.
 answer: |
-  Training a language model involves predicting the next token given previous tokens. Sample sequences from the corpus, compute cross-entropy loss on next-token predictions, and update parameters via backpropagation.
+  **Level 0: Evolution of Language Modeling**
+
+  **Language Modeling Task:** Given sequence of tokens [w₁, w₂, ..., wₜ], predict next token wₜ₊₁
+
+  **Historical Evolution:**
+
+  **1. N-gram Models (1990s-2000s)**
+  ```
+  P(wₜ | w₁...wₜ₋₁) ≈ P(wₜ | wₜ₋ₙ₊₁...wₜ₋₁)
   
-  Pseudocode:
+  Example (bigram): P("learning" | "machine") = count("machine learning") / count("machine")
+  
+  ✓ Simple, fast
+  ✗ Fixed context (n=3-5 words max)
+  ✗ Sparse data (most n-grams unseen)
+  ✗ No generalization
   ```
-  function TRAIN_LM(corpusText, tokenizer, model, optimizer, steps, seqLen, batchSize):
-      tokens = tokenizer.encode(corpusText)
+
+  **2. Neural Language Models (2003-2010s)**
+  ```
+  Embed words → Neural network → Probability distribution
+  
+  ✓ Dense representations (word embeddings)
+  ✓ Generalization (similar words behave similarly)
+  ✗ Still fixed context window
+  ```
+
+  **3. Recurrent Neural Networks (2010-2017)**
+  ```
+  h₀ = 0
+  For each token t:
+      hₜ = RNN(wₜ, hₜ₋₁)
+      P(wₜ₊₁) = softmax(W·hₜ)
+  
+  ✓ Arbitrary-length context
+  ✓ Sequential processing
+  ✗ Sequential bottleneck (can't parallelize)
+  ✗ Vanishing gradients (long sequences)
+  ✗ Fixed-size hidden state (information bottleneck)
+  ```
+
+  **LSTM/GRU improvements:**
+  - Gates control information flow
+  - Better at long-range dependencies
+  - Still fundamentally sequential
+
+  **4. Transformers (2017-present)**
+  ```
+  Self-attention: All tokens attend to all previous tokens in parallel
+  
+  Attention(Q,K,V) = softmax(QKᵀ/√d)V
+  
+  ✓ Parallel computation (train on full sequences)
+  ✓ Direct connections (every position to every position)
+  ✓ Scalable (billions of parameters)
+  ✓ No vanishing gradients
+  ✗ Quadratic memory (O(n²) in sequence length)
+  ```
+
+  ---
+
+  **Why GPT Architecture Won:**
+
+  **GPT (Generative Pre-trained Transformer) = Decoder-only transformer**
+
+  **Architecture comparison:**
+
+  ```
+  BERT (Encoder):           GPT (Decoder):
+  Bidirectional attention   Causal attention (autoregressive)
+  [MASK] token prediction   Next-token prediction
+  Good for understanding    Good for generation
+  ```
+
+  **Why GPT dominated:**
+
+  1. **Simplicity**: One architecture for everything (no encoder-decoder complexity)
+  
+  2. **Scalability**: Decoder-only scales better
+     - GPT-3: 175B parameters
+     - Training: Just predict next token (simple objective)
+  
+  3. **Generality**: Next-token prediction = universal objective
+     - Translation: "English: Hello. French:" → "Bonjour"
+     - QA: "Q: Capital of France? A:" → "Paris"
+     - Code: "def factorial(n):" → function implementation
+  
+  4. **Few-shot learning**: Large models learn from prompts
+     - No fine-tuning needed
+     - In-context learning emerges naturally
+  
+  5. **Generation quality**: Autoregressive = coherent long-form text
+     - Better than BERT for generation tasks
+  
+  6. **Commercial success**: ChatGPT (GPT-3.5/4) proved the architecture
+
+  **Key insight:** "Next-token prediction at scale" turns out to be enough for intelligence
+
+  ---
+
+  **What is a Transformer Language Model?**
+
+  **Architecture:**
+
+  ```
+  Input: "To be or not to"
+         ↓
+  Tokenization: [15496, 307, 393, 407, 284]
+         ↓
+  Embedding: token → d-dimensional vector
+         ↓
+  Positional Encoding: Add position information
+         ↓
+  [Transformer Blocks] × N layers:
+      ├─ Multi-Head Self-Attention (causal mask)
+      ├─ Add & LayerNorm
+      ├─ Feed-Forward Network
+      └─ Add & LayerNorm
+         ↓
+  Linear: d → vocab_size
+         ↓
+  Softmax: Probability distribution over vocabulary
+         ↓
+  Output: P("be" | "To be or not to") = 0.71
+  ```
+
+  **Key components:**
+
+  **1. Causal Self-Attention:**
+  ```
+  Token at position t can only attend to positions ≤ t
+  
+  Attention mask (lower triangular):
+  [1 0 0 0]    Token 0 sees: [0]
+  [1 1 0 0]    Token 1 sees: [0,1]
+  [1 1 1 0]    Token 2 sees: [0,1,2]
+  [1 1 1 1]    Token 3 sees: [0,1,2,3]
+  
+  Prevents "cheating" - can't look into future during training
+  ```
+
+  **2. Multi-Head Attention:**
+  ```
+  8 attention heads → 8 different attention patterns
+  - Head 1: Syntax (subject-verb agreement)
+  - Head 2: Semantics (related concepts)
+  - Head 3: Coreference (pronouns → nouns)
+  - ... different aspects of language
+  
+  Concatenate and project
+  ```
+
+  **3. Feed-Forward Network:**
+  ```
+  FFN(x) = ReLU(W₁x + b₁)W₂ + b₂
+  
+  Applied independently to each position
+  2-layer MLP with expansion (typically 4×)
+  ```
+
+  **4. Residual Connections & Layer Norm:**
+  ```
+  x → Attention → Add(x, ·) → LayerNorm → FFN → Add → LayerNorm
+  
+  Enables training very deep networks (96+ layers in GPT-3)
+  ```
+
+  ---
+
+  **Next-Token Prediction Objective:**
+
+  **Task:** Given tokens [w₁, ..., wₜ], predict wₜ₊₁
+
+  **Training:**
+  ```
+  Input sequence:  "To be or not to be"
+  
+  Split into (input, target) pairs:
+  [To]              → [be]
+  [To, be]          → [or]
+  [To, be, or]      → [not]
+  [To, be, or, not] → [to]
+  [To, be, or, not, to] → [be]
+  
+  Compute all predictions in parallel (teacher forcing)
+  ```
+
+  **Loss (Cross-Entropy):**
+  ```
+  For sequence of length T:
+  L = -Σₜ log P(wₜ | w₁...wₜ₋₁)
+  
+  Model outputs: logits ∈ ℝᵛᵒᶜᵃᵇ
+  Convert to probabilities: softmax(logits)
+  Compare with target token (one-hot)
+  ```
+
+  **Why this works:**
+  - **Unsupervised**: No manual labels needed (text is self-supervising)
+  - **Scalable**: Works on any text (books, web, code)
+  - **General**: Captures all aspects of language (syntax, semantics, world knowledge)
+
+  ---
+
+  **Level 1: Training Loop and Perplexity**
+
+  **Training Loop Diagram:**
+
+  ```
+  ┌─────────────────────────────────────────────────────────────┐
+  │                    TRAINING ITERATION                        │
+  └─────────────────────────────────────────────────────────────┘
+  
+  1. SAMPLE BATCH
+     Raw text: "To be, or not to be, that is the question."
+     ↓
+  
+  2. TOKENIZATION
+     Tokens: [1212, 307, 11, 393, 407, 284, 307, 11, 326, 318, ...]
+     ↓
+  
+  3. CREATE INPUT/TARGET PAIRS
+     Input:  [1212, 307, 11, 393, 407, 284, 307, 11, 326]
+     Target: [307, 11, 393, 407, 284, 307, 11, 326, 318]
+     (Target is Input shifted by 1)
+     ↓
+  
+  4. FORWARD PASS
+     Input → Embedding → Transformer Blocks → Logits
+     Shape: (batch, seq_len) → (batch, seq_len, vocab_size)
+     ↓
+  
+  5. COMPUTE LOSS
+     For each position: CrossEntropy(logits[i], target[i])
+     Average over positions and batch
+     L = 2.731  (example)
+     ↓
+  
+  6. BACKWARD PASS
+     Compute gradients: ∂L/∂W for all parameters
+     ↓
+  
+  7. PARAMETER UPDATE
+     W ← W - α·∇L (or Adam/AdamW)
+     ↓
+  
+  8. REPEAT (thousands of iterations)
+  ```
+
+  **Detailed Pseudocode:**
+
+  ```python
+  def train_language_model(
+      text_data,           # Raw text corpus
+      model,               # Transformer model
+      tokenizer,           # BPE/WordPiece tokenizer
+      optimizer,           # Adam optimizer
+      num_steps=10000,     # Training iterations
+      batch_size=32,       # Sequences per batch
+      seq_len=128,         # Tokens per sequence
+      learning_rate=3e-4
+  ):
+      # Tokenize entire corpus
+      tokens = tokenizer.encode(text_data)
+      print(f"Total tokens: {len(tokens)}")
       
-      for step in 1..steps:
-          batchX = []
-          batchY = []
-          for b in 1..batchSize:
-              i = randomInt(0, len(tokens)-seqLen-2)
-              x = tokens[i : i+seqLen]              # input tokens
-              y = tokens[i+1 : i+seqLen+1]          # next-token targets
-              batchX.append(x)
-              batchY.append(y)
+      losses = []
+      
+      for step in range(num_steps):
+          # === 1. SAMPLE BATCH ===
+          batch_inputs = []
+          batch_targets = []
           
-          logits = model.forward(batchX)            # (B, seqLen, vocab)
-          L = CROSS_ENTROPY(logits, batchY)         # token-wise
-          grads = model.backward(L)
-          optimizer.step(model.params, grads)
+          for b in range(batch_size):
+              # Random starting position
+              start_idx = random.randint(0, len(tokens) - seq_len - 1)
+              
+              # Input: tokens[i:i+seq_len]
+              input_seq = tokens[start_idx : start_idx + seq_len]
+              
+              # Target: tokens[i+1:i+seq_len+1] (shifted by 1)
+              target_seq = tokens[start_idx + 1 : start_idx + seq_len + 1]
+              
+              batch_inputs.append(input_seq)
+              batch_targets.append(target_seq)
+          
+          # Convert to tensors
+          X = torch.tensor(batch_inputs)  # (batch_size, seq_len)
+          Y = torch.tensor(batch_targets) # (batch_size, seq_len)
+          
+          # === 2. FORWARD PASS ===
+          logits = model(X)  # (batch_size, seq_len, vocab_size)
+          
+          # === 3. COMPUTE LOSS ===
+          # Reshape for cross-entropy
+          B, T, V = logits.shape
+          logits_flat = logits.view(B * T, V)
+          targets_flat = Y.view(B * T)
+          
+          loss = F.cross_entropy(logits_flat, targets_flat)
+          
+          # === 4. BACKWARD PASS ===
+          optimizer.zero_grad()
+          loss.backward()
+          
+          # Optional: Gradient clipping
+          torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+          
+          # === 5. UPDATE PARAMETERS ===
+          optimizer.step()
+          
+          # === 6. LOGGING ===
+          losses.append(loss.item())
+          
+          if step % 100 == 0:
+              perplexity = math.exp(loss.item())
+              print(f"Step {step}/{num_steps}: Loss={loss.item():.4f}, "
+                    f"Perplexity={perplexity:.2f}")
       
-      return model
+      return model, losses
+  
+  def generate_text(model, tokenizer, prompt, max_tokens=100, temperature=1.0):
+      """Generate text autoregressively."""
+      tokens = tokenizer.encode(prompt)
+      
+      for _ in range(max_tokens):
+          # Forward pass
+          logits = model(torch.tensor([tokens]))  # (1, seq_len, vocab_size)
+          
+          # Get logits for last position
+          next_token_logits = logits[0, -1, :] / temperature
+          
+          # Sample from distribution
+          probs = F.softmax(next_token_logits, dim=0)
+          next_token = torch.multinomial(probs, num_samples=1).item()
+          
+          # Append to sequence
+          tokens.append(next_token)
+          
+          # Stop if end-of-sequence token
+          if next_token == tokenizer.eos_token_id:
+              break
+      
+      return tokenizer.decode(tokens)
   ```
+
+  ---
+
+  **Perplexity and Its Relationship to Loss:**
+
+  **Definition:**
+  ```
+  Perplexity = exp(CrossEntropyLoss)
+  
+  PPL = exp(-1/N Σᵢ log P(wᵢ | w₁...wᵢ₋₁))
+  ```
+
+  **Interpretation:**
+  - **Perplexity = "Effective vocabulary size" for next token**
+  - PPL = 100: Model is as uncertain as choosing uniformly from 100 words
+  - PPL = 1: Model perfectly predicts next token (probability = 1)
+  - Lower is better
+
+  **Example:**
+  ```
+  Loss = 2.3 → PPL = exp(2.3) = 10.0
+  "Model is like guessing uniformly from 10 options"
+  
+  Loss = 4.6 → PPL = exp(4.6) = 100
+  "Like guessing uniformly from 100 options"
+  
+  Loss = 0 → PPL = 1
+  "Perfect prediction"
+  ```
+
+  **Typical values:**
+  - Random model: PPL ≈ vocab_size (50,000 for English)
+  - Decent model: PPL = 50-100
+  - Good model: PPL = 20-40
+  - SOTA models: PPL = 10-20
+
+  **Relationship:**
+  ```
+  Loss ↓ → Perplexity ↓
+  
+  Optimizing cross-entropy loss = minimizing perplexity
+  ```
+
+  ---
+
+  **Level 2: Implementation**
+
+  ```python
+  import torch
+  import torch.nn as nn
+  import torch.nn.functional as F
+  import math
+  import requests
+
+  # Download TinyShakespeare
+  def download_shakespeare():
+      url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+      response = requests.get(url)
+      return response.text
+
+  # Simple character-level tokenizer
+  class CharTokenizer:
+      def __init__(self, text):
+          chars = sorted(set(text))
+          self.vocab_size = len(chars)
+          self.char_to_idx = {ch: i for i, ch in enumerate(chars)}
+          self.idx_to_char = {i: ch for i, ch in enumerate(chars)}
+      
+      def encode(self, text):
+          return [self.char_to_idx[ch] for ch in text]
+      
+      def decode(self, tokens):
+          return ''.join([self.idx_to_char[i] for i in tokens])
+
+  # Multi-Head Attention
+  class MultiHeadAttention(nn.Module):
+      def __init__(self, d_model, n_heads):
+          super().__init__()
+          assert d_model % n_heads == 0
+          
+          self.d_model = d_model
+          self.n_heads = n_heads
+          self.head_dim = d_model // n_heads
+          
+          self.qkv = nn.Linear(d_model, 3 * d_model)
+          self.proj = nn.Linear(d_model, d_model)
+      
+      def forward(self, x):
+          B, T, C = x.shape
+          
+          # Compute Q, K, V
+          qkv = self.qkv(x)
+          q, k, v = qkv.split(self.d_model, dim=2)
+          
+          # Reshape for multi-head: (B, T, C) -> (B, n_heads, T, head_dim)
+          q = q.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
+          k = k.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
+          v = v.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
+          
+          # Scaled dot-product attention
+          scores = (q @ k.transpose(-2, -1)) / math.sqrt(self.head_dim)
+          
+          # Causal mask (prevent attending to future)
+          mask = torch.tril(torch.ones(T, T, device=x.device))
+          scores = scores.masked_fill(mask[None, None, :, :] == 0, float('-inf'))
+          
+          attn = F.softmax(scores, dim=-1)
+          out = attn @ v  # (B, n_heads, T, head_dim)
+          
+          # Concatenate heads
+          out = out.transpose(1, 2).contiguous().view(B, T, C)
+          
+          return self.proj(out)
+
+  # Transformer Block
+  class TransformerBlock(nn.Module):
+      def __init__(self, d_model, n_heads):
+          super().__init__()
+          self.attn = MultiHeadAttention(d_model, n_heads)
+          self.ffn = nn.Sequential(
+              nn.Linear(d_model, 4 * d_model),
+              nn.GELU(),
+              nn.Linear(4 * d_model, d_model)
+          )
+          self.ln1 = nn.LayerNorm(d_model)
+          self.ln2 = nn.LayerNorm(d_model)
+      
+      def forward(self, x):
+          # Self-attention with residual
+          x = x + self.attn(self.ln1(x))
+          # Feed-forward with residual
+          x = x + self.ffn(self.ln2(x))
+          return x
+
+  # GPT-style Language Model
+  class GPT(nn.Module):
+      def __init__(self, vocab_size, d_model=256, n_layers=4, n_heads=4, max_seq_len=256):
+          super().__init__()
+          
+          self.token_embedding = nn.Embedding(vocab_size, d_model)
+          self.position_embedding = nn.Embedding(max_seq_len, d_model)
+          
+          self.blocks = nn.ModuleList([
+              TransformerBlock(d_model, n_heads) for _ in range(n_layers)
+          ])
+          
+          self.ln_f = nn.LayerNorm(d_model)
+          self.head = nn.Linear(d_model, vocab_size, bias=False)
+          
+          # Weight tying
+          self.token_embedding.weight = self.head.weight
+          
+          self.max_seq_len = max_seq_len
+      
+      def forward(self, idx):
+          B, T = idx.shape
+          assert T <= self.max_seq_len
+          
+          # Token + positional embeddings
+          tok_emb = self.token_embedding(idx)
+          pos_emb = self.position_embedding(torch.arange(T, device=idx.device))
+          x = tok_emb + pos_emb
+          
+          # Transformer blocks
+          for block in self.blocks:
+              x = block(x)
+          
+          x = self.ln_f(x)
+          logits = self.head(x)
+          
+          return logits
+      
+      @torch.no_grad()
+      def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+          """Generate tokens autoregressively."""
+          for _ in range(max_new_tokens):
+              # Crop context if too long
+              idx_cond = idx if idx.size(1) <= self.max_seq_len else idx[:, -self.max_seq_len:]
+              
+              # Forward pass
+              logits = self(idx_cond)
+              logits = logits[:, -1, :] / temperature
+              
+              # Optional top-k sampling
+              if top_k is not None:
+                  v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                  logits[logits < v[:, [-1]]] = -float('Inf')
+              
+              # Sample
+              probs = F.softmax(logits, dim=-1)
+              idx_next = torch.multinomial(probs, num_samples=1)
+              idx = torch.cat([idx, idx_next], dim=1)
+          
+          return idx
+
+  # Training loop
+  def train():
+      # Load data
+      text = download_shakespeare()
+      print(f"Dataset size: {len(text)} characters")
+      
+      # Tokenizer
+      tokenizer = CharTokenizer(text)
+      vocab_size = tokenizer.vocab_size
+      print(f"Vocabulary size: {vocab_size}")
+      
+      # Encode entire dataset
+      data = torch.tensor(tokenizer.encode(text), dtype=torch.long)
+      
+      # Train/val split
+      n = int(0.9 * len(data))
+      train_data = data[:n]
+      val_data = data[n:]
+      
+      # Model
+      device = 'cuda' if torch.cuda.is_available() else 'cpu'
+      model = GPT(vocab_size, d_model=256, n_layers=4, n_heads=4, max_seq_len=256)
+      model = model.to(device)
+      
+      print(f"Model parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
+      
+      # Optimizer
+      optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
+      
+      # Training config
+      batch_size = 32
+      seq_len = 128
+      num_steps = 5000
+      
+      train_losses = []
+      val_losses = []
+      
+      for step in range(num_steps):
+          model.train()
+          
+          # Sample batch
+          ix = torch.randint(len(train_data) - seq_len, (batch_size,))
+          x = torch.stack([train_data[i:i+seq_len] for i in ix]).to(device)
+          y = torch.stack([train_data[i+1:i+seq_len+1] for i in ix]).to(device)
+          
+          # Forward
+          logits = model(x)
+          loss = F.cross_entropy(logits.view(-1, vocab_size), y.view(-1))
+          
+          # Backward
+          optimizer.zero_grad()
+          loss.backward()
+          torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+          optimizer.step()
+          
+          train_losses.append(loss.item())
+          
+          # Validation
+          if step % 100 == 0:
+              model.eval()
+              with torch.no_grad():
+                  ix = torch.randint(len(val_data) - seq_len, (batch_size,))
+                  x_val = torch.stack([val_data[i:i+seq_len] for i in ix]).to(device)
+                  y_val = torch.stack([val_data[i+1:i+seq_len+1] for i in ix]).to(device)
+                  val_logits = model(x_val)
+                  val_loss = F.cross_entropy(val_logits.view(-1, vocab_size), y_val.view(-1))
+              
+              val_losses.append(val_loss.item())
+              
+              train_ppl = math.exp(loss.item())
+              val_ppl = math.exp(val_loss.item())
+              
+              print(f"Step {step}: Train Loss={loss.item():.4f} (PPL={train_ppl:.2f}), "
+                    f"Val Loss={val_loss.item():.4f} (PPL={val_ppl:.2f})")
+              
+              # Generate sample
+              if step % 500 == 0:
+                  context = torch.tensor([tokenizer.encode("ROMEO:")], dtype=torch.long, device=device)
+                  generated = model.generate(context, max_new_tokens=200, temperature=0.8, top_k=40)
+                  print("\n" + "="*50)
+                  print(tokenizer.decode(generated[0].tolist()))
+                  print("="*50 + "\n")
+      
+      # Plot training curves
+      import matplotlib.pyplot as plt
+      
+      fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+      
+      ax1.plot(train_losses, alpha=0.3, label='Train')
+      ax1.plot(range(0, len(train_losses), 100), val_losses, 'o-', label='Val')
+      ax1.set_xlabel('Step')
+      ax1.set_ylabel('Loss')
+      ax1.set_title('Training Loss')
+      ax1.legend()
+      ax1.grid(True)
+      
+      train_ppl = [math.exp(min(l, 10)) for l in train_losses]  # Cap for visualization
+      val_ppl = [math.exp(min(l, 10)) for l in val_losses]
+      
+      ax2.plot(train_ppl, alpha=0.3, label='Train')
+      ax2.plot(range(0, len(train_ppl), 100), val_ppl, 'o-', label='Val')
+      ax2.set_xlabel('Step')
+      ax2.set_ylabel('Perplexity')
+      ax2.set_title('Perplexity')
+      ax2.legend()
+      ax2.grid(True)
+      
+      plt.tight_layout()
+      plt.savefig('training_curves.png')
+      plt.show()
+      
+      return model, tokenizer
+
+  if __name__ == '__main__':
+      model, tokenizer = train()
+  ```
+
+  **Expected Output:**
+  ```
+  Dataset size: 1115394 characters
+  Vocabulary size: 65
+  Model parameters: 2.58M
+  
+  Step 0: Train Loss=4.1743 (PPL=65.00), Val Loss=4.1698 (PPL=64.71)
+  ==================================================
+  ROMEO:
+  CZqd,yWIuT'hNzKxmY-vH
+  ==================================================
+  
+  Step 500: Train Loss=1.8234 (PPL=6.19), Val Loss=1.9012 (PPL=6.70)
+  ==================================================
+  ROMEO:
+  What shall I do?
+  
+  JULIET:
+  I am not well to-day.
+  ==================================================
+  
+  Step 4900: Train Loss=1.1247 (PPL=3.08), Val Loss=1.3521 (PPL=3.87)
+  ==================================================
+  ROMEO:
+  O, speak again, bright angel! for thou art
+  As glorious to this night, being o'er my head
+  As is a winged messenger of heaven
+  ==================================================
+  ```
+
+  ---
+
+  **Level 3: Analysis and Advanced Topics**
+
+  **Hyperparameter Effects:**
+
+  **1. Learning Rate**
+  ```
+  Too high (1e-2):
+  - Loss oscillates or diverges
+  - Training unstable
+  
+  Too low (1e-6):
+  - Very slow convergence
+  - May get stuck in poor local minima
+  
+  Optimal (3e-4 for AdamW):
+  - Steady decrease in loss
+  - Good convergence
+  
+  Best practice: Learning rate warmup + cosine decay
+  lr(t) = lr_max · min(t/warmup_steps, 0.5(1 + cos(π·t/max_steps)))
+  ```
+
+  **2. Batch Size**
+  ```
+  Small (4-8):
+  ✓ Less memory
+  ✓ Noisy gradients (regularization)
+  ✗ Slower training
+  ✗ Unstable
+  
+  Large (256-512):
+  ✓ Stable gradients
+  ✓ Better hardware utilization
+  ✗ More memory
+  ✗ May overfit
+  
+  Optimal: 32-64 for small models, 512-2048 for large models
+  ```
+
+  **3. Sequence Length**
+  ```
+  Short (64):
+  ✓ Less memory (O(n²) attention)
+  ✓ Faster iteration
+  ✗ Limited context
+  
+  Long (2048):
+  ✓ More context
+  ✗ Much more memory
+  ✗ Slower
+  
+  Trade-off: Start with 128-256, increase if needed
+  GPT-3: 2048 tokens
+  GPT-4: 8k-32k tokens
+  ```
+
+  ---
+
+  **Common Pitfalls and Solutions:**
+
+  **1. Overfitting**
+  
+  **Symptoms:**
+  - Train loss << Val loss
+  - Model memorizes training data
+  - Poor generation quality (repetitive, incoherent)
+  
+  **Solutions:**
+  - **Dropout**: Add dropout (0.1-0.2) in attention and FFN
+  - **More data**: Train on larger corpus
+  - **Weight decay**: L2 regularization (AdamW with weight_decay=0.1)
+  - **Early stopping**: Stop when val loss stops improving
+  - **Data augmentation**: Paraphrase, back-translation
+
+  **2. Underfitting**
+  
+  **Symptoms:**
+  - Both train and val loss high
+  - Model generates random/nonsensical text
+  
+  **Solutions:**
+  - **Bigger model**: More layers, wider hidden size
+  - **Train longer**: More iterations
+  - **Higher learning rate**: (with warmup)
+  - **Check data**: Ensure tokenization correct
+
+  **3. Vanishing/Exploding Gradients**
+  
+  **Symptoms:**
+  - Loss becomes NaN
+  - Gradients → 0 or → ∞
+  
+  **Solutions:**
+  - **Gradient clipping**: `clip_grad_norm_(params, 1.0)`
+  - **Layer normalization**: Already helps significantly
+  - **Residual connections**: Already in transformer
+  - **Better initialization**: Xavier/He initialization
+  - **Lower learning rate**: Reduce by 10×
+
+  **4. Poor Generation Quality**
+  
+  **Symptoms:**
+  - Repetitive text
+  - Incoherent sentences
+  - Boring/generic output
+  
+  **Solutions:**
+  - **Temperature sampling**: T=0.8-1.2 for diversity
+  - **Top-k/top-p sampling**: Restrict to likely tokens
+  - **Longer context**: Increase sequence length
+  - **Better training**: Train longer, more data
+  - **Prompt engineering**: Better starting prompts
+
+  ---
+
+  **Limitations and Improvements:**
+
+  **Current Limitations:**
+
+  1. **Quadratic complexity**: O(n²) memory/compute for sequence length n
+  2. **Fixed context**: Can't attend beyond training seq_len
+  3. **No grounding**: Hallucinates facts
+  4. **Expensive**: GPT-3 cost ~$4.6M to train
+  5. **Repetition**: Tends to repeat common patterns
+
+  **Improvements:**
+
+  **1. Efficient Attention:**
+  - **Sparse attention**: Only attend to subset of positions
+  - **Linear attention**: Approximations (Performer, Linformer)
+  - **Flash attention**: Optimized implementation (2-4× faster)
+  - **Sliding window**: Local attention + global tokens
+
+  **2. Longer Context:**
+  - **Positional embeddings**: RoPE, ALiBi enable extrapolation
+  - **Memory**: Compress older context
+  - **Retrieval**: Augment with external memory
+  - Current SOTA: 128k-1M tokens (Gemini, Claude)
+
+  **3. Better Training:**
+  - **Instruction tuning**: Fine-tune on (instruction, response) pairs
+  - **RLHF**: Reinforce good outputs via human feedback
+  - **Constitutional AI**: Train with AI-generated feedback
+  - **Mixture of Experts**: Route to specialized sub-networks
+
+  **4. Scaling:**
+  - **Larger models**: 100B-1T parameters
+  - **More data**: Trillions of tokens
+  - **Better data**: High-quality, diverse sources
+  - **Compute efficiency**: Quantization, distillation
+
+  **5. Grounding:**
+  - **Retrieval augmentation**: Search before generating
+  - **Tool use**: Call APIs, calculators, search engines
+  - **Multimodal**: Combine text, images, audio
+  - **Verification**: Check facts against knowledge base
+
+  **Scaling Laws (Kaplan et al., 2020):**
+  ```
+  Loss ∝ N^(-α) · D^(-β)
+  
+  Where:
+  N = number of parameters
+  D = dataset size
+  α, β ≈ 0.07-0.1
+  
+  Insight: Bigger models + more data = better performance (predictably)
+  ```
+
+  **Conclusion:**
+
+  Transformer language models trained on next-token prediction have revolutionized NLP. Despite limitations, they achieve remarkable performance through scale. The same principles that work for Shakespeare work for GPT-4: next-token prediction + massive scale + good engineering = intelligence.
+
+  Key takeaways:
+  1. Simple objective (predict next token) is surprisingly powerful
+  2. Transformers scale better than RNNs
+  3. Attention is all you need (mostly)
+  4. Bigger is better (within compute budget)
+  5. Engineering matters (optimization, implementation, data quality)
 topics:
   - "Language Models"
   - "Transformers"

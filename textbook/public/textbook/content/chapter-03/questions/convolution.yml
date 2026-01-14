@@ -4,72 +4,807 @@ chapter: 3
 question: |
   **Build a convolutional neural network (CNN) to recognize handwritten digits from the MNIST dataset.**
 
-  **Level 0** Discuss biological inspiration: receptive fields in visual cortex (Hubel & Wiesel 1959). Neurons respond to edges/bars in specific positions, organized in hierarchies (V1 edges → V2 textures → V4 object parts → IT objects). CNNs mimic this: early layers detect edges, later layers combine into complex patterns. Why fully-connected doesn't scale: For 224×224 RGB image, 150K input dimensions. One hidden layer with 4096 neurons = 614M parameters (600MB of memory). Convolutional: 64 filters of 3×3×3 = 1728 parameters (negligible). Compare with transformers (next questions): CNNs dominated 2012-2020 (AlexNet, ResNet), now Vision Transformers (ViT) competitive but CNNs still efficient for small data/compute.
+  **Level 0** What is a convolutional neural network?  When would you use a CNN instead of a fully-connected network?  What are the key components of a CNN (convolution, pooling, activation functions)?
 
-  **Level 1** **2D Convolution for MNIST Edge Detection:** Input: 28×28 MNIST digit. Filter (kernel): 3×3 matrix, e.g., vertical edge detector:
-  ```
-  [[-1, 0, 1],
-   [-1, 0, 1],
-   [-1, 0, 1]]
-  ```
-  Convolution: Slide filter across image. At position (i,j), output = Σ_a Σ_b image[i+a, j+b] × filter[a,b]. Example: position (5,5), multiply 3×3 patch centered at (5,5) with filter element-wise, sum. Output dimensions: (28-3+1) × (28-3+1) = 26×26 (no padding, stride=1).
-  
-  **Stride and Padding:** Stride s: skip s pixels per step (reduces output size). Padding p: add p zeros around border (preserves size). Output size: ⌊(H + 2p - k)/s⌋ + 1 where H=height, k=kernel size.
-  
-  **Multi-channel Convolution:** MNIST is grayscale (1 channel), but general images have RGB (3 channels). Filter becomes 3×3×3 (k×k×C_in). Multiple filters: 64 filters ⇒ 64 output channels. Each filter learns different feature (horizontal edges, vertical edges, diagonals, textures).
-  
-  Pseudocode:
-  ```
-  CONV2D(image, kernel, stride=1, padding=0):
-    H, W = image.shape
-    kH, kW = kernel.shape
-    # Add padding
-    padded = zero_pad(image, padding)
-    outH = (H + 2*padding - kH) // stride + 1
-    outW = (W + 2*padding - kW) // stride + 1
-    output = zeros(outH, outW)
-    
-    for i in range(0, outH):
-      for j in range(0, outW):
-        patch = padded[i*stride : i*stride+kH, j*stride : j*stride+kW]
-        output[i, j] = sum(patch * kernel)
-    return output
-  ```
-  
-  Demonstrate: 5×5 MNIST patch (digit "1", vertical bar at column 2). Apply vertical edge detector. Output large at column 2 (edge detected).
-  
-  **MaxPooling:** Downsample by taking max in each 2×2 window. 26×26 → 13×13. Provides translation invariance (small shifts don't change max) and reduces compute.
+  **Level 1** Demonstrate how training a CNN on MNIST works.  What does the architecture look like?  How do you compute the number of parameters?  What are the receptive fields of each layer? 
 
-  **Level 2** **Implement MNIST CNN:** Architecture: Input (28×28×1) → Conv1 (32 filters, 3×3, ReLU) → MaxPool (2×2) → Conv2 (64 filters, 3×3, ReLU) → MaxPool (2×2) → Flatten → Dense (128 neurons, ReLU) → Dense (10 neurons, softmax). Details: Conv1 output: (26×26×32) after conv, (13×13×32) after pool. Conv2: (11×11×64) after conv, (5×5×64) after pool. Flatten: 5×5×64 = 1600 dims. First dense: 1600×128 weights. Output: 128×10.
-  
-  Implement: CONV2D with stride/padding, MAXPOOL, forward pass, backpropagation (convolutional layer gradients: flip kernel, convolve with upstream gradient). Train on MNIST for 10 epochs. Should achieve 99%+ accuracy (vs. 97-98% for fully-connected). Visualize learned filters: Conv1 filters look like edge detectors (Gabor-like patterns). Test on "adversarial" digit: add imperceptible noise, prediction flips (famous CNN vulnerability).
+  **Level 2** Implement a simple CNN in a language of your choice (e.g., Python with TensorFlow or PyTorch) to classify MNIST digits.  Include code for training and evaluating the model.
 
-  **Level 3** **Parameter Efficiency Analysis:** Fully-connected MNIST (784 → 128 → 10): (784×128) + (128×10) = 101,632 parameters. Convolutional (32 filters 3×3, then 64 filters 3×3, then 1600×128, 128×10): (3×3×1×32) + (3×3×32×64) + (1600×128) + (128×10) = 288 + 18,432 + 204,800 + 1,280 = 224,800. Wait, more parameters? But key: fully-connected doesn't scale to larger images. 224×224 ImageNet: FC would be 150K×128 = 19M parameters first layer. CNN: still just 3×3×3×64 = 1,728 parameters for first conv (1000× savings!).
+  **Level 3**  Analyze the performance of your CNN.  What are some common techniques to improve CNN performance (e.g., data augmentation, dropout, batch normalization)? 
   
-  **Receptive Field Growth:** Each Conv1 neuron sees 3×3 patch. After pooling (stride 2), each Conv2 neuron sees 2×2 Conv1 outputs, each covering 3×3, so Conv2 receptive field ≈ 6×6. After second pool, Dense layer sees entire 28×28 image indirectly. Deep CNNs: stack many layers, exponential receptive field growth (ResNet-50: layer 50 sees ~224×224 despite each conv being 3×3).
-  
-  **Historical CNNs:** LeNet (LeCun 1998): first CNN for MNIST, 2 conv layers, 99% accuracy. AlexNet (Krizhevsky 2012): won ImageNet, 5 conv layers, ReLU (vs. sigmoid), dropout, GPUs. VGG (Simonyan 2014): very deep (16-19 layers), all 3×3 convs. ResNet (He 2015): 50-152 layers with residual connections (x + f(x)), solved vanishing gradients. EfficientNet (Tan 2019): optimized depth/width/resolution jointly. Vision Transformers (Dosovitskiy 2021): replace convolution with self-attention (next questions). Why did CNNs dominate 2012-2020? Built-in inductive bias (locality, translation invariance) works well for vision with limited data. Why transformers now competitive? Scale to huge datasets (billions of images), no inductive bias (learns from data).
 answer: |
-  Convolution is a fundamental operation in CNNs that applies a filter (kernel) across an image to detect features. The kernel slides over the image, computing dot products at each position.
+  **Level 0: Convolutional Neural Networks (CNNs)**
+
+  **What is a CNN?**
+
+  A **Convolutional Neural Network** is a specialized neural network architecture designed for processing grid-structured data (images, videos, time series) that exploits spatial/temporal relationships through local connectivity and weight sharing.
+
+  **Key innovation:** Instead of connecting every input pixel to every neuron (fully connected), CNNs use **convolution operations** that:
+  1. Apply small filters/kernels across the input
+  2. Share weights across spatial positions
+  3. Detect local patterns (edges, textures, shapes)
+
+  **Visual comparison:**
+  ```
+  Fully Connected:           Convolutional:
+  All pixels → All neurons   Small region → One neuron
   
-  Pseudocode:
+  [Image]                    [Image]
+    ↓↓↓↓                       ↓↓↓  (3×3 filter)
+  [Neurons]                  [Feature Map]
+  
+  Parameters: width × height  Parameters: filter_size²
+  (784 × 100 = 78,400)       (3 × 3 = 9, shared)
   ```
-  function CONV2D(image, kernel):
-      H = image.height; W = image.width
-      kH = kernel.height; kW = kernel.width
-      outH = H - kH + 1
-      outW = W - kW + 1
-      out = matrix(outH, outW, 0)
+
+  ---
+
+  **When to use CNNs vs. Fully-Connected Networks:**
+
+  **Use CNNs when:**
+  - ✓ **Spatial/temporal structure matters**: Images, videos, audio spectrograms
+  - ✓ **Translation invariance needed**: "Cat" anywhere in image should be detected
+  - ✓ **Local patterns sufficient**: Edges, textures, shapes build to objects
+  - ✓ **Large input dimensions**: 224×224×3 image = 150K inputs (too many parameters for FC)
+  - **Examples**: Image classification, object detection, segmentation, style transfer
+
+  **Use Fully-Connected when:**
+  - ✓ **No spatial structure**: Tabular data, feature vectors
+  - ✓ **Global relationships needed**: Each feature relates to all others
+  - ✓ **Small input dimensions**: Few features
+  - **Examples**: Structured data classification, embeddings, final classifier layers
+
+  **Why CNNs dominate vision:**
+  1. **Parameter efficiency**: Share weights → 1000× fewer parameters
+  2. **Translation invariance**: Detect patterns anywhere
+  3. **Hierarchical features**: Low-level → mid-level → high-level
+  4. **Inductive bias**: Exploit spatial locality
+
+  ---
+
+  **Key Components of CNNs:**
+
+  **1. Convolution Layer**
+
+  **Operation:** Slide a filter (kernel) across input, computing dot products
+
+  ```
+  Input: 28×28 image
+  Filter: 3×3 weights
+  
+  [i i i i i]     [w w w]
+  [i i i i i]  *  [w w w]  = one output value
+  [i i i i i]     [w w w]
+  [i i i i i]
+  
+  Slide filter across entire image → 26×26 output (if no padding)
+  ```
+
+  **Mathematics:**
+  ```
+  Output[i,j] = Σₐ Σᵦ Input[i+a, j+b] · Kernel[a,b] + bias
+  
+  With multiple channels:
+  Output[i,j,k] = Σ_c Σₐ Σᵦ Input[i+a, j+b, c] · Kernel[a,b,c,k] + bias[k]
+  ```
+
+  **Properties:**
+  - **Local connectivity**: Each output depends on small region
+  - **Weight sharing**: Same filter applied everywhere
+  - **Multiple filters**: Detect different features (edges, corners, textures)
+
+  **Example filters:**
+  - Horizontal edge: `[[-1,-1,-1], [0,0,0], [1,1,1]]`
+  - Vertical edge: `[[-1,0,1], [-1,0,1], [-1,0,1]]`
+  - Blur: `[[1,1,1], [1,1,1], [1,1,1]] / 9`
+
+  **2. Pooling Layer**
+
+  **Operation:** Downsample spatial dimensions by summarizing regions
+
+  **Max Pooling (most common):**
+  ```
+  2×2 window with stride 2:
+  
+  [1  3  2  4]      [3  4]
+  [5  6  7  8]  →   [8  9]
+  [4  2  9  1]
+  [0  1  3  2]
+  
+  Take maximum from each 2×2 block
+  ```
+
+  **Average Pooling:**
+  ```
+  [1  3  2  4]      [3.75  5.25]
+  [5  6  7  8]  →   [2.75  3.75]
+  [4  2  9  1]
+  [0  1  3  2]
+  ```
+
+  **Purpose:**
+  - **Reduce dimensions**: 28×28 → 14×14 (fewer parameters)
+  - **Translation invariance**: Small shifts don't change output
+  - **Broader receptive field**: Each neuron sees larger input region
+  - **Reduce overfitting**: Less capacity
+
+  **3. Activation Functions**
+
+  **ReLU (Rectified Linear Unit)** - standard choice:
+  ```
+  f(x) = max(0, x)
+  
+  ✓ Non-linear (enables learning complex patterns)
+  ✓ Computationally efficient
+  ✓ Mitigates vanishing gradient
+  ✗ "Dying ReLU" (neurons stuck at 0)
+  ```
+
+  **Applied after convolution:**
+  ```
+  Conv → ReLU → Pool
+  
+  x → Conv(x) → max(0, Conv(x)) → Pool(...)
+  ```
+
+  **Alternatives:**
+  - **Leaky ReLU**: f(x) = max(0.01x, x) - prevents dying
+  - **ELU**: Smooth for negative values
+  - **Sigmoid/Tanh**: Older, suffers from vanishing gradient
+
+  **4. Fully-Connected Layer (Classification Head)**
+
+  After convolutional/pooling layers, flatten and use FC layers for classification:
+  ```
+  Conv layers: Extract features
+  FC layers: Combine features for classification
+  
+  [Conv → Pool]ₙ → Flatten → FC → Softmax → Class probabilities
+  ```
+
+  ---
+
+  **Level 1: MNIST CNN Architecture and Analysis**
+
+  **MNIST Dataset:**
+  - 60,000 training images, 10,000 test images
+  - 28×28 grayscale images of handwritten digits (0-9)
+  - Task: Classify digit in image
+
+  **CNN Architecture (LeNet-inspired):**
+
+  ```
+  Input: 28×28×1 (grayscale image)
+         ↓
+  Conv1: 32 filters, 3×3, stride 1, padding 1
+         → 28×28×32
+         ↓
+  ReLU
+         ↓
+  MaxPool1: 2×2, stride 2
+         → 14×14×32
+         ↓
+  Conv2: 64 filters, 3×3, stride 1, padding 1
+         → 14×14×64
+         ↓
+  ReLU
+         ↓
+  MaxPool2: 2×2, stride 2
+         → 7×7×64 = 3136 features
+         ↓
+  Flatten
+         ↓
+  FC1: 3136 → 128 neurons
+         ↓
+  ReLU
+         ↓
+  Dropout (0.5)
+         ↓
+  FC2: 128 → 10 neurons
+         ↓
+  Softmax
+         ↓
+  Output: 10 probabilities (one per digit)
+  ```
+
+  ---
+
+  **Computing Number of Parameters:**
+
+  **Conv1 Layer:**
+  ```
+  Input: 28×28×1
+  Filters: 32 filters, each 3×3×1
+  
+  Parameters per filter: 3 × 3 × 1 = 9 weights + 1 bias = 10
+  Total parameters: 32 × 10 = 320
+  
+  Output shape: 28×28×32 (with padding='same')
+  Output values: 28 × 28 × 32 = 25,088 activations
+  ```
+
+  **MaxPool1 Layer:**
+  ```
+  Input: 28×28×32
+  Operation: 2×2 max, stride 2
+  
+  Parameters: 0 (no learnable parameters)
+  Output shape: 14×14×32
+  ```
+
+  **Conv2 Layer:**
+  ```
+  Input: 14×14×32
+  Filters: 64 filters, each 3×3×32
+  
+  Parameters per filter: 3 × 3 × 32 = 288 weights + 1 bias = 289
+  Total parameters: 64 × 289 = 18,496
+  
+  Output shape: 14×14×64
+  ```
+
+  **MaxPool2 Layer:**
+  ```
+  Input: 14×14×64
+  Parameters: 0
+  Output shape: 7×7×64 = 3,136 features
+  ```
+
+  **FC1 Layer:**
+  ```
+  Input: 3,136 features
+  Output: 128 neurons
+  
+  Parameters: 3,136 × 128 + 128 = 401,536
+  ```
+
+  **FC2 Layer:**
+  ```
+  Input: 128
+  Output: 10
+  
+  Parameters: 128 × 10 + 10 = 1,290
+  ```
+
+  **Total Parameters:**
+  ```
+  Conv1:    320
+  Conv2:    18,496
+  FC1:      401,536
+  FC2:      1,290
+  ───────────────
+  Total:    421,642 parameters
+  ```
+
+  **Compare with Fully-Connected:**
+  ```
+  FC from 28×28 to 128: 784 × 128 = 100,352
+  FC from 128 to 10: 128 × 10 = 1,280
+  Total: ~100K parameters (much less, but poor performance)
+  
+  CNN uses more parameters but much better structure!
+  ```
+
+  ---
+
+  **Receptive Field Analysis:**
+
+  **Receptive field**: Region of input that affects one output neuron
+
+  ```
+  Layer          | Output Size | Receptive Field
+  ───────────────|─────────────|────────────────
+  Input          | 28×28×1     | 1×1 (itself)
+  Conv1 (3×3)    | 28×28×32    | 3×3
+  Pool1 (2×2)    | 14×14×32    | 6×6
+  Conv2 (3×3)    | 14×14×64    | 10×10
+  Pool2 (2×2)    | 7×7×64      | 20×20
+  FC1            | 128         | 28×28 (full)
+  ```
+
+  **Calculation (simplified, stride=1):**
+  ```
+  RF_out = RF_in + (kernel_size - 1) × stride_product
+  
+  After Conv1: 1 + (3-1) × 1 = 3
+  After Pool1: 3 + (2-1) × 1 = 4... (doubles due to stride)
+  Actually: 3 × 2 = 6 (pool doubles receptive field)
+  After Conv2: 6 + (3-1) × 2 = 10
+  After Pool2: 10 × 2 = 20
+  ```
+
+  **Insight:** Deep networks progressively see larger regions, building hierarchical features
+
+  ---
+
+  **Training Demonstration:**
+
+  **Forward Pass Example:**
+  ```
+  Input: 28×28 image of digit "7"
+  
+  Conv1 (32 filters):
+  - Filter 1 detects horizontal edges → activates on top of "7"
+  - Filter 2 detects vertical edges → activates on right side of "7"
+  - Filter 3 detects diagonal → activates on diagonal stroke
+  - ... 29 more filters detect various low-level features
+  
+  Pool1: Downsample to 14×14×32
+  
+  Conv2 (64 filters):
+  - Filter 1 combines edges → detects "T-junction" (top of 7)
+  - Filter 2 combines edges → detects "diagonal stroke"
+  - ... 62 more filters detect mid-level patterns
+  
+  Pool2: Downsample to 7×7×64
+  
+  FC1: Combines all features → 128 abstract representations
+  
+  FC2: Maps to 10 classes → [0.01, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.89, 0.03, 0.02]
+                              └─────────────────────────────────────────────┘
+                              Class "7" has highest probability (0.89)
+  ```
+
+  **Loss Computation:**
+  ```
+  True label: y = 7 (one-hot: [0,0,0,0,0,0,0,1,0,0])
+  Predicted: ŷ = [0.01, 0.02, ..., 0.89, ...]
+  
+  Loss = CrossEntropy(ŷ, y) = -log(0.89) = 0.117
+  ```
+
+  **Backward Pass:**
+  - Compute gradients through FC layers (standard backprop)
+  - Backpropagate through pooling (route gradient to max location)
+  - Backpropagate through convolution (convolve gradient with transposed filter)
+  - Update filter weights via gradient descent
+
+  ---
+
+  **Level 2: Implementation**
+
+  ```python
+  import torch
+  import torch.nn as nn
+  import torch.nn.functional as F
+  import torch.optim as optim
+  from torchvision import datasets, transforms
+  from torch.utils.data import DataLoader
+  import matplotlib.pyplot as plt
+
+  class CNN(nn.Module):
+      def __init__(self):
+          super(CNN, self).__init__()
+          
+          # Convolutional layers
+          self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, 
+                                 kernel_size=3, padding=1)
+          self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, 
+                                 kernel_size=3, padding=1)
+          
+          # Pooling layer
+          self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+          
+          # Fully connected layers
+          self.fc1 = nn.Linear(64 * 7 * 7, 128)
+          self.fc2 = nn.Linear(128, 10)
+          
+          # Dropout for regularization
+          self.dropout = nn.Dropout(0.5)
       
-      for i in 0..outH-1:
-          for j in 0..outW-1:
-              s = 0
-              for a in 0..kH-1:
-                  for b in 0..kW-1:
-                      s += image[i+a][j+b] * kernel[a][b]
-              out[i][j] = s
-      return out
+      def forward(self, x):
+          # Conv1 + ReLU + Pool: 28x28x1 -> 14x14x32
+          x = self.pool(F.relu(self.conv1(x)))
+          
+          # Conv2 + ReLU + Pool: 14x14x32 -> 7x7x64
+          x = self.pool(F.relu(self.conv2(x)))
+          
+          # Flatten: 7x7x64 -> 3136
+          x = x.view(-1, 64 * 7 * 7)
+          
+          # FC1 + ReLU + Dropout
+          x = self.dropout(F.relu(self.fc1(x)))
+          
+          # FC2 (logits)
+          x = self.fc2(x)
+          
+          return x
+
+  def train_model(model, device, train_loader, optimizer, epoch):
+      """Train for one epoch."""
+      model.train()
+      train_loss = 0
+      correct = 0
+      total = 0
+      
+      for batch_idx, (data, target) in enumerate(train_loader):
+          data, target = data.to(device), target.to(device)
+          
+          # Zero gradients
+          optimizer.zero_grad()
+          
+          # Forward pass
+          output = model(data)
+          loss = F.cross_entropy(output, target)
+          
+          # Backward pass
+          loss.backward()
+          
+          # Update weights
+          optimizer.step()
+          
+          # Statistics
+          train_loss += loss.item()
+          pred = output.argmax(dim=1, keepdim=True)
+          correct += pred.eq(target.view_as(pred)).sum().item()
+          total += target.size(0)
+          
+          if batch_idx % 100 == 0:
+              print(f'Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)} '
+                    f'({100. * batch_idx / len(train_loader):.0f}%)]\t'
+                    f'Loss: {loss.item():.6f}')
+      
+      avg_loss = train_loss / len(train_loader)
+      accuracy = 100. * correct / total
+      return avg_loss, accuracy
+
+  def test_model(model, device, test_loader):
+      """Evaluate on test set."""
+      model.eval()
+      test_loss = 0
+      correct = 0
+      
+      with torch.no_grad():
+          for data, target in test_loader:
+              data, target = data.to(device), target.to(device)
+              output = model(data)
+              test_loss += F.cross_entropy(output, target, reduction='sum').item()
+              pred = output.argmax(dim=1, keepdim=True)
+              correct += pred.eq(target.view_as(pred)).sum().item()
+      
+      test_loss /= len(test_loader.dataset)
+      accuracy = 100. * correct / len(test_loader.dataset)
+      
+      print(f'\nTest set: Average loss: {test_loss:.4f}, '
+            f'Accuracy: {correct}/{len(test_loader.dataset)} ({accuracy:.2f}%)\n')
+      
+      return test_loss, accuracy
+
+  def visualize_predictions(model, device, test_loader, num_images=10):
+      """Visualize model predictions."""
+      model.eval()
+      images, labels = next(iter(test_loader))
+      images, labels = images[:num_images], labels[:num_images]
+      
+      with torch.no_grad():
+          outputs = model(images.to(device))
+          predictions = outputs.argmax(dim=1).cpu()
+      
+      fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+      for idx, ax in enumerate(axes.flat):
+          ax.imshow(images[idx].squeeze(), cmap='gray')
+          ax.set_title(f'True: {labels[idx]}, Pred: {predictions[idx]}')
+          ax.axis('off')
+      plt.tight_layout()
+      plt.show()
+
+  def main():
+      # Hyperparameters
+      batch_size = 64
+      learning_rate = 0.001
+      epochs = 10
+      
+      # Device configuration
+      device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+      print(f'Using device: {device}')
+      
+      # Data loading
+      transform = transforms.Compose([
+          transforms.ToTensor(),
+          transforms.Normalize((0.1307,), (0.3081,))  # MNIST mean and std
+      ])
+      
+      train_dataset = datasets.MNIST('./data', train=True, download=True,
+                                    transform=transform)
+      test_dataset = datasets.MNIST('./data', train=False,
+                                   transform=transform)
+      
+      train_loader = DataLoader(train_dataset, batch_size=batch_size,
+                               shuffle=True, num_workers=2)
+      test_loader = DataLoader(test_dataset, batch_size=batch_size,
+                              shuffle=False, num_workers=2)
+      
+      # Model, optimizer, scheduler
+      model = CNN().to(device)
+      optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+      scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
+      
+      # Print model architecture
+      print(model)
+      print(f'\nTotal parameters: {sum(p.numel() for p in model.parameters())}')
+      
+      # Training loop
+      train_losses = []
+      test_losses = []
+      train_accs = []
+      test_accs = []
+      
+      for epoch in range(1, epochs + 1):
+          train_loss, train_acc = train_model(model, device, train_loader, 
+                                              optimizer, epoch)
+          test_loss, test_acc = test_model(model, device, test_loader)
+          
+          train_losses.append(train_loss)
+          test_losses.append(test_loss)
+          train_accs.append(train_acc)
+          test_accs.append(test_acc)
+          
+          scheduler.step()
+      
+      # Plot training curves
+      fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+      
+      ax1.plot(train_losses, label='Train Loss')
+      ax1.plot(test_losses, label='Test Loss')
+      ax1.set_xlabel('Epoch')
+      ax1.set_ylabel('Loss')
+      ax1.set_title('Training and Test Loss')
+      ax1.legend()
+      ax1.grid(True)
+      
+      ax2.plot(train_accs, label='Train Accuracy')
+      ax2.plot(test_accs, label='Test Accuracy')
+      ax2.set_xlabel('Epoch')
+      ax2.set_ylabel('Accuracy (%)')
+      ax2.set_title('Training and Test Accuracy')
+      ax2.legend()
+      ax2.grid(True)
+      
+      plt.tight_layout()
+      plt.show()
+      
+      # Visualize predictions
+      visualize_predictions(model, device, test_loader)
+      
+      # Save model
+      torch.save(model.state_dict(), 'mnist_cnn.pth')
+      print('Model saved to mnist_cnn.pth')
+
+  if __name__ == '__main__':
+      main()
   ```
+
+  **Expected Output:**
+  ```
+  Using device: cuda
+  
+  CNN(
+    (conv1): Conv2d(1, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (conv2): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (fc1): Linear(in_features=3136, out_features=128, bias=True)
+    (fc2): Linear(in_features=128, out_features=10, bias=True)
+    (dropout): Dropout(p=0.5, inplace=False)
+  )
+  
+  Total parameters: 421642
+  
+  Train Epoch: 1 [0/60000 (0%)]    Loss: 2.304523
+  Train Epoch: 1 [6400/60000 (11%)]    Loss: 0.523091
+  ...
+  Test set: Average loss: 0.0512, Accuracy: 9837/10000 (98.37%)
+  
+  Train Epoch: 10 [0/60000 (0%)]    Loss: 0.012394
+  ...
+  Test set: Average loss: 0.0234, Accuracy: 9923/10000 (99.23%)
+  
+  Model saved to mnist_cnn.pth
+  ```
+
+  ---
+
+  **Level 3: Performance Analysis and Improvements**
+
+  **Baseline Performance:**
+  - Simple CNN: ~99% accuracy on MNIST
+  - Training time: ~2 minutes on GPU
+  - Parameters: ~420K
+
+  ---
+
+  **Techniques to Improve CNN Performance:**
+
+  **1. Data Augmentation**
+
+  **Purpose:** Artificially expand dataset with transformations, reduce overfitting
+
+  ```python
+  transform_train = transforms.Compose([
+      transforms.RandomRotation(10),        # Rotate ±10 degrees
+      transforms.RandomAffine(0, translate=(0.1, 0.1)),  # Shift
+      transforms.ToTensor(),
+      transforms.Normalize((0.1307,), (0.3081,))
+  ])
+  ```
+
+  **Common augmentations:**
+  - **Rotation**: Rotate images
+  - **Translation**: Shift horizontally/vertically
+  - **Scaling**: Zoom in/out
+  - **Flipping**: Horizontal/vertical flip (not for digits!)
+  - **Color jittering**: Brightness, contrast, saturation
+  - **Cutout**: Random rectangular masks
+  - **Mixup**: Blend two images
+
+  **Impact:** +1-2% accuracy, much better generalization
+
+  ---
+
+  **2. Dropout**
+
+  **Purpose:** Regularization by randomly dropping neurons during training
+
+  ```python
+  self.dropout1 = nn.Dropout(0.25)  # After conv layers
+  self.dropout2 = nn.Dropout(0.5)   # After FC layers
+  
+  x = self.dropout1(F.relu(self.conv2(x)))
+  x = self.dropout2(F.relu(self.fc1(x)))
+  ```
+
+  **How it works:**
+  - Training: Each neuron kept with probability p (e.g., 0.5)
+  - Testing: Use all neurons, scale by p
+  - Forces network to not rely on specific neurons
+  - Creates ensemble effect
+
+  **Impact:** Reduces overfitting, +0.5-1% test accuracy
+
+  ---
+
+  **3. Batch Normalization**
+
+  **Purpose:** Normalize layer inputs, stabilize training
+
+  ```python
+  self.bn1 = nn.BatchNorm2d(32)
+  self.bn2 = nn.BatchNorm2d(64)
+  
+  x = self.bn1(F.relu(self.conv1(x)))
+  x = self.bn2(F.relu(self.conv2(x)))
+  ```
+
+  **Mathematics:**
+  ```
+  x̂ = (x - μ_batch) / √(σ²_batch + ε)
+  y = γ·x̂ + β  (learnable scale and shift)
+  ```
+
+  **Benefits:**
+  - Reduces internal covariate shift
+  - Allows higher learning rates (10× faster training)
+  - Reduces sensitivity to initialization
+  - Acts as regularization (slight noise from batch statistics)
+
+  **Impact:** 2-5× faster convergence, +0.5-1% accuracy
+
+  ---
+
+  **4. Better Architectures**
+
+  **Modern patterns:**
+
+  **Deeper networks:**
+  ```
+  [Conv-Conv-Pool] × 3 → FC → Softmax
+  
+  More depth = more hierarchical features
+  ```
+
+  **Residual connections (ResNet):**
+  ```
+  x_out = F.relu(Conv(x) + x)  # Skip connection
+  
+  Enables training very deep networks (100+ layers)
+  ```
+
+  **Inception modules:**
+  ```
+  Parallel paths: 1×1, 3×3, 5×5 convolutions
+  Concatenate outputs
+  Multi-scale feature extraction
+  ```
+
+  **Impact:** Modern architectures reach 99.7%+ on MNIST
+
+  ---
+
+  **5. Advanced Optimization**
+
+  **Learning rate scheduling:**
+  ```python
+  # Reduce LR when training plateaus
+  scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+      optimizer, mode='min', factor=0.5, patience=2
+  )
+  ```
+
+  **Better optimizers:**
+  ```python
+  # Adam with weight decay (AdamW)
+  optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.01)
+  ```
+
+  **Gradient clipping:**
+  ```python
+  torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+  ```
+
+  **Impact:** More stable training, faster convergence
+
+  ---
+
+  **6. Ensemble Methods**
+
+  **Train multiple models, average predictions:**
+  ```python
+  predictions = []
+  for model in models:
+      pred = model(x)
+      predictions.append(pred)
+  
+  final_pred = torch.stack(predictions).mean(dim=0)
+  ```
+
+  **Impact:** +0.5-1% accuracy (expensive)
+
+  ---
+
+  **Performance Comparison:**
+
+  | Technique | MNIST Accuracy | Training Time |
+  |-----------|---------------|---------------|
+  | Baseline CNN | 98.5% | 2 min |
+  | + Data Aug | 98.8% | 3 min |
+  | + Dropout | 99.0% | 2 min |
+  | + BatchNorm | 99.2% | 1.5 min |
+  | + Deeper (4 conv) | 99.4% | 3 min |
+  | + All techniques | 99.6% | 4 min |
+  | State-of-art ensemble | 99.77% | 30 min |
+
+  ---
+
+  **Common Pitfalls and Solutions:**
+
+  **Problem 1: Overfitting**
+  - Symptoms: Train acc >> Test acc
+  - Solutions: Dropout, data augmentation, early stopping, L2 regularization
+
+  **Problem 2: Underfitting**
+  - Symptoms: Both train and test acc low
+  - Solutions: Deeper network, more filters, train longer, higher learning rate
+
+  **Problem 3: Slow convergence**
+  - Solutions: Batch normalization, better optimizer (Adam), learning rate scheduling
+
+  **Problem 4: Vanishing gradients**
+  - Solutions: ReLU activation, batch normalization, residual connections
+
+  **Problem 5: Exploding gradients**
+  - Solutions: Gradient clipping, lower learning rate, batch normalization
+
+  ---
+
+  **Conclusion:**
+
+  CNNs revolutionized computer vision by:
+  1. **Local connectivity** - exploit spatial structure
+  2. **Weight sharing** - translation invariance + parameter efficiency
+  3. **Hierarchical features** - low → mid → high level patterns
+
+  For MNIST, a simple CNN achieves 99%+ accuracy. Modern architectures (ResNet, EfficientNet) with proper training techniques achieve near-perfect performance (99.77%+).
+
+  The same principles apply to more complex tasks: ImageNet classification (1000 classes), object detection (YOLO, Faster R-CNN), semantic segmentation (U-Net), and even beyond vision (audio, time series, NLP with 1D convolutions).
 topics:
   - "Convolution"
   - "CNNs"

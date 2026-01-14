@@ -2,15 +2,15 @@ id: "m2-8queens-objective"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement a simple multi-agent system**
+  **Implement the famous sugar scape multi-agent system**
 
-  **Level 0**  Discuss the concept of agents and environments.  Give examples of different types of agents (simple reflex, model-based, goal-based, utility-based) and environments (fully/partially observable, deterministic/stochastic, episodic/sequential). 
+  **Level 0**  Discuss the philosophical significance of agents and environments.  What is "intelligence"?  What is "artificial intelligence"?
+  
+  **Level 1**  Describe the famous sugar scape multi-agent system.  What are the agents, the environment, and the rules?  How do the agents interact with each other and the environment?  What kinds of "emergent behaviors" arise?
 
-  **Level 1**  Give some examples of famous multi-agent systems, or modifications thereof, that illustrate the above concepts.
+  **Level 2**  Implement sugar scape in a language of your choice.  Simulate the system and observe the emergent behaviors.  How do different parameters (e.g., initial distribution of sugar, agent metabolism, vision range) affect the outcomes?
 
-  **Level 2**  Implement a simple multi-agent system in a language of your choice.
-
-  **Level 3**  ...
+  **Level 3**  In what ways could the agents be improved to make them more intelligent (from simple reflex, to: model-based, goal-based, utility-based)?  How might the key topics of this course (search, optimization, constraint satisfaction, adversarial reasoning, logical inference, probabilistic reasoning, and learning) serve to raise the "intelligence level" of these agents?  How intelligent do agents have to be for the system to be interesting?
 answer: |
 topics:
   - "Agents"

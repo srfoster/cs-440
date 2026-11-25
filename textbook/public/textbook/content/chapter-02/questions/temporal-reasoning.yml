@@ -2,7 +2,7 @@ id: "m6-temporal-reasoning"
 type: "short-answer"
 chapter: 3
 question: |
-  **Track a disease outbreak over time using Hidden Markov Models and particle filtering.**
+  **Use Bayesian probability networks with temporal reasoning to determine infection patterns in a social network.**  (Or the non network version is probably easier?)
 
   An infectious disease spreads through a city. Day 0: 100 infected. Each day, infected individuals recover (20% rate) or infect others (each infects 0.3 new people on average). You observe hospital admissions (proxy for infections), but noisy: not all infected go to hospital (only 10%), and some admissions are other illnesses. Task: estimate true number of infected at day t given hospital data. This is temporal probabilistic reasoning: state Xᵗ (true infected count) evolves via dynamics, observations Eᵗ (hospital admissions) provide noisy evidence. Hidden Markov Model captures this: Xᵗ depends on Xᵗ₋₁ (transition model), Eᵗ depends on Xᵗ (observation model). Filtering computes P(Xᵗ|e₁:ᵗ). This matters for epidemic response: policymakers need real-time estimates of infection counts to decide interventions (lockdowns, vaccinations), but observations are delayed and noisy.
 

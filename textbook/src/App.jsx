@@ -68,7 +68,7 @@ function AppContent() {
         <div className="header-content">
           <div className="header-title">
             <h1>CS440: Artificial Intelligence</h1>
-            <p>Exploring intelligent agents, search algorithms, and machine learning</p>
+            <p>Intelligent agents: search, reasoning, and learning</p>
           </div>
           <nav className="main-nav">
             <Link to="/textbook" className={`nav-link ${location.pathname.startsWith('/textbook') ? 'active' : ''}`}>

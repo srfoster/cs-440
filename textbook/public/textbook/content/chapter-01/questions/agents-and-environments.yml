@@ -2,18 +2,19 @@ id: "m2-8queens-objective"
 type: "short-answer"
 chapter: 1
 question: |
-  **Implement the famous sugar scape multi-agent system**
+  **What is "artificial intelligence"?**
 
-  **Level 0**  Discuss the philosophical significance of agents and environments.  What is "intelligence"?  What is "artificial intelligence"?
+  **Level 0**  Give a brief history of AI, from its philosophical roots to large language models.  Discuss how the word "AI" has changed over time, and how it is used in different contexts today.  
+
+  **Level 1**  This course has three chapters: Search, Reasoning, and Learning.  Discuss each of these ideas, and unpack them into their subtopics.  For each subtopic, give a brief description and example problem, and say how it matters in the modern context (either in AI or in the larger context of computer science). 
+
+  **Level 2**  In a language of your choice, implement a simple system with an agent and an environment.  Run the system to demonstrate what the agent does.
   
-  **Level 1**  Describe the famous sugar scape multi-agent system.  What are the agents, the environment, and the rules?  How do the agents interact with each other and the environment?  What kinds of "emergent behaviors" arise?
-
-  **Level 2**  Implement sugar scape in a language of your choice.  Simulate the system and observe the emergent behaviors.  How do different parameters (e.g., initial distribution of sugar, agent metabolism, vision range) affect the outcomes?
-
-  **Level 3**  In what ways could the agents be improved to make them more intelligent (from simple reflex, to: model-based, goal-based, utility-based)?  How might the key topics of this course (search, optimization, constraint satisfaction, adversarial reasoning, logical inference, probabilistic reasoning, and learning) serve to raise the "intelligence level" of these agents?  How intelligent do agents have to be for the system to be interesting?
+  **Level 3**  For each of the topics in the course, discuss how they could be used to improve the intelligence of the agent you implemented and what changes in the environment would necessitate those improvements.  
 answer: |
 topics:
   - "Agents"
   - "Environments"
 example_videos:
-  - "https://www.youtube.com/watch?v=xouin83ebxE"
+  - "https://youtu.be/KBf7QCtZdcA"
+  - "https://youtu.be/QqlbLlnyL6o"

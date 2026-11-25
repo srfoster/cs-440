@@ -69,4 +69,8 @@ Navigate to the module content using the navigation panel on the left. Each modu
 - **Video resources** for visual learners
 - **Hands-on coding exercises** to implement AI algorithms
 
+## External Resources
+
+- [Artificial Intelligence: A Modern Approach (PDF)](https://people.engr.tamu.edu/guni/csce625/slides/AI.pdf) - Comprehensive AI textbook slides
+
 Good luck with your AI journey!
